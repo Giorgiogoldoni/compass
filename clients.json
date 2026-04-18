@@ -1,0 +1,22 @@
+{
+  "clients": [
+    {"id":"ClienteC1","nome":"Cliente C1","livello":"C1","capitale":0,"pac_mensile":0,"modalita":"unica","data_apertura":"","note":"","portafoglio":[]},
+    {"id":"ClienteC2","nome":"Cliente C2","livello":"C2","capitale":0,"pac_mensile":0,"modalita":"unica","data_apertura":"","note":"","portafoglio":[]},
+    {"id":"ClienteC3","nome":"Cliente C3","livello":"C3","capitale":0,"pac_mensile":0,"modalita":"unica","data_apertura":"","note":"","portafoglio":[]},
+    {"id":"ClienteC4","nome":"Cliente C4","livello":"C4","capitale":0,"pac_mensile":0,"modalita":"unica","data_apertura":"","note":"","portafoglio":[]},
+    {"id":"ClienteC5","nome":"Cliente C5","livello":"C5","capitale":0,"pac_mensile":0,"modalita":"unica","data_apertura":"","note":"","portafoglio":[]},
+    {"id":"ClienteC6","nome":"Cliente C6","livello":"C6","capitale":0,"pac_mensile":0,"modalita":"unica","data_apertura":"","note":"","portafoglio":[]},
+    {"id":"ClienteC7","nome":"Cliente C7","livello":"C7","capitale":0,"pac_mensile":0,"modalita":"unica","data_apertura":"","note":"","portafoglio":[]},
+    {"id":"ClienteC8","nome":"Cliente C8","livello":"C8","capitale":0,"pac_mensile":0,"modalita":"unica","data_apertura":"","note":"","portafoglio":[]},
+    {"id":"ClienteC9","nome":"Cliente C9","livello":"C9","capitale":0,"pac_mensile":0,"modalita":"unica","data_apertura":"","note":"","portafoglio":[]},
+    {"id":"ClienteA1","nome":"Cliente A1","livello":"A1","capitale":0,"pac_mensile":0,"modalita":"unica","data_apertura":"","note":"","portafoglio":[]},
+    {"id":"ClienteA2","nome":"Cliente A2","livello":"A2","capitale":0,"pac_mensile":0,"modalita":"unica","data_apertura":"","note":"","portafoglio":[]},
+    {"id":"ClienteA3","nome":"Cliente A3","livello":"A3","capitale":0,"pac_mensile":0,"modalita":"unica","data_apertura":"","note":"","portafoglio":[]},
+    {"id":"ClienteA4","nome":"Cliente A4","livello":"A4","capitale":0,"pac_mensile":0,"modalita":"unica","data_apertura":"","note":"","portafoglio":[]},
+    {"id":"ClienteA5","nome":"Cliente A5","livello":"A5","capitale":0,"pac_mensile":0,"modalita":"unica","data_apertura":"","note":"","portafoglio":[]},
+    {"id":"ClienteA6","nome":"Cliente A6","livello":"A6","capitale":0,"pac_mensile":0,"modalita":"unica","data_apertura":"","note":"","portafoglio":[]},
+    {"id":"ClienteA7","nome":"Cliente A7","livello":"A7","capitale":0,"pac_mensile":0,"modalita":"unica","data_apertura":"","note":"","portafoglio":[]},
+    {"id":"ClienteA8","nome":"Cliente A8","livello":"A8","capitale":0,"pac_mensile":0,"modalita":"unica","data_apertura":"","note":"","portafoglio":[]},
+    {"id":"ClienteA9","nome":"Cliente A9","livello":"A9","capitale":0,"pac_mensile":0,"modalita":"unica","data_apertura":"","note":"","portafoglio":[]}
+  ]
+}
