@@ -1,0 +1,148 @@
+{
+  "levels": [
+    {
+      "id":"C1","nome":"Monetario Cedola","tipo":"Dist","colore":"#16A34A",
+      "alloc":{"monetario":100,"obbligaz":0,"hy":0,"azionario":0},
+      "obiettivo":"Liquidità protetta con flusso cedolare",
+      "cliente_tipo":"Pensionato o liquidità parcheggio",
+      "rendimento_atteso":3.2,"var_pct":1.0,"n_etf_max":3,
+      "etf_pool":["XEON.MI","SMART.MI","IU0E.MI","XEOD.MI","ERNX.MI"]
+    },
+    {
+      "id":"C2","nome":"Monetario+ Cedola","tipo":"Dist","colore":"#22C55E",
+      "alloc":{"monetario":70,"obbligaz":30,"hy":0,"azionario":0},
+      "obiettivo":"Rendimento minimo con cedola",
+      "cliente_tipo":"Conservativo con reddito",
+      "rendimento_atteso":3.4,"var_pct":2.5,"n_etf_max":4,
+      "etf_pool":["XEON.MI","SMART.MI","XEOD.MI","IBTE.MI","SXRM.MI","GOM.MI"]
+    },
+    {
+      "id":"C3","nome":"Conservativo Cedola","tipo":"Dist","colore":"#84CC16",
+      "alloc":{"monetario":40,"obbligaz":55,"hy":0,"azionario":5},
+      "obiettivo":"Reddito stabile bassa volatilità",
+      "cliente_tipo":"Reddito fisso prioritario",
+      "rendimento_atteso":3.8,"var_pct":5.0,"n_etf_max":5,
+      "etf_pool":["XEON.MI","SMART.MI","IBTE.MI","SXRM.MI","EUNH.MI","GOM.MI","IBTM.MI","AGGH.MI","PHAU.MI","SGLN.MI","VHYL.MI","IDVY.MI"]
+    },
+    {
+      "id":"C4","nome":"Moderato Cedola","tipo":"Dist","colore":"#EAB308",
+      "alloc":{"monetario":20,"obbligaz":55,"hy":5,"azionario":20},
+      "obiettivo":"Reddito + crescita lieve",
+      "cliente_tipo":"Rischio basso con flusso cedolare",
+      "rendimento_atteso":4.5,"var_pct":8.0,"n_etf_max":5,
+      "etf_pool":["XEON.MI","SMART.MI","SXRM.MI","EUNH.MI","AGGH.MI","2B70.MI","SXRV.MI","IHYU.MI","EUHI.MI","VHYL.MI","IDVY.MI","FGEQ.MI","IPRP.MI","IWDP.MI","ESGE.MI"]
+    },
+    {
+      "id":"C5","nome":"Bilanciato Cedola","tipo":"Dist","colore":"#F97316",
+      "alloc":{"monetario":10,"obbligaz":45,"hy":5,"azionario":40},
+      "obiettivo":"Equilibrio cedola e crescita",
+      "cliente_tipo":"Bilanciato con income",
+      "rendimento_atteso":5.2,"var_pct":12.0,"n_etf_max":6,
+      "etf_pool":["XEON.MI","SMART.MI","AGGH.MI","SEMB.MI","IHYU.MI","EUHI.MI","VHYL.MI","IDVY.MI","FGEQ.MI","TDIV.MI","EUDV.MI","IUSA.MI","IPRP.MI","IWDP.MI","MEUD.MI","ESGE.MI","PHAU.MI"]
+    },
+    {
+      "id":"C6","nome":"Bilanciato+ Cedola","tipo":"Dist","colore":"#EF4444",
+      "alloc":{"monetario":5,"obbligaz":35,"hy":10,"azionario":50},
+      "obiettivo":"Crescita con flusso cedolare",
+      "cliente_tipo":"Dinamico con reddito",
+      "rendimento_atteso":5.8,"var_pct":15.0,"n_etf_max":6,
+      "etf_pool":["SMART.MI","SEMB.MI","IHYU.MI","EUHI.MI","STHE.MI","HYLD.MI","VHYL.MI","IDVY.MI","FGEQ.MI","TDIV.MI","EUDV.MI","EMDV.MI","DHS.MI","IUSA.MI","WENT.MI","MEUD.MI","IPRP.MI","IWDP.MI","RARE.MI","COPA.MI","ICOM.MI"]
+    },
+    {
+      "id":"C7","nome":"Dinamico Cedola","tipo":"Dist","colore":"#DC2626",
+      "alloc":{"monetario":0,"obbligaz":20,"hy":10,"azionario":70},
+      "obiettivo":"Crescita prevalente con dividendi",
+      "cliente_tipo":"Crescita con flusso",
+      "rendimento_atteso":6.5,"var_pct":18.0,"n_etf_max":6,
+      "etf_pool":["IHYU.MI","EUHI.MI","STHE.MI","HYLD.MI","VHYL.MI","IDVY.MI","TDIV.MI","EUDV.MI","EMDV.MI","DHS.MI","IUSA.MI","VUSA.MI","WENT.MI","MEUD.MI","IPRP.MI","IWDP.MI","IFFF.MI","DFNS.MI","WSPE.MI","WSPX.MI","WS5X.MI","PHAU.MI"]
+    },
+    {
+      "id":"C8","nome":"Azionario Cedola","tipo":"Dist","colore":"#9F1239",
+      "alloc":{"monetario":0,"obbligaz":5,"hy":5,"azionario":90},
+      "obiettivo":"Azionario con dividendi elevati",
+      "cliente_tipo":"Growth income",
+      "rendimento_atteso":7.0,"var_pct":22.0,"n_etf_max":5,
+      "etf_pool":["IHYU.MI","VHYL.MI","IDVY.MI","DHS.MI","IUSA.MI","VUSA.MI","WENT.MI","DFNS.MI","IPRP.MI","IWDP.MI","IFFF.MI","WSPE.MI","WSPX.MI","WWRD.MI","JPNH.MI"]
+    },
+    {
+      "id":"C9","nome":"Trading Cedola","tipo":"Dist","colore":"#6D28D9",
+      "alloc":{"monetario":0,"obbligaz":0,"hy":0,"azionario":100},
+      "obiettivo":"Azionario attivo ETP con income",
+      "cliente_tipo":"Trader attivo con income",
+      "rendimento_atteso":8.5,"var_pct":28.0,"n_etf_max":4,
+      "etf_pool":["IUSA.MI","VUSA.MI","DHS.MI","DFNS.MI","WWRD.MI","WSPE.MI","WSPX.MI","WS5X.MI","2LVE.MI","L2SP.MI","EXSH.DE","QNTM.MI"]
+    },
+    {
+      "id":"A1","nome":"Monetario Acc","tipo":"Acc","colore":"#0EA5E9",
+      "alloc":{"monetario":100,"obbligaz":0,"hy":0,"azionario":0},
+      "obiettivo":"Liquidità reinvestita automaticamente",
+      "cliente_tipo":"Risparmio breve termine",
+      "rendimento_atteso":3.2,"var_pct":1.0,"n_etf_max":3,
+      "etf_pool":["XEON.MI","IU0E.MI","ERNX.MI"]
+    },
+    {
+      "id":"A2","nome":"Monetario+ Acc","tipo":"Acc","colore":"#38BDF8",
+      "alloc":{"monetario":70,"obbligaz":30,"hy":0,"azionario":0},
+      "obiettivo":"Rendimento composto minimale",
+      "cliente_tipo":"Prudente lungo termine PAC",
+      "rendimento_atteso":3.4,"var_pct":2.5,"n_etf_max":4,
+      "etf_pool":["XEON.MI","IU0E.MI","ERNX.MI","IBTE.MI","IEAG.MI","GOM.MI","IBTM.MI"]
+    },
+    {
+      "id":"A3","nome":"Conservativo Acc","tipo":"Acc","colore":"#7DD3FC",
+      "alloc":{"monetario":40,"obbligaz":55,"hy":0,"azionario":5},
+      "obiettivo":"Crescita prudente composta",
+      "cliente_tipo":"PAC conservativo lungo termine",
+      "rendimento_atteso":3.8,"var_pct":5.0,"n_etf_max":5,
+      "etf_pool":["XEON.MI","IU0E.MI","IBTE.MI","IEAC.MI","IEAG.MI","GOM.MI","IBTM.MI","IGLO.MI","VAGE.MI","PHAU.MI","SGLN.MI","ESGE.MI","SUSW.MI"]
+    },
+    {
+      "id":"A4","nome":"Moderato Acc","tipo":"Acc","colore":"#6366F1",
+      "alloc":{"monetario":20,"obbligaz":55,"hy":5,"azionario":20},
+      "obiettivo":"Bilanciato con capitalizzazione",
+      "cliente_tipo":"PAC moderato",
+      "rendimento_atteso":4.5,"var_pct":8.0,"n_etf_max":5,
+      "etf_pool":["XEON.MI","IU0E.MI","IEAC.MI","IEAG.MI","IGLO.MI","VAGE.MI","XUCS.MI","HYLD.MI","XREA.MI","REET.MI","ESGE.MI","SUSW.MI","PHAU.MI","SGLN.MI"]
+    },
+    {
+      "id":"A5","nome":"Bilanciato Acc","tipo":"Acc","colore":"#8B5CF6",
+      "alloc":{"monetario":10,"obbligaz":45,"hy":5,"azionario":40},
+      "obiettivo":"Crescita bilanciata composta",
+      "cliente_tipo":"PAC bilanciato",
+      "rendimento_atteso":5.2,"var_pct":12.0,"n_etf_max":6,
+      "etf_pool":["XEON.MI","IU0E.MI","IGLO.MI","VAGE.MI","XUTC.MI","EMBE.MI","HYLD.MI","JNHD.MI","SWDA.MI","VWCE.DE","XREA.MI","REET.MI","ESGE.MI","SUSW.MI","NTSG.MI","PHAU.MI"]
+    },
+    {
+      "id":"A6","nome":"Bilanciato+ Acc","tipo":"Acc","colore":"#A855F7",
+      "alloc":{"monetario":5,"obbligaz":35,"hy":10,"azionario":50},
+      "obiettivo":"Crescita moderata alta efficienza",
+      "cliente_tipo":"Efficient Core mix",
+      "rendimento_atteso":5.8,"var_pct":15.0,"n_etf_max":6,
+      "etf_pool":["EMBE.MI","HYLD.MI","JNHD.MI","DHYA.MI","EUHA.MI","SWDA.MI","VWCE.DE","CSPX.MI","XDWT.MI","EXXW.DE","NTSX.MI","NTSG.MI","NTSZ.MI","RARE.MI","AIGA.MI","CMOD.MI","PHAU.MI","COPA.MI"]
+    },
+    {
+      "id":"A7","nome":"Dinamico Acc","tipo":"Acc","colore":"#C026D3",
+      "alloc":{"monetario":0,"obbligaz":20,"hy":10,"azionario":70},
+      "obiettivo":"Crescita alta composta",
+      "cliente_tipo":"Crescita aggressiva",
+      "rendimento_atteso":6.5,"var_pct":18.0,"n_etf_max":6,
+      "etf_pool":["HYLD.MI","JNHD.MI","DHYA.MI","EUHA.MI","SWDA.MI","VWCE.DE","CSPX.MI","XDWT.MI","IS3N.MI","VAPX.MI","JPNH.MI","NTSX.MI","NTSG.MI","NTSZ.MI","WSPE.MI","WSPX.MI","WS5X.MI","AIGA.MI","CMOD.MI","PHAU.MI","COPA.MI"]
+    },
+    {
+      "id":"A8","nome":"Azionario Acc","tipo":"Acc","colore":"#DB2777",
+      "alloc":{"monetario":0,"obbligaz":5,"hy":5,"azionario":90},
+      "obiettivo":"Massima crescita composta",
+      "cliente_tipo":"Long term wealth building",
+      "rendimento_atteso":7.0,"var_pct":22.0,"n_etf_max":5,
+      "etf_pool":["HYLD.MI","SWDA.MI","VWCE.DE","CSPX.MI","EQQQ.MI","IUIT.MI","XDWT.MI","EXX5.DE","EXV1.DE","IS3N.MI","VAPX.MI","DFNS.MI","XAIX.MI","SMH.MI","IFFF.MI","NTSX.MI","NTSG.MI","WRTY.MI","WWRD.MI","WSPE.MI","SILVER.MI","COPA.MI"]
+    },
+    {
+      "id":"A9","nome":"Trading Acc","tipo":"Acc","colore":"#E11D48",
+      "alloc":{"monetario":0,"obbligaz":0,"hy":0,"azionario":100},
+      "obiettivo":"Azionario attivo Efficient Core",
+      "cliente_tipo":"Trader attivo accumulo",
+      "rendimento_atteso":9.0,"var_pct":30.0,"n_etf_max":4,
+      "etf_pool":["SWDA.MI","CSPX.MI","EQQQ.MI","DFNS.MI","XAIX.MI","SMH.MI","NTSX.MI","WRTY.MI","WWRD.MI","WSPE.MI","WSPX.MI","WS5X.MI","L2SP.MI","2LVE.MI","UC44.MI","2NVD.MI","2TSL.MI","2AAP.MI","2AMZ.MI","3USL.MI","3EUL.MI","QQQ3.MI","3NVD.MI","3TSL.MI","3MSF.MI","GLD3.MI","5MVW.MI","3SUE.MI","EXSH.DE","QNTM.MI"]
+    }
+  ]
+}
