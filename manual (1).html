@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>COMPASS — Manuale Advisor</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;0,9..144,700;1,9..144,300&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F5F3EE;--surface:#FAFAF7;--navy:#0A1628;--navy2:#122040;
+  --gold:#C9A84C;--gold2:#E8C96A;--text:#1A1A2A;--text2:#6B7280;
+  --border:#E2DDD6;--border2:#EDE9E2;
+  --green:#16A34A;--green-bg:#DCFCE7;--green-bd:#86EFAC;
+  --red:#DC2626;--red-bg:#FEE2E2;
+  --blue:#1D4ED8;--blue-bg:#DBEAFE;
+  --shadow:0 2px 8px rgba(10,22,40,.07);
+  --radius:12px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'DM Mono',monospace;background:var(--bg);color:var(--text);min-height:100vh;}
+button{font-family:'DM Mono',monospace;cursor:pointer;border:none;background:none;}
+a{color:var(--blue);text-decoration:none;}
+
+/* NAVBAR */
+.navbar{background:var(--navy);height:54px;display:flex;align-items:center;padding:0 24px;gap:16px;position:sticky;top:0;z-index:200;box-shadow:0 2px 20px rgba(0,0,0,.25);}
+.brand{display:flex;align-items:center;gap:10px;}
+.brand-compass{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--gold),var(--gold2));display:flex;align-items:center;justify-content:center;font-size:16px;}
+.brand-name{font-family:'Fraunces',serif;font-size:16px;font-weight:600;color:#fff;}
+.brand-sub{font-size:9px;color:rgba(255,255,255,.35);letter-spacing:2px;text-transform:uppercase;}
+.nav-right{margin-left:auto;display:flex;align-items:center;gap:8px;}
+.nav-btn{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);color:rgba(255,255,255,.6);font-size:10px;padding:5px 14px;border-radius:20px;text-decoration:none;}
+.nav-btn:hover{background:rgba(255,255,255,.12);color:#fff;}
+.print-btn{background:var(--gold);color:var(--navy);font-size:10px;padding:6px 16px;border-radius:20px;font-weight:500;}
+
+/* LAYOUT */
+.layout{display:grid;grid-template-columns:240px 1fr;min-height:calc(100vh - 54px);max-width:1200px;margin:0 auto;}
+
+/* SIDEBAR NAV */
+.sidenav{padding:20px 12px;border-right:1px solid var(--border);position:sticky;top:54px;height:calc(100vh - 54px);overflow-y:auto;}
+.sidenav::-webkit-scrollbar{width:2px;}
+.sidenav::-webkit-scrollbar-thumb{background:var(--border);}
+.sn-section{font-size:8px;letter-spacing:2px;color:var(--text2);text-transform:uppercase;padding:12px 8px 4px;border-top:1px solid var(--border);margin-top:8px;}
+.sn-section:first-child{border-top:none;margin-top:0;padding-top:0;}
+.sn-item{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:8px;cursor:pointer;font-size:10px;color:var(--text2);transition:all .12s;border:1px solid transparent;}
+.sn-item:hover{background:var(--surface);border-color:var(--border);color:var(--text);}
+.sn-item.active{background:var(--navy);color:#fff;border-color:var(--navy);}
+.sn-num{width:18px;height:18px;border-radius:50%;background:rgba(201,168,76,.15);color:var(--gold);font-size:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-weight:500;}
+.sn-item.active .sn-num{background:rgba(255,255,255,.15);color:#fff;}
+
+/* CONTENT */
+.content{padding:32px 40px;max-width:800px;}
+
+/* SECTION */
+.section{display:none;animation:fadeIn .2s ease;}
+.section.active{display:block;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+
+/* HERO */
+.section-hero{background:var(--navy);border-radius:var(--radius);padding:24px 28px;margin-bottom:24px;color:#fff;}
+.sh-num{font-size:9px;color:rgba(255,255,255,.3);letter-spacing:2px;text-transform:uppercase;margin-bottom:6px;}
+.sh-title{font-family:'Fraunces',serif;font-size:22px;font-weight:300;color:#fff;margin-bottom:6px;}
+.sh-title span{color:var(--gold2);}
+.sh-sub{font-size:10px;color:rgba(255,255,255,.4);line-height:1.7;}
+
+/* TYPOGRAPHY */
+h2{font-family:'Fraunces',serif;font-size:18px;font-weight:600;color:var(--navy);margin:24px 0 10px;}
+h3{font-size:12px;font-weight:500;color:var(--navy);margin:18px 0 8px;letter-spacing:.5px;text-transform:uppercase;}
+p{font-size:11px;color:var(--text2);line-height:1.9;margin-bottom:10px;}
+ul,ol{font-size:11px;color:var(--text2);line-height:2;padding-left:20px;margin-bottom:12px;}
+li{margin-bottom:2px;}
+strong{color:var(--text);font-weight:500;}
+code{background:var(--navy);color:var(--gold2);padding:2px 7px;border-radius:4px;font-size:10px;}
+
+/* CARDS */
+.info-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px 18px;margin-bottom:12px;box-shadow:var(--shadow);}
+.info-card.gold{border-left:4px solid var(--gold);}
+.info-card.green{border-left:4px solid var(--green);}
+.info-card.red{border-left:4px solid var(--red);}
+.info-card.blue{border-left:4px solid var(--blue);}
+.ic-title{font-size:10px;font-weight:500;letter-spacing:.5px;text-transform:uppercase;margin-bottom:8px;color:var(--text);}
+.ic-body{font-size:11px;color:var(--text2);line-height:1.8;}
+
+/* STEP */
+.steps{display:flex;flex-direction:column;gap:12px;margin:14px 0;}
+.step{display:flex;gap:14px;align-items:flex-start;}
+.step-num{width:28px;height:28px;border-radius:50%;background:var(--navy);color:#fff;font-size:10px;font-weight:500;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;}
+.step-body{flex:1;}
+.step-title{font-size:11px;font-weight:500;color:var(--navy);margin-bottom:4px;}
+.step-desc{font-size:10px;color:var(--text2);line-height:1.8;}
+
+/* TABLE */
+.tbl{width:100%;border-collapse:collapse;margin:14px 0;font-size:10px;}
+.tbl thead th{background:var(--navy);color:rgba(255,255,255,.7);padding:9px 12px;text-align:left;font-size:9px;letter-spacing:.8px;text-transform:uppercase;}
+.tbl tbody tr{border-bottom:1px solid var(--border2);}
+.tbl tbody tr:hover{background:var(--surface);}
+.tbl td{padding:9px 12px;color:var(--text2);vertical-align:top;}
+.tbl td:first-child{font-weight:500;color:var(--text);}
+
+/* BADGE */
+.badge{display:inline-block;font-size:8px;padding:2px 8px;border-radius:10px;font-weight:500;border:1px solid;}
+.badge-green{background:var(--green-bg);color:var(--green);border-color:var(--green-bd);}
+.badge-gold{background:#FEF3C7;color:#92400E;border-color:#FCD34D;}
+.badge-red{background:var(--red-bg);color:var(--red);border-color:#FCA5A5;}
+.badge-blue{background:var(--blue-bg);color:var(--blue);border-color:#93C5FD;}
+
+/* FLOW */
+.flow{background:var(--navy);border-radius:var(--radius);padding:16px 18px;margin:14px 0;font-size:10px;color:rgba(255,255,255,.6);line-height:2.2;font-family:'DM Mono',monospace;}
+.flow-arrow{color:var(--gold2);}
+.flow-highlight{color:#fff;font-weight:500;}
+
+/* LEVEL TABLE */
+.level-row-c{background:#FFF0F0;}
+.level-row-a{background:#F0F4FF;}
+
+/* FORMULA */
+.formula{background:var(--navy);border-radius:8px;padding:12px 16px;font-size:11px;color:var(--gold2);margin:10px 0;font-family:'DM Mono',monospace;line-height:1.8;}
+
+/* PRINT */
+@media print{
+  .navbar,.sidenav{display:none !important;}
+  .layout{grid-template-columns:1fr;}
+  .section{display:block !important;}
+  .content{padding:20px;max-width:100%;}
+  .section-hero{background:var(--navy) !important;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+}
+@media(max-width:800px){
+  .layout{grid-template-columns:1fr;}
+  .sidenav{display:none;}
+  .content{padding:20px 16px;}
+}
+</style>
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="brand">
+    <div class="brand-compass">🧭</div>
+    <div>
+      <div class="brand-name">COMPASS</div>
+      <div class="brand-sub">Manuale Advisor</div>
+    </div>
+  </div>
+  <div class="nav-right">
+    <a href="advisor.html" class="nav-btn">← Dashboard</a>
+    <button class="print-btn" onclick="window.print()">🖨 Stampa</button>
+  </div>
+</nav>
+
+<div class="layout">
+
+<!-- SIDENAV -->
+<aside class="sidenav">
+  <div class="sn-section">Introduzione</div>
+  <div class="sn-item active" onclick="showSection('intro',this)"><div class="sn-num">0</div>Panoramica sistema</div>
+
+  <div class="sn-section">Setup</div>
+  <div class="sn-item" onclick="showSection('s1',this)"><div class="sn-num">1</div>Setup iniziale</div>
+  <div class="sn-item" onclick="showSection('s2',this)"><div class="sn-num">2</div>Workflow notturno</div>
+
+  <div class="sn-section">Operatività</div>
+  <div class="sn-item" onclick="showSection('s3',this)"><div class="sn-num">3</div>Creare un cliente</div>
+  <div class="sn-item" onclick="showSection('s4',this)"><div class="sn-num">4</div>Intervista profilo</div>
+  <div class="sn-item" onclick="showSection('s5',this)"><div class="sn-num">5</div>Generare portafoglio</div>
+  <div class="sn-item" onclick="showSection('s6',this)"><div class="sn-num">6</div>Link cliente</div>
+
+  <div class="sn-section">Riferimento</div>
+  <div class="sn-item" onclick="showSection('s7',this)"><div class="sn-num">7</div>I 18 livelli</div>
+  <div class="sn-item" onclick="showSection('s8',this)"><div class="sn-num">8</div>Segnali RAPTOR</div>
+  <div class="sn-item" onclick="showSection('s9',this)"><div class="sn-num">9</div>ETF Universe</div>
+  <div class="sn-item" onclick="showSection('s10',this)"><div class="sn-num">10</div>Cedola & PAC</div>
+  <div class="sn-item" onclick="showSection('s11',this)"><div class="sn-num">11</div>FAQ</div>
+</aside>
+
+<!-- CONTENT -->
+<div class="content">
+
+<!-- INTRO -->
+<div class="section active" id="intro">
+  <div class="section-hero">
+    <div class="sh-num">COMPASS — Manuale Advisor v1.0</div>
+    <div class="sh-title">Panoramica del <span>Sistema</span></div>
+    <div class="sh-sub">COMPASS è un sistema di gestione patrimoniale costruito su RAPTOR. Permette di costruire, monitorare e aggiornare portafogli per i tuoi clienti usando segnali tecnici automatici su 104 ETF.</div>
+  </div>
+
+  <div class="info-card gold">
+    <div class="ic-title">🧭 Architettura</div>
+    <div class="flow">
+      <span class="flow-highlight">RAPTOR SUITE</span> (Scanner + Min Finder)<br>
+      <span class="flow-arrow">  ↓</span> Segnali BUY/SELL/WATCH ogni notte<br>
+      <span class="flow-highlight">fetch_rwm.py</span><br>
+      <span class="flow-arrow">  ↓</span> Calcola segnali su 104 ETF RWM<br>
+      <span class="flow-highlight">rwm_signals.json</span><br>
+      <span class="flow-arrow">  ↓</span> Alimenta advisor.html e client.html<br>
+      <span class="flow-highlight">Portafoglio cliente</span> → seleziona ETF con BUY nel livello assegnato
+    </div>
+  </div>
+
+  <div class="info-card green">
+    <div class="ic-title">✅ Cosa fa COMPASS</div>
+    <div class="ic-body">
+      <ul>
+        <li>Gestisce <strong>18 clienti</strong> con profili C1-C9 (cedola) e A1-A9 (accumulo)</li>
+        <li>Seleziona automaticamente gli ETF migliori per ogni profilo usando i segnali RAPTOR</li>
+        <li>Calcola cedola stimata, rendimento atteso, VaR e simulazione PAC</li>
+        <li>Genera un <strong>portale read-only</strong> per ogni cliente con link univoco</li>
+        <li>Aggiorna segnali ogni notte alle 02:30 e ogni pomeriggio alle 15:30</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="info-card blue">
+    <div class="ic-title">📁 File del sistema</div>
+    <div class="ic-body">
+      <table class="tbl">
+        <thead><tr><th>File</th><th>Descrizione</th></tr></thead>
+        <tbody>
+          <tr><td>index.html</td><td>Landing page — accesso advisor e cliente</td></tr>
+          <tr><td>advisor.html</td><td>Dashboard completa advisor (privata)</td></tr>
+          <tr><td>client.html?id=XXX</td><td>Portale cliente read-only (link univoco)</td></tr>
+          <tr><td>manual.html</td><td>Questo manuale</td></tr>
+          <tr><td>fetch_rwm.py</td><td>Script Python — aggiorna segnali ogni notte</td></tr>
+          <tr><td>data/rwm_signals.json</td><td>Segnali e prezzi 104 ETF (generato automaticamente)</td></tr>
+          <tr><td>data/levels.json</td><td>18 livelli con allocazioni e pool ETF</td></tr>
+          <tr><td>data/clients.json</td><td>Dati 18 clienti e portafogli</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- S1: SETUP -->
+<div class="section" id="s1">
+  <div class="section-hero">
+    <div class="sh-num">Sezione 1</div>
+    <div class="sh-title">Setup <span>Iniziale</span></div>
+    <div class="sh-sub">Come configurare il repo GitHub e abilitare il workflow automatico.</div>
+  </div>
+
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-body">
+        <div class="step-title">Crea il repo GitHub</div>
+        <div class="step-desc">Vai su <strong>github.com</strong> → New repository → nome: <code>compass</code> → Public → Create. La visibilità pubblica è necessaria per GitHub Pages.</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-body">
+        <div class="step-title">Carica i file</div>
+        <div class="step-desc">Carica nella root: <code>index.html</code>, <code>advisor.html</code>, <code>client.html</code>, <code>manual.html</code>, <code>fetch_rwm.py</code>, <code>requirements.txt</code>. Nella cartella <code>data/</code>: <code>levels.json</code>, <code>clients.json</code>. In <code>.github/workflows/</code>: <code>rwm.yml</code>.</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-body">
+        <div class="step-title">Abilita GitHub Pages</div>
+        <div class="step-desc">Settings → Pages → Source: Deploy from branch → Branch: main → Save. Il sito sarà disponibile su <code>.github.io/compass/</code>.</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">4</div>
+      <div class="step-body">
+        <div class="step-title">Prima run manuale</div>
+        <div class="step-desc">Actions → RAPTOR Wealth Meridian → Run workflow. La prima run scarica tutti i 101 ETF e genera <code>rwm_signals.json</code> in circa 10-15 minuti.</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">5</div>
+      <div class="step-body">
+        <div class="step-title">Verifica</div>
+        <div class="step-desc">Apri <code>.github.io/compass/advisor.html</code> — dovresti vedere le cards dei 18 clienti e il pallino verde LIVE in alto a destra.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- S2: WORKFLOW -->
+<div class="section" id="s2">
+  <div class="section-hero">
+    <div class="sh-num">Sezione 2</div>
+    <div class="sh-title">Workflow <span>Notturno</span></div>
+    <div class="sh-sub">Come funziona l'aggiornamento automatico dei segnali.</div>
+  </div>
+
+  <div class="info-card gold">
+    <div class="ic-title">⏱ Orari automatici</div>
+    <div class="ic-body">
+      <table class="tbl">
+        <thead><tr><th>Orario IT</th><th>Orario UTC</th><th>Cosa fa</th></tr></thead>
+        <tbody>
+          <tr><td>02:30</td><td>01:30</td><td>Scansione completa 101 ETF → aggiorna rwm_signals.json</td></tr>
+          <tr><td>15:30</td><td>14:30</td><td>Aggiornamento pomeridiano → ricalcola segnali con prezzi live</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <h3>Logiche di segnale per tipo ETF</h3>
+
+  <div class="info-card green">
+    <div class="ic-title">🟢 ETF MONETARI — sempre HOLD</div>
+    <div class="ic-body">XEON, SMART, IU0E, XEOD, ERNX. Non hanno segnale tecnico — entrano sempre in portafoglio per i livelli che li prevedono. Score fisso 100.</div>
+  </div>
+
+  <div class="info-card blue">
+    <div class="ic-title">🔵 ETF OBBLIGAZIONARI — ACCUMULA / HOLD / RIDUCI</div>
+    <div class="ic-body">
+      <div class="formula">
+Score = 50 base<br>
++ 20 se prezzo &gt; MA200<br>
++ 15 se momentum 3M &gt; +1%<br>
++ 10 se momentum 1M &gt; +0.3%<br>
+─────────────────────────<br>
+≥ 65 → ACCUMULA · 40-64 → HOLD · &lt;40 → RIDUCI
+      </div>
+    </div>
+  </div>
+
+  <div class="info-card gold">
+    <div class="ic-title">🟡 ETF AZIONARI — BUY / WATCH / SELL</div>
+    <div class="ic-body">
+      <div class="formula">
+Score = 0 base<br>
++ 25 se prezzo &gt; KAMA(10)<br>
++ 25 se SAR parabolico bullish<br>
++ 20 se prezzo &gt; MA200<br>
++ 20 proporzionale all'ER (Efficiency Ratio)<br>
++ 10 se momentum 3M positivo<br>
+─────────────────────────<br>
+≥ 65 → BUY · 40-64 → WATCH · &lt;40 → SELL
+      </div>
+    </div>
+  </div>
+
+  <div class="info-card red">
+    <div class="ic-title">🔴 ETF LEVA 2x/3x — soglia più alta</div>
+    <div class="ic-body">Stessa logica azionario ma soglia BUY alzata a <strong>80/100</strong>. Entrano in portafoglio solo con segnale molto forte. Solo per livelli A9/C9.</div>
+  </div>
+</div>
+
+<!-- S3: CREARE CLIENTE -->
+<div class="section" id="s3">
+  <div class="section-hero">
+    <div class="sh-num">Sezione 3</div>
+    <div class="sh-title">Creare un <span>Cliente</span></div>
+    <div class="sh-sub">Come configurare un cliente esistente con capitale, livello e modalità di investimento.</div>
+  </div>
+
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-body">
+        <div class="step-title">Apri advisor.html</div>
+        <div class="step-desc">Clicca sulla card del cliente nella sezione "Con Cedola" o "Accumulazione", oppure selezionalo dalla sidebar sinistra.</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-body">
+        <div class="step-title">Vai su Impostazioni</div>
+        <div class="step-desc">Nel tab <strong>Impostazioni</strong> configura: nome, livello (C1-A9), capitale investito, PAC mensile, modalità (unica/PAC/misto).</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-body">
+        <div class="step-title">Clicca Salva</div>
+        <div class="step-desc">I dati vengono salvati nella sessione corrente. Per persistere i dati tra sessioni è necessario aggiornare <code>clients.json</code> nel repo GitHub con i valori inseriti.</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">4</div>
+      <div class="step-body">
+        <div class="step-title">Aggiorna clients.json</div>
+        <div class="step-desc">Vai su GitHub → <code>data/clients.json</code> → modifica → inserisci il capitale e il livello del cliente → Commit. I dati saranno permanenti.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="info-card gold">
+    <div class="ic-title">💡 Nota importante</div>
+    <div class="ic-body">COMPASS non ha un database backend — i dati sono nel file <code>clients.json</code> su GitHub. Per ora le modifiche fatte nell'interfaccia durano solo per la sessione corrente. Per renderle permanenti bisogna aggiornare il JSON sul repo.</div>
+  </div>
+</div>
+
+<!-- S4: INTERVISTA -->
+<div class="section" id="s4">
+  <div class="section-hero">
+    <div class="sh-num">Sezione 4</div>
+    <div class="sh-title">Intervista <span>Profilo</span></div>
+    <div class="sh-sub">Come condurre l'intervista e assegnare automaticamente il livello corretto.</div>
+  </div>
+
+  <p>Clicca <strong>Nuova Intervista</strong> nella navbar di advisor.html. Il sistema calcola il profilo in base alle risposte.</p>
+
+  <h3>Domande e peso nel calcolo</h3>
+  <table class="tbl">
+    <thead><tr><th>Domanda</th><th>Peso nel profilo</th></tr></thead>
+    <tbody>
+      <tr><td>Orizzonte temporale</td><td>Alto — 1-3a → livelli bassi, &gt;10a → livelli alti</td></tr>
+      <tr><td>Tolleranza perdita</td><td>Alto — -5% → C1/A1, &gt;-40% → C9/A9</td></tr>
+      <tr><td>Obiettivo principale</td><td>Medio — protezione abbassa, trading alza</td></tr>
+      <tr><td>Necessità liquidità 3 anni</td><td>Medio — sì totale abbassa di 2 livelli</td></tr>
+      <tr><td>Distribuzione (Cedola/Acc)</td><td>Determina prefisso C o A</td></tr>
+      <tr><td>Fonte capitale, reddito, ESG</td><td>Informativo — non cambia il livello</td></tr>
+    </tbody>
+  </table>
+
+  <div class="formula">
+Score rischio = (orizzonte × 1.5) + (tolleranza × 1.5) + obiettivo_bonus - liquidità_malus<br>
+Livello = max(1, min(9, round(score)))<br>
+Prefisso = C (cedola) o A (acc) dalla preferenza distribuzione
+  </div>
+
+  <div class="info-card green">
+    <div class="ic-title">✅ Dopo il calcolo</div>
+    <div class="ic-body">Il sistema mostra il profilo assegnato con rendimento atteso, VaR e cedola stimata. Clicca <strong>"Applica a Cliente Esistente"</strong> e inserisci l'ID (es. <code>ClienteC5</code>) per applicare il profilo.</div>
+  </div>
+</div>
+
+<!-- S5: PORTAFOGLIO -->
+<div class="section" id="s5">
+  <div class="section-hero">
+    <div class="sh-num">Sezione 5</div>
+    <div class="sh-title">Generare il <span>Portafoglio</span></div>
+    <div class="sh-sub">Come costruire il portafoglio automaticamente dai segnali RAPTOR.</div>
+  </div>
+
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-body">
+        <div class="step-title">Apri dashboard cliente</div>
+        <div class="step-desc">Clicca sul cliente dalla sidebar o dalle cards. Si apre la dashboard con 4 tab.</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-body">
+        <div class="step-title">Tab Segnali</div>
+        <div class="step-desc">Vedi tutti gli ETF del pool del livello con il loro segnale corrente (BUY/WATCH/SELL), score e yield. Questo ti dà una visione completa prima di generare.</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-body">
+        <div class="step-title">Clicca "Rigenera da Segnali"</div>
+        <div class="step-desc">Il sistema seleziona automaticamente gli ETF con segnale <strong>BUY o HOLD</strong> nel pool del livello, ordinati per score. Prende i migliori N (definito dal livello, es. 5 per C3).</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">4</div>
+      <div class="step-body">
+        <div class="step-title">Verifica e aggiusta</div>
+        <div class="step-desc">I pesi vengono distribuiti in parti uguali. Se vuoi pesi personalizzati, aggiorna <code>clients.json</code> manualmente con i pesi desiderati.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="info-card blue">
+    <div class="ic-title">📊 Logica selezione</div>
+    <div class="ic-body">
+      <ol>
+        <li>Prende gli ETF del pool del livello con BUY/HOLD/ACCUMULA ordinati per score ↓</li>
+        <li>Se troppo pochi BUY, aggiunge WATCH</li>
+        <li>Seleziona i migliori N (N_ETF_MAX del livello)</li>
+        <li>Distribuisce pesi uguali (100% / N ETF)</li>
+      </ol>
+    </div>
+  </div>
+</div>
+
+<!-- S6: LINK CLIENTE -->
+<div class="section" id="s6">
+  <div class="section-hero">
+    <div class="sh-num">Sezione 6</div>
+    <div class="sh-title">Link <span>Cliente</span></div>
+    <div class="sh-sub">Come inviare al cliente il link al suo portafoglio personale.</div>
+  </div>
+
+  <p>Ogni cliente ha un portale read-only con link univoco. Il cliente vede solo il suo portafoglio — non può modificare nulla.</p>
+
+  <div class="info-card gold">
+    <div class="ic-title">🔗 Formato link</div>
+    <div class="ic-body">
+      <code>https://.github.io/compass/client.html?id=ClienteC5</code><br><br>
+      Sostituisci <code>ClienteC5</code> con l'ID del cliente (ClienteC1...C9 oppure ClienteA1...A9).
+    </div>
+  </div>
+
+  <h3>Come copiare e inviare il link</h3>
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-body">
+        <div class="step-title">Da advisor.html</div>
+        <div class="step-desc">Apri il cliente → tab Impostazioni → clicca <strong>"Copia"</strong> accanto al link. Il link viene copiato negli appunti.</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-body">
+        <div class="step-title">Invia via WhatsApp o email</div>
+        <div class="step-desc">Il cliente clicca il link da qualsiasi dispositivo (smartphone, tablet, PC) e vede il suo portafoglio aggiornato in tempo reale.</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-body">
+        <div class="step-title">Il cliente può accedere anche da index.html</div>
+        <div class="step-desc">Invia <code>.github.io/compass/</code> e il cliente inserisce il suo codice (es. <code>ClienteC5</code>) nel campo in basso.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="info-card green">
+    <div class="ic-title">✅ Cosa vede il cliente</div>
+    <div class="ic-body">
+      <ul>
+        <li>Capitale investito e rendimento atteso</li>
+        <li>Cedola annua/mensile/trimestrale (se profilo Dist)</li>
+        <li>Grafico allocazione a torta</li>
+        <li>Lista ETF con segnale e variazione giornaliera</li>
+        <li>Proiezione portafoglio a 5/10/20 anni</li>
+        <li>Simulazione PAC (se attivo)</li>
+        <li>Glossario finanziario</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- S7: 18 LIVELLI -->
+<div class="section" id="s7">
+  <div class="section-hero">
+    <div class="sh-num">Sezione 7</div>
+    <div class="sh-title">I <span>18 Livelli</span></div>
+    <div class="sh-sub">Guida completa ai profili di rischio con allocazioni e rendimenti attesi.</div>
+  </div>
+
+  <h3>🔴 Con Cedola — Distribuzione</h3>
+  <table class="tbl">
+    <thead><tr><th>ID</th><th>Nome</th><th>MM%</th><th>OBB%</th><th>HY%</th><th>AZ%</th><th>Rend. Att.</th><th>VaR</th></tr></thead>
+    <tbody>
+      <tr class="level-row-c"><td>C1</td><td>Monetario Cedola</td><td>100</td><td>0</td><td>0</td><td>0</td><td style="color:var(--green)">3.2%</td><td style="color:var(--red)">1%</td></tr>
+      <tr class="level-row-c"><td>C2</td><td>Monetario+ Cedola</td><td>70</td><td>30</td><td>0</td><td>0</td><td style="color:var(--green)">3.4%</td><td style="color:var(--red)">2.5%</td></tr>
+      <tr class="level-row-c"><td>C3</td><td>Conservativo Cedola</td><td>40</td><td>55</td><td>0</td><td>5</td><td style="color:var(--green)">3.8%</td><td style="color:var(--red)">5%</td></tr>
+      <tr class="level-row-c"><td>C4</td><td>Moderato Cedola</td><td>20</td><td>55</td><td>5</td><td>20</td><td style="color:var(--green)">4.5%</td><td style="color:var(--red)">8%</td></tr>
+      <tr class="level-row-c"><td>C5</td><td>Bilanciato Cedola</td><td>10</td><td>45</td><td>5</td><td>40</td><td style="color:var(--green)">5.2%</td><td style="color:var(--red)">12%</td></tr>
+      <tr class="level-row-c"><td>C6</td><td>Bilanciato+ Cedola</td><td>5</td><td>35</td><td>10</td><td>50</td><td style="color:var(--green)">5.8%</td><td style="color:var(--red)">15%</td></tr>
+      <tr class="level-row-c"><td>C7</td><td>Dinamico Cedola</td><td>0</td><td>20</td><td>10</td><td>70</td><td style="color:var(--green)">6.5%</td><td style="color:var(--red)">18%</td></tr>
+      <tr class="level-row-c"><td>C8</td><td>Azionario Cedola</td><td>0</td><td>5</td><td>5</td><td>90</td><td style="color:var(--green)">7.0%</td><td style="color:var(--red)">22%</td></tr>
+      <tr class="level-row-c"><td>C9</td><td>Trading Cedola</td><td>0</td><td>0</td><td>0</td><td>100</td><td style="color:var(--green)">8.5%</td><td style="color:var(--red)">28%</td></tr>
+    </tbody>
+  </table>
+
+  <h3>🔵 Accumulazione</h3>
+  <table class="tbl">
+    <thead><tr><th>ID</th><th>Nome</th><th>MM%</th><th>OBB%</th><th>HY%</th><th>AZ%</th><th>Rend. Att.</th><th>VaR</th></tr></thead>
+    <tbody>
+      <tr class="level-row-a"><td>A1</td><td>Monetario Acc</td><td>100</td><td>0</td><td>0</td><td>0</td><td style="color:var(--green)">3.2%</td><td style="color:var(--red)">1%</td></tr>
+      <tr class="level-row-a"><td>A2</td><td>Monetario+ Acc</td><td>70</td><td>30</td><td>0</td><td>0</td><td style="color:var(--green)">3.4%</td><td style="color:var(--red)">2.5%</td></tr>
+      <tr class="level-row-a"><td>A3</td><td>Conservativo Acc</td><td>40</td><td>55</td><td>0</td><td>5</td><td style="color:var(--green)">3.8%</td><td style="color:var(--red)">5%</td></tr>
+      <tr class="level-row-a"><td>A4</td><td>Moderato Acc</td><td>20</td><td>55</td><td>5</td><td>20</td><td style="color:var(--green)">4.5%</td><td style="color:var(--red)">8%</td></tr>
+      <tr class="level-row-a"><td>A5</td><td>Bilanciato Acc</td><td>10</td><td>45</td><td>5</td><td>40</td><td style="color:var(--green)">5.2%</td><td style="color:var(--red)">12%</td></tr>
+      <tr class="level-row-a"><td>A6</td><td>Bilanciato+ Acc</td><td>5</td><td>35</td><td>10</td><td>50</td><td style="color:var(--green)">5.8%</td><td style="color:var(--red)">15%</td></tr>
+      <tr class="level-row-a"><td>A7</td><td>Dinamico Acc</td><td>0</td><td>20</td><td>10</td><td>70</td><td style="color:var(--green)">6.5%</td><td style="color:var(--red)">18%</td></tr>
+      <tr class="level-row-a"><td>A8</td><td>Azionario Acc</td><td>0</td><td>5</td><td>5</td><td>90</td><td style="color:var(--green)">7.0%</td><td style="color:var(--red)">22%</td></tr>
+      <tr class="level-row-a"><td>A9</td><td>Trading Acc</td><td>0</td><td>0</td><td>0</td><td>100</td><td style="color:var(--green)">9.0%</td><td style="color:var(--red)">30%</td></tr>
+    </tbody>
+  </table>
+
+  <div class="info-card gold">
+    <div class="ic-title">💡 Come scegliere tra C e A</div>
+    <div class="ic-body">
+      <strong>Profili C (Cedola/Distribuzione):</strong> per chi vuole un flusso di reddito periodico — pensionati, chi ha bisogno di liquidità ricorrente, chi vuole "sentire" il rendimento.<br><br>
+      <strong>Profili A (Accumulazione):</strong> per chi vuole massimizzare il capitale nel tempo — PAC, giovani, risparmio a lungo termine, efficienza fiscale (non paghi tasse sui dividendi ogni anno).
+    </div>
+  </div>
+</div>
+
+<!-- S8: SEGNALI -->
+<div class="section" id="s8">
+  <div class="section-hero">
+    <div class="sh-num">Sezione 8</div>
+    <div class="sh-title">Segnali <span>RAPTOR</span></div>
+    <div class="sh-sub">Come interpretare i segnali tecnici usati da COMPASS per selezionare gli ETF.</div>
+  </div>
+
+  <h3>Indicatori usati</h3>
+  <table class="tbl">
+    <thead><tr><th>Indicatore</th><th>Cosa misura</th><th>Come si legge</th></tr></thead>
+    <tbody>
+      <tr><td>KAMA (10)</td><td>Kaufman Adaptive MA — trend adattivo</td><td>Prezzo &gt; KAMA = struttura bullish</td></tr>
+      <tr><td>SAR Parabolico</td><td>Stop and Reverse — inversione trend</td><td>SAR sotto prezzo = bullish</td></tr>
+      <tr><td>MA200</td><td>Media 200 giorni — trend primario</td><td>Prezzo &gt; MA200 = mercato bull</td></tr>
+      <tr><td>ER (Efficiency Ratio)</td><td>Quanto è direzionale il movimento</td><td>ER alto = trend forte</td></tr>
+      <tr><td>Momentum 3M</td><td>Rendimento ultimi 3 mesi</td><td>Positivo = slancio positivo</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Lettura del segnale</h3>
+  <div class="info-card green">
+    <div class="ic-title"><span class="badge badge-green">BUY</span> — Score ≥ 65</div>
+    <div class="ic-body">ETF in trend rialzista confermato. Entra nel portafoglio con peso pieno. Almeno 3 dei 4 criteri soddisfatti.</div>
+  </div>
+  <div class="info-card gold">
+    <div class="ic-title"><span class="badge badge-gold">WATCH</span> — Score 40-64</div>
+    <div class="ic-body">Segnale misto. Entra solo se non ci sono abbastanza BUY nel pool del livello. Monitorare attentamente.</div>
+  </div>
+  <div class="info-card red">
+    <div class="ic-title"><span class="badge badge-red">SELL</span> — Score &lt; 40</div>
+    <div class="ic-body">Non entra in portafoglio. Se già presente, valuta l'uscita. Trend ribassista o laterale.</div>
+  </div>
+</div>
+
+<!-- S9: ETF UNIVERSE -->
+<div class="section" id="s9">
+  <div class="section-hero">
+    <div class="sh-num">Sezione 9</div>
+    <div class="sh-title">ETF <span>Universe</span></div>
+    <div class="sh-sub">I 104 ETF monitorati da COMPASS divisi per categoria.</div>
+  </div>
+
+  <table class="tbl">
+    <thead><tr><th>Categoria</th><th>N. ETF</th><th>Livelli</th><th>Logica segnale</th></tr></thead>
+    <tbody>
+      <tr><td>Monetario</td><td>5</td><td>C1-C2, A1-A2</td><td>Sempre HOLD</td></tr>
+      <tr><td>Obbligazionario Core</td><td>8</td><td>C2-C5, A2-A5</td><td>MA200 + momentum</td></tr>
+      <tr><td>Obbligazionario Globale</td><td>5</td><td>C4-C6, A4-A6</td><td>MA200 + momentum</td></tr>
+      <tr><td>High Yield</td><td>7</td><td>C5-C7, A6-A7</td><td>MA200 + momentum</td></tr>
+      <tr><td>Azionario Core</td><td>11</td><td>C7-C9, A5-A9</td><td>KAMA+SAR+MA200+ER</td></tr>
+      <tr><td>Azionario Dividendi</td><td>8</td><td>C5-C8</td><td>KAMA+SAR+MA200+ER</td></tr>
+      <tr><td>Azionario Tematico</td><td>7</td><td>A8-A9, C8-C9</td><td>KAMA+SAR+MA200+ER</td></tr>
+      <tr><td>Real Estate / REIT</td><td>4</td><td>C5-C7, A6-A7</td><td>KAMA+SAR (soglia 60)</td></tr>
+      <tr><td>Commodities</td><td>8</td><td>A3-A9, C3-C8</td><td>KAMA+SAR+MA200+ER</td></tr>
+      <tr><td>WisdomTree ETP</td><td>5</td><td>A7-A9, C7-C9</td><td>KAMA+SAR+MA200+ER</td></tr>
+      <tr><td>Efficient Core</td><td>4</td><td>A6-A9</td><td>KAMA+SAR+MA200+ER</td></tr>
+      <tr><td>Leva 2x</td><td>7</td><td>A9, C9</td><td>Score ≥ 80</td></tr>
+      <tr><td>Leva 3x / 5x</td><td>10</td><td>A9, C9</td><td>Score ≥ 80</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- S10: CEDOLA & PAC -->
+<div class="section" id="s10">
+  <div class="section-hero">
+    <div class="sh-num">Sezione 10</div>
+    <div class="sh-title">Cedola <span>&amp; PAC</span></div>
+    <div class="sh-sub">Come vengono calcolate le stime di cedola e la simulazione PAC.</div>
+  </div>
+
+  <h3>Stima cedola</h3>
+  <div class="formula">
+Cedola annua = Σ (Importo_ETF × Yield_ETF)<br><br>
+dove Importo_ETF = Capitale × Peso_ETF%<br>
+e Yield_ETF = rendimento da distribuzione annuo stimato dell'ETF<br><br>
+Se nessun portafoglio configurato:<br>
+Cedola annua ≈ Capitale × Rendimento_Atteso_Livello%
+  </div>
+
+  <div class="info-card gold">
+    <div class="ic-title">⚠️ Nota sulla stima cedola</div>
+    <div class="ic-body">Il yield degli ETF è una stima storica media. Le cedole effettive variano ogni trimestre in base ai dividendi/cedole incassati dagli ETF sottostanti. La stima è indicativa e non garantita.</div>
+  </div>
+
+  <h3>Simulazione PAC</h3>
+  <div class="formula">
+Valore finale = PAC_mensile × ((1+r)^n - 1) / r<br><br>
+dove r = rendimento_atteso / 12<br>
+e n = numero mesi di versamento<br><br>
+Esempio: €500/mese per 10 anni al 5%<br>
+= 500 × ((1.00417)^120 - 1) / 0.00417<br>
+= €77.641
+  </div>
+
+  <div class="info-card blue">
+    <div class="ic-title">📊 Scenari proiezione</div>
+    <div class="ic-body">
+      Il grafico nel portale cliente mostra 3 scenari:<br>
+      <ul style="margin-top:6px">
+        <li><strong>Ottimista:</strong> rendimento × 1.3</li>
+        <li><strong>Base:</strong> rendimento atteso del livello</li>
+        <li><strong>Conservativo:</strong> rendimento × 0.5</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- S11: FAQ -->
+<div class="section" id="s11">
+  <div class="section-hero">
+    <div class="sh-num">Sezione 11</div>
+    <div class="sh-title">FAQ</div>
+    <div class="sh-sub">Domande frequenti e soluzioni ai problemi comuni.</div>
+  </div>
+
+  <div class="info-card gold">
+    <div class="ic-title">Il pallino è arancione (NO SEGNALI) — cosa faccio?</div>
+    <div class="ic-body">Il file <code>rwm_signals.json</code> non esiste ancora o il workflow non è mai girato. Vai su GitHub → Actions → RAPTOR Wealth Meridian → Run workflow → lascia girare 10-15 minuti.</div>
+  </div>
+
+  <div class="info-card blue">
+    <div class="ic-title">Come aggiorno i dati del cliente in modo permanente?</div>
+    <div class="ic-body">Modifica <code>data/clients.json</code> su GitHub con i dati corretti (capitale, livello, portafoglio). I dati nell'interfaccia durano solo per la sessione corrente.</div>
+  </div>
+
+  <div class="info-card green">
+    <div class="ic-title">Quando devo rigenerare il portafoglio?</div>
+    <div class="ic-body">Rigenera quando: (1) i segnali cambiano significativamente, (2) aggiungi capitale, (3) cambi il livello del cliente, (4) periodicamente ogni 1-3 mesi per ribilanciamento.</div>
+  </div>
+
+  <div class="info-card gold">
+    <div class="ic-title">Nessun ETF BUY nel pool del livello — cosa succede?</div>
+    <div class="ic-body">Il sistema aggiunge automaticamente i WATCH. Se nemmeno quelli ci sono, compare il messaggio "Nessun ETF con segnale attivo — riprova dopo l'aggiornamento notturno". In questo caso mantieni il portafoglio esistente.</div>
+  </div>
+
+  <div class="info-card blue">
+    <div class="ic-title">Come aggiungo un ETF all'universe?</div>
+    <div class="ic-body">Modifica <code>fetch_rwm.py</code> aggiungendo il ticker nell'array <code>ETF_UNIVERSE</code> con categoria, logica, tipo e yield stimato. Poi aggiorna il <code>levels.json</code> con il ticker nel pool del livello giusto.</div>
+  </div>
+
+  <div class="info-card red">
+    <div class="ic-title">Il workflow fallisce — errore comune</div>
+    <div class="ic-body">Verifica che <code>rwm.yml</code> sia in <code>.github/workflows/</code> e non nella root. Controlla i log su Actions → clicca sulla run fallita → espandi lo step con errore.</div>
+  </div>
+
+  <div class="info-card green">
+    <div class="ic-title">Come aggiungo un nuovo cliente oltre i 18?</div>
+    <div class="ic-body">Aggiungi un record in <code>clients.json</code> con un ID univoco (es. <code>ClienteExtra1</code>). Il portale cliente funziona con qualsiasi ID presente nel JSON.</div>
+  </div>
+</div>
+
+</div><!-- /content -->
+</div><!-- /layout -->
+
+<script>
+function showSection(id, el){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.sn-item').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  el.classList.add('active');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+</script>
+</body>
+</html>
