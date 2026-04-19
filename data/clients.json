@@ -1,22 +1,356 @@
 {
   "clients": [
-    {"id":"ClienteC1","nome":"Cliente C1","livello":"C1","capitale":0,"pac_mensile":0,"modalita":"unica","data_apertura":"","note":"","portafoglio":[]},
-    {"id":"ClienteC2","nome":"Cliente C2","livello":"C2","capitale":0,"pac_mensile":0,"modalita":"unica","data_apertura":"","note":"","portafoglio":[]},
-    {"id":"ClienteC3","nome":"Cliente C3","livello":"C3","capitale":0,"pac_mensile":0,"modalita":"unica","data_apertura":"","note":"","portafoglio":[]},
-    {"id":"ClienteC4","nome":"Cliente C4","livello":"C4","capitale":0,"pac_mensile":0,"modalita":"unica","data_apertura":"","note":"","portafoglio":[]},
-    {"id":"ClienteC5","nome":"Cliente C5","livello":"C5","capitale":0,"pac_mensile":0,"modalita":"unica","data_apertura":"","note":"","portafoglio":[]},
-    {"id":"ClienteC6","nome":"Cliente C6","livello":"C6","capitale":0,"pac_mensile":0,"modalita":"unica","data_apertura":"","note":"","portafoglio":[]},
-    {"id":"ClienteC7","nome":"Cliente C7","livello":"C7","capitale":0,"pac_mensile":0,"modalita":"unica","data_apertura":"","note":"","portafoglio":[]},
-    {"id":"ClienteC8","nome":"Cliente C8","livello":"C8","capitale":0,"pac_mensile":0,"modalita":"unica","data_apertura":"","note":"","portafoglio":[]},
-    {"id":"ClienteC9","nome":"Cliente C9","livello":"C9","capitale":0,"pac_mensile":0,"modalita":"unica","data_apertura":"","note":"","portafoglio":[]},
-    {"id":"ClienteA1","nome":"Cliente A1","livello":"A1","capitale":0,"pac_mensile":0,"modalita":"unica","data_apertura":"","note":"","portafoglio":[]},
-    {"id":"ClienteA2","nome":"Cliente A2","livello":"A2","capitale":0,"pac_mensile":0,"modalita":"unica","data_apertura":"","note":"","portafoglio":[]},
-    {"id":"ClienteA3","nome":"Cliente A3","livello":"A3","capitale":0,"pac_mensile":0,"modalita":"unica","data_apertura":"","note":"","portafoglio":[]},
-    {"id":"ClienteA4","nome":"Cliente A4","livello":"A4","capitale":0,"pac_mensile":0,"modalita":"unica","data_apertura":"","note":"","portafoglio":[]},
-    {"id":"ClienteA5","nome":"Cliente A5","livello":"A5","capitale":0,"pac_mensile":0,"modalita":"unica","data_apertura":"","note":"","portafoglio":[]},
-    {"id":"ClienteA6","nome":"Cliente A6","livello":"A6","capitale":0,"pac_mensile":0,"modalita":"unica","data_apertura":"","note":"","portafoglio":[]},
-    {"id":"ClienteA7","nome":"Cliente A7","livello":"A7","capitale":0,"pac_mensile":0,"modalita":"unica","data_apertura":"","note":"","portafoglio":[]},
-    {"id":"ClienteA8","nome":"Cliente A8","livello":"A8","capitale":0,"pac_mensile":0,"modalita":"unica","data_apertura":"","note":"","portafoglio":[]},
-    {"id":"ClienteA9","nome":"Cliente A9","livello":"A9","capitale":0,"pac_mensile":0,"modalita":"unica","data_apertura":"","note":"","portafoglio":[]}
+    {
+      "id": "ClienteC1",
+      "nome": "Cliente C1",
+      "livello": "C1",
+      "capitale": 0,
+      "pac_mensile": 0,
+      "modalita": "unica",
+      "data_apertura": "",
+      "note": "",
+      "portafoglio": []
+    },
+    {
+      "id": "ClienteC2",
+      "nome": "Cliente C2",
+      "livello": "C2",
+      "capitale": 0,
+      "pac_mensile": 0,
+      "modalita": "unica",
+      "data_apertura": "",
+      "note": "",
+      "portafoglio": []
+    },
+    {
+      "id": "ClienteC3",
+      "nome": "Cliente C3",
+      "livello": "C3",
+      "capitale": 0,
+      "pac_mensile": 0,
+      "modalita": "unica",
+      "data_apertura": "",
+      "note": "",
+      "portafoglio": [
+        {
+          "ticker": "XEON.MI",
+          "nome": "Xtrackers EUR Overnight Rate Swap",
+          "peso": 16.5
+        },
+        {
+          "ticker": "SMART.MI",
+          "nome": "iShares € Ultrashort Bond Dist",
+          "peso": 16.7
+        },
+        {
+          "ticker": "GOM.MI",
+          "nome": "iShares € Govt Bond 3-5yr",
+          "peso": 16.7
+        },
+        {
+          "ticker": "VHYL.MI",
+          "nome": "Vanguard FTSE All-World High Div",
+          "peso": 16.7
+        },
+        {
+          "ticker": "AGGH.MI",
+          "nome": "iShares Core Global Aggregate Dist",
+          "peso": 16.7
+        },
+        {
+          "ticker": "IBTM.MI",
+          "nome": "iShares € Govt Bond 3-7yr",
+          "peso": 16.7
+        }
+      ]
+    },
+    {
+      "id": "ClienteC4",
+      "nome": "Cliente C4",
+      "livello": "C4",
+      "capitale": 0,
+      "pac_mensile": 0,
+      "modalita": "unica",
+      "data_apertura": "",
+      "note": "",
+      "portafoglio": []
+    },
+    {
+      "id": "ClienteC5",
+      "nome": "Cliente C5",
+      "livello": "A9",
+      "capitale": 0,
+      "pac_mensile": 10000,
+      "modalita": "misto",
+      "data_apertura": "",
+      "note": "",
+      "portafoglio": [
+        {
+          "ticker": "SMH.MI",
+          "nome": "VanEck Semiconductor",
+          "peso": 11.2
+        },
+        {
+          "ticker": "WRTY.MI",
+          "nome": "WisdomTree Russell 2000 EC",
+          "peso": 11.1
+        },
+        {
+          "ticker": "QQQ3.MI",
+          "nome": "WisdomTree NASDAQ-100 3x",
+          "peso": 11.1
+        },
+        {
+          "ticker": "EQQQ.MI",
+          "nome": "Invesco NASDAQ-100",
+          "peso": 11.1
+        },
+        {
+          "ticker": "QNTM.MI",
+          "nome": "VanEck Quantum Computing",
+          "peso": 11.1
+        },
+        {
+          "ticker": "SWDA.MI",
+          "nome": "iShares Core MSCI World Acc",
+          "peso": 11.1
+        },
+        {
+          "ticker": "VWCE.DE",
+          "nome": "Vanguard FTSE All-World Acc",
+          "peso": 11.1
+        },
+        {
+          "ticker": "XAIX.MI",
+          "nome": "Xtrackers AI & Big Data",
+          "peso": 11.1
+        },
+        {
+          "ticker": "WSPX.MI",
+          "nome": "WisdomTree S&P 500 ETP",
+          "peso": 11.1
+        }
+      ]
+    },
+    {
+      "id": "ClienteC6",
+      "nome": "Elisabetta",
+      "livello": "C5",
+      "capitale": 130000,
+      "pac_mensile": 0,
+      "modalita": "unica",
+      "data_apertura": "2026-05-01",
+      "note": "",
+      "portafoglio": [
+        {
+          "ticker": "XEON.MI",
+          "nome": "Xtrackers EUR Overnight Rate Swap",
+          "peso": 59.8
+        },
+        {
+          "ticker": "IUSA.MI",
+          "nome": "iShares Core S&P 500 Dist",
+          "peso": 6.7
+        },
+        {
+          "ticker": "VUSA.MI",
+          "nome": "Vanguard S&P 500 Dist",
+          "peso": 6.7
+        },
+        {
+          "ticker": "IDVY.MI",
+          "nome": "iShares € Dividend",
+          "peso": 6.7
+        },
+        {
+          "ticker": "IWDP.MI",
+          "nome": "iShares Developed Markets Property",
+          "peso": 6.7
+        },
+        {
+          "ticker": "ESGE.MI",
+          "nome": "iShares MSCI World ESG Enhanced",
+          "peso": 6.7
+        },
+        {
+          "ticker": "MEUD.MI",
+          "nome": "Lyxor MSCI EMU Dist",
+          "peso": 6.7
+        }
+      ]
+    },
+    {
+      "id": "ClienteC7",
+      "nome": "Cliente C7",
+      "livello": "C7",
+      "capitale": 0,
+      "pac_mensile": 0,
+      "modalita": "unica",
+      "data_apertura": "",
+      "note": "",
+      "portafoglio": []
+    },
+    {
+      "id": "ClienteC8",
+      "nome": "Carla Riccioni Giuangluigi Giorgetti ",
+      "livello": "C6",
+      "capitale": 100000,
+      "pac_mensile": 0,
+      "modalita": "unica",
+      "data_apertura": "2026-04-20",
+      "note": "",
+      "portafoglio": [
+        {
+          "ticker": "XEON.MI",
+          "nome": "Xtrackers EUR Overnight Rate Swap",
+          "peso": 50.3
+        },
+        {
+          "ticker": "IUSA.MI",
+          "nome": "iShares Core S&P 500 Dist",
+          "peso": 7.1
+        },
+        {
+          "ticker": "VUSA.MI",
+          "nome": "Vanguard S&P 500 Dist",
+          "peso": 7.1
+        },
+        {
+          "ticker": "IDVY.MI",
+          "nome": "iShares € Dividend",
+          "peso": 7.1
+        },
+        {
+          "ticker": "SWDA.MI",
+          "nome": "iShares Core MSCI World Acc",
+          "peso": 7.1
+        },
+        {
+          "ticker": "IWDP.MI",
+          "nome": "iShares Developed Markets Property",
+          "peso": 7.1
+        },
+        {
+          "ticker": "ESGE.MI",
+          "nome": "iShares MSCI World ESG Enhanced",
+          "peso": 7.1
+        },
+        {
+          "ticker": "MEUD.MI",
+          "nome": "Lyxor MSCI EMU Dist",
+          "peso": 7.1
+        }
+      ]
+    },
+    {
+      "id": "ClienteC9",
+      "nome": "Cliente C9",
+      "livello": "C9",
+      "capitale": 0,
+      "pac_mensile": 0,
+      "modalita": "unica",
+      "data_apertura": "",
+      "note": "",
+      "portafoglio": []
+    },
+    {
+      "id": "ClienteA1",
+      "nome": "Cliente A1",
+      "livello": "A1",
+      "capitale": 0,
+      "pac_mensile": 0,
+      "modalita": "unica",
+      "data_apertura": "",
+      "note": "",
+      "portafoglio": []
+    },
+    {
+      "id": "ClienteA2",
+      "nome": "Cliente A2",
+      "livello": "A2",
+      "capitale": 0,
+      "pac_mensile": 0,
+      "modalita": "unica",
+      "data_apertura": "",
+      "note": "",
+      "portafoglio": []
+    },
+    {
+      "id": "ClienteA3",
+      "nome": "Cliente A3",
+      "livello": "A3",
+      "capitale": 0,
+      "pac_mensile": 0,
+      "modalita": "unica",
+      "data_apertura": "",
+      "note": "",
+      "portafoglio": []
+    },
+    {
+      "id": "ClienteA4",
+      "nome": "Cliente A4",
+      "livello": "A4",
+      "capitale": 0,
+      "pac_mensile": 0,
+      "modalita": "unica",
+      "data_apertura": "",
+      "note": "",
+      "portafoglio": []
+    },
+    {
+      "id": "ClienteA5",
+      "nome": "Cliente A5",
+      "livello": "A5",
+      "capitale": 0,
+      "pac_mensile": 0,
+      "modalita": "unica",
+      "data_apertura": "",
+      "note": "",
+      "portafoglio": []
+    },
+    {
+      "id": "ClienteA6",
+      "nome": "Cliente A6",
+      "livello": "A6",
+      "capitale": 0,
+      "pac_mensile": 0,
+      "modalita": "unica",
+      "data_apertura": "",
+      "note": "",
+      "portafoglio": []
+    },
+    {
+      "id": "ClienteA7",
+      "nome": "Cliente A7",
+      "livello": "A7",
+      "capitale": 0,
+      "pac_mensile": 0,
+      "modalita": "unica",
+      "data_apertura": "",
+      "note": "",
+      "portafoglio": []
+    },
+    {
+      "id": "ClienteA8",
+      "nome": "Cliente A8",
+      "livello": "A8",
+      "capitale": 0,
+      "pac_mensile": 0,
+      "modalita": "unica",
+      "data_apertura": "",
+      "note": "",
+      "portafoglio": []
+    },
+    {
+      "id": "ClienteA9",
+      "nome": "Cliente A9",
+      "livello": "A9",
+      "capitale": 0,
+      "pac_mensile": 0,
+      "modalita": "unica",
+      "data_apertura": "",
+      "note": "",
+      "portafoglio": []
+    }
   ]
 }
