@@ -1,0 +1,1152 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>COMPASS — Advisor Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;0,9..144,700;1,9..144,300&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F5F3EE;--surface:#FAFAF7;--navy:#0A1628;--navy2:#122040;
+  --gold:#C9A84C;--gold2:#E8C96A;--text:#1A1A2A;--text2:#6B7280;
+  --border:#E2DDD6;--border2:#EDE9E2;
+  --green:#16A34A;--green-bg:#DCFCE7;--green-bd:#86EFAC;
+  --red:#DC2626;--red-bg:#FEE2E2;--red-bd:#FCA5A5;
+  --orange:#D97706;--orange-bg:#FEF3C7;--orange-bd:#FCD34D;
+  --blue:#1D4ED8;--blue-bg:#DBEAFE;--blue-bd:#93C5FD;
+  --shadow:0 2px 8px rgba(10,22,40,.08);
+  --radius:12px;--radius-sm:8px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'DM Mono',monospace;background:var(--bg);color:var(--text);min-height:100vh;}
+button{font-family:'DM Mono',monospace;cursor:pointer;border:none;background:none;}
+input,select,textarea{font-family:'DM Mono',monospace;}
+a{text-decoration:none;}
+
+/* NAVBAR */
+.navbar{background:var(--navy);height:54px;display:flex;align-items:center;padding:0 24px;gap:16px;position:sticky;top:0;z-index:200;box-shadow:0 2px 20px rgba(0,0,0,.25);}
+.brand{display:flex;align-items:center;gap:10px;}
+.brand-compass{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--gold),var(--gold2));display:flex;align-items:center;justify-content:center;font-size:16px;}
+.brand-name{font-family:'Fraunces',serif;font-size:16px;font-weight:600;color:#fff;letter-spacing:.02em;}
+.brand-sub{font-size:9px;color:rgba(255,255,255,.35);letter-spacing:2px;text-transform:uppercase;}
+.nav-right{margin-left:auto;display:flex;align-items:center;gap:10px;}
+.nav-pill{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);color:rgba(255,255,255,.6);font-size:10px;padding:5px 12px;border-radius:20px;letter-spacing:.5px;cursor:pointer;}
+.nav-pill:hover{background:rgba(255,255,255,.12);color:#fff;}
+.nav-pill.active{background:var(--gold);border-color:var(--gold);color:var(--navy);}
+.status-dot{width:7px;height:7px;border-radius:50%;background:#22C55E;animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.nav-meta{font-size:9px;color:rgba(255,255,255,.35);letter-spacing:.5px;}
+
+/* LAYOUT */
+.layout{display:grid;grid-template-columns:260px 1fr;min-height:calc(100vh - 54px);}
+
+/* SIDEBAR */
+.sidebar{background:var(--navy2);border-right:1px solid rgba(255,255,255,.06);padding:16px 12px;display:flex;flex-direction:column;gap:4px;overflow-y:auto;}
+.sidebar-section{font-size:8px;letter-spacing:2px;color:rgba(255,255,255,.25);padding:12px 8px 4px;text-transform:uppercase;}
+.sidebar-section:first-child{padding-top:4px;}
+.client-item{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:var(--radius-sm);cursor:pointer;transition:all .15s;border:1px solid transparent;}
+.client-item:hover{background:rgba(255,255,255,.05);border-color:rgba(255,255,255,.08);}
+.client-item.active{background:rgba(201,168,76,.12);border-color:rgba(201,168,76,.25);}
+.client-avatar{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:500;flex-shrink:0;border:1px solid rgba(255,255,255,.1);}
+.client-info{flex:1;overflow:hidden;}
+.client-name{font-size:10px;color:rgba(255,255,255,.75);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.client-level{font-size:8px;color:rgba(255,255,255,.3);margin-top:1px;}
+.client-signal{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
+.sig-green{background:#22C55E;}
+.sig-orange{background:#F59E0B;}
+.sig-red{background:#EF4444;}
+.sig-gray{background:#6B7280;}
+
+/* MAIN */
+.main{overflow-y:auto;background:var(--bg);}
+
+/* HERO STRIP */
+.hero-strip{background:var(--navy);padding:20px 28px;border-bottom:1px solid rgba(255,255,255,.06);}
+.hero-title{font-family:'Fraunces',serif;font-size:22px;font-weight:300;color:#fff;margin-bottom:4px;}
+.hero-title span{color:var(--gold2);}
+.hero-sub{font-size:10px;color:rgba(255,255,255,.35);letter-spacing:1px;}
+.hero-kpis{display:flex;gap:24px;margin-top:14px;flex-wrap:wrap;}
+.hkpi{border-left:2px solid rgba(201,168,76,.3);padding-left:12px;}
+.hkpi-label{font-size:8px;color:rgba(255,255,255,.3);letter-spacing:1.5px;text-transform:uppercase;}
+.hkpi-val{font-size:18px;font-weight:300;color:#fff;margin-top:2px;}
+.hkpi-val.gold{color:var(--gold2);}
+
+/* CONTENT */
+.content{padding:24px 28px;}
+
+/* CARDS GRID */
+.cards-row{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;margin-bottom:24px;}
+
+/* PANEL */
+.panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;}
+.panel-header{padding:14px 18px;border-bottom:1px solid var(--border2);display:flex;align-items:center;justify-content:space-between;}
+.panel-title{font-size:11px;font-weight:500;letter-spacing:.5px;text-transform:uppercase;color:var(--text2);}
+.panel-body{padding:18px;}
+
+/* CLIENT CARD */
+.client-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;cursor:pointer;transition:all .15s;position:relative;}
+.client-card:hover{border-color:var(--gold);box-shadow:0 4px 20px rgba(201,168,76,.12);}
+.client-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;}
+.card-head{padding:14px 16px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border2);}
+.card-avatar{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:500;flex-shrink:0;}
+.card-name{font-family:'Fraunces',serif;font-size:13px;font-weight:600;color:var(--text);}
+.card-level{font-size:9px;color:var(--text2);letter-spacing:.5px;margin-top:1px;}
+.card-body{padding:12px 16px;}
+.card-metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px;}
+.cm{background:var(--bg);border-radius:6px;padding:7px 10px;}
+.cml{font-size:8px;color:var(--text2);letter-spacing:.8px;text-transform:uppercase;margin-bottom:2px;}
+.cmv{font-size:13px;font-weight:500;}
+.card-signal{display:flex;align-items:center;gap:6px;font-size:9px;}
+.signal-badge{padding:2px 10px;border-radius:10px;font-size:9px;font-weight:500;border:1px solid;}
+.sb-buy{background:var(--green-bg);color:var(--green);border-color:var(--green-bd);}
+.sb-watch{background:var(--orange-bg);color:var(--orange);border-color:var(--orange-bd);}
+.sb-sell{background:var(--red-bg);color:var(--red);border-color:var(--red-bd);}
+.sb-none{background:#F3F4F6;color:#6B7280;border-color:#D1D5DB;}
+.card-footer{padding:8px 16px;border-top:1px solid var(--border2);display:flex;gap:6px;}
+.cf-btn{flex:1;padding:6px;border-radius:6px;font-size:9px;letter-spacing:.5px;text-transform:uppercase;font-weight:500;transition:all .15s;text-align:center;}
+.cf-primary{background:var(--navy);color:#fff;}
+.cf-primary:hover{background:var(--navy2);}
+.cf-secondary{background:var(--bg);border:1px solid var(--border);color:var(--text2);}
+.cf-secondary:hover{border-color:var(--gold);color:var(--gold);}
+
+/* DETAIL PANEL */
+.detail-panel{display:none;}
+.detail-panel.active{display:block;}
+
+/* LEVEL SELECTOR */
+.level-grid{display:grid;grid-template-columns:repeat(9,1fr);gap:4px;margin-bottom:12px;}
+.level-btn{padding:8px 4px;border-radius:6px;border:1.5px solid var(--border);background:var(--bg);font-size:9px;text-align:center;cursor:pointer;transition:all .15s;}
+.level-btn:hover{border-color:var(--gold);}
+.level-btn.selected{border-color:var(--gold);background:rgba(201,168,76,.1);}
+.level-code{font-weight:500;font-size:11px;display:block;margin-bottom:2px;}
+.level-tipo{font-size:7px;color:var(--text2);}
+
+/* TABLE */
+.tbl-wrap{overflow-x:auto;}
+table{width:100%;border-collapse:collapse;}
+thead th{background:var(--navy);color:rgba(255,255,255,.6);font-size:9px;letter-spacing:1px;text-transform:uppercase;padding:9px 12px;text-align:left;white-space:nowrap;}
+tbody tr{border-bottom:1px solid var(--border2);transition:background .1s;}
+tbody tr:hover{background:var(--surface);}
+td{padding:9px 12px;font-size:11px;white-space:nowrap;}
+.ret-p{color:var(--green);}
+.ret-n{color:var(--red);}
+.ret-z{color:var(--text2);}
+
+/* ALLOC BAR */
+.alloc-bars{display:flex;height:8px;border-radius:4px;overflow:hidden;margin:10px 0;}
+.alloc-seg{height:100%;transition:width .3s;}
+.alloc-legend{display:flex;gap:12px;flex-wrap:wrap;}
+.al-item{display:flex;align-items:center;gap:4px;font-size:9px;color:var(--text2);}
+.al-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+
+/* FORM */
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.form-group{display:flex;flex-direction:column;gap:5px;}
+.form-group.full{grid-column:1/-1;}
+.form-label{font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--text2);}
+.form-input{background:var(--bg);border:1.5px solid var(--border);color:var(--text);font-size:11px;padding:8px 12px;border-radius:var(--radius-sm);outline:none;transition:border-color .15s;}
+.form-input:focus{border-color:var(--gold);}
+.form-select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%236B7280'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;}
+.btn-gold{background:linear-gradient(135deg,var(--gold),var(--gold2));color:var(--navy);padding:10px 24px;border-radius:var(--radius-sm);font-size:10px;font-weight:500;letter-spacing:1px;text-transform:uppercase;transition:opacity .15s;}
+.btn-gold:hover{opacity:.88;}
+.btn-outline{background:transparent;border:1.5px solid var(--border);color:var(--text2);padding:10px 24px;border-radius:var(--radius-sm);font-size:10px;letter-spacing:1px;text-transform:uppercase;}
+.btn-outline:hover{border-color:var(--gold);color:var(--gold);}
+
+/* LOADING */
+.loading{padding:40px;text-align:center;color:var(--text2);font-size:11px;}
+.spinner{width:28px;height:28px;border:2px solid var(--border);border-top-color:var(--gold);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 12px;}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* LINK */
+.link-box{background:var(--navy);border-radius:var(--radius-sm);padding:10px 14px;display:flex;align-items:center;gap:10px;margin-top:10px;}
+.link-url{font-size:10px;color:var(--gold2);flex:1;word-break:break-all;}
+.link-copy{font-size:9px;color:rgba(255,255,255,.4);padding:4px 8px;border:1px solid rgba(255,255,255,.1);border-radius:4px;cursor:pointer;}
+.link-copy:hover{color:#fff;border-color:rgba(255,255,255,.3);}
+
+/* TABS */
+.tabs{display:flex;gap:2px;border-bottom:1px solid var(--border);margin-bottom:18px;}
+.tab{padding:9px 16px;font-size:10px;letter-spacing:.5px;color:var(--text2);border-bottom:2px solid transparent;cursor:pointer;transition:all .15s;}
+.tab.active{color:var(--gold);border-bottom-color:var(--gold);}
+.tab-content{display:none;}
+.tab-content.active{display:block;}
+
+/* ETF SIGNAL ROW */
+.etf-row{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--border2);}
+.etf-row:last-child{border-bottom:none;}
+.etf-ticker{font-size:11px;font-weight:500;color:var(--blue);width:80px;flex-shrink:0;}
+.etf-nome{font-size:10px;color:var(--text2);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.etf-sig{font-size:9px;padding:2px 8px;border-radius:10px;border:1px solid;flex-shrink:0;}
+.etf-score{font-size:10px;color:var(--text2);width:30px;text-align:right;flex-shrink:0;}
+.etf-peso{font-size:10px;width:45px;text-align:right;flex-shrink:0;}
+
+/* CEDOLA BOX */
+.cedola-box{background:linear-gradient(135deg,var(--navy),var(--navy2));border-radius:var(--radius);padding:18px;margin-top:14px;color:#fff;}
+.cedola-title{font-size:9px;letter-spacing:2px;color:rgba(255,255,255,.4);text-transform:uppercase;margin-bottom:8px;}
+.cedola-val{font-family:'Fraunces',serif;font-size:32px;font-weight:300;color:var(--gold2);line-height:1;}
+.cedola-sub{font-size:10px;color:rgba(255,255,255,.4);margin-top:4px;}
+.cedola-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:14px;}
+.ced-item{background:rgba(255,255,255,.05);border-radius:8px;padding:10px 12px;}
+.ced-label{font-size:8px;color:rgba(255,255,255,.3);letter-spacing:1px;text-transform:uppercase;margin-bottom:3px;}
+.ced-val{font-size:14px;font-weight:500;}
+
+/* SECTION TITLE */
+.section-title{font-size:9px;letter-spacing:2px;color:var(--text2);text-transform:uppercase;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;}
+
+@media(max-width:900px){
+  .layout{grid-template-columns:1fr;}
+  .sidebar{display:none;}
+  .form-grid{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="brand">
+    <div class="brand-compass">🧭</div>
+    <div>
+      <div class="brand-name">COMPASS</div>
+      <div class="brand-sub">Wealth Management System</div>
+    </div>
+  </div>
+  <div class="nav-right">
+    <div style="display:flex;align-items:center;gap:5px">
+      <div class="status-dot" id="statusDot"></div>
+      <div class="nav-meta" id="statusTxt">CARICAMENTO</div>
+    </div>
+    <div class="nav-meta" id="lastUpd">—</div>
+    <button class="nav-pill active" onclick="showView('clients')">Clienti</button>
+    <button class="nav-pill" onclick="showView('interview')">Nuova Intervista</button>
+    <a href="manual.html" class="nav-pill">📖 Manuale</a>
+    <button class="nav-pill" onclick="lsExport()" title="Backup">💾 Backup</button>
+    <button class="nav-pill" onclick="lsReset()" style="color:#EF4444">⚠ Reset</button>
+    <a href="https://.github.io/trader/" class="nav-pill">← Hub</a>
+  </div>
+</nav>
+
+<div class="layout">
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sidebar-section">🔴 Con Cedola</div>
+  <div id="sidebar-cedola"></div>
+  <div class="sidebar-section">🔵 Accumulazione</div>
+  <div id="sidebar-acc"></div>
+</aside>
+
+<!-- MAIN -->
+<main class="main">
+  <div id="view-loading" class="loading"><div class="spinner"></div>Caricamento dati...</div>
+
+  <!-- VIEW: CLIENTS -->
+  <div id="view-clients" style="display:none">
+    <div class="hero-strip">
+      <div class="hero-title">Panoramica <span>Clienti</span></div>
+      <div class="hero-sub">COMPASS WEALTH MANAGEMENT · ADVISOR VIEW</div>
+      <div class="hero-kpis">
+        <div class="hkpi"><div class="hkpi-label">Clienti Attivi</div><div class="hkpi-val" id="kpi-clienti">—</div></div>
+        <div class="hkpi"><div class="hkpi-label">AUM Totale</div><div class="hkpi-val gold" id="kpi-aum">—</div></div>
+        <div class="hkpi"><div class="hkpi-label">ETF Monitorati</div><div class="hkpi-val" id="kpi-etf">—</div></div>
+        <div class="hkpi"><div class="hkpi-label">Segnali BUY</div><div class="hkpi-val gold" id="kpi-buy">—</div></div>
+        <div class="hkpi"><div class="hkpi-label">Ultimo Update</div><div class="hkpi-val" id="kpi-update">—</div></div>
+      </div>
+    </div>
+    <div class="content">
+      <div class="section-title">🔴 Profili Con Cedola</div>
+      <div class="cards-row" id="cards-cedola"></div>
+      <div class="section-title">🔵 Profili Accumulazione</div>
+      <div class="cards-row" id="cards-acc"></div>
+    </div>
+  </div>
+
+  <!-- VIEW: DETAIL -->
+  <div id="view-detail" style="display:none">
+    <div class="hero-strip" id="detail-hero"></div>
+    <div class="content">
+      <div class="tabs">
+        <div class="tab active" onclick="showTab('portafoglio',this)">Portafoglio</div>
+        <div class="tab" onclick="showTab('segnali',this)">Segnali ETF</div>
+        <div class="tab" onclick="showTab('cedola',this)">Cedola / PAC</div>
+        <div class="tab" onclick="showTab('impostazioni',this)">Impostazioni</div>
+      </div>
+
+      <!-- TAB: PORTAFOGLIO -->
+      <div class="tab-content active" id="tab-portafoglio">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
+          <div class="panel">
+            <div class="panel-header"><div class="panel-title">Allocazione Target</div></div>
+            <div class="panel-body">
+              <div class="alloc-bars" id="alloc-bars"></div>
+              <div class="alloc-legend" id="alloc-legend"></div>
+            </div>
+          </div>
+          <div class="panel">
+            <div class="panel-header"><div class="panel-title">Dati Portafoglio</div></div>
+            <div class="panel-body" id="ptf-stats"></div>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">ETF in Portafoglio</div>
+            <button class="btn-gold" style="font-size:9px;padding:5px 14px" onclick="buildPortfolio()">⟳ Rigenera da Segnali</button>
+          </div>
+          <div class="panel-body">
+            <div class="tbl-wrap"><table>
+              <thead><tr><th>Ticker</th><th>Nome</th><th>Categoria</th><th>Peso%</th><th>Importo €</th><th>Segnale</th><th>Score</th><th>Yield%</th><th>Cedola Ann. €</th><th>1D%</th></tr></thead>
+              <tbody id="ptf-table"></tbody>
+            </table></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB: SEGNALI -->
+      <div class="tab-content" id="tab-segnali">
+        <div class="panel">
+          <div class="panel-header"><div class="panel-title">Segnali ETF del Livello</div></div>
+          <div class="panel-body" id="segnali-list"></div>
+        </div>
+      </div>
+
+      <!-- TAB: CEDOLA / PAC -->
+      <div class="tab-content" id="tab-cedola">
+        <div id="cedola-content"></div>
+      </div>
+
+      <!-- TAB: IMPOSTAZIONI -->
+      <div class="tab-content" id="tab-impostazioni">
+        <div class="panel">
+          <div class="panel-header"><div class="panel-title">Impostazioni Cliente</div></div>
+          <div class="panel-body">
+            <div class="form-grid" id="settings-form"></div>
+            <div style="display:flex;gap:8px;margin-top:16px">
+              <button class="btn-gold" onclick="saveSettings()">Salva</button>
+              <button class="btn-outline" onclick="openClientPortal()">Apri Portale Cliente ↗</button>
+            </div>
+            <div id="client-link-box"></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- VIEW: INTERVIEW -->
+  <div id="view-interview" style="display:none">
+    <div class="hero-strip">
+      <div class="hero-title">Nuova <span>Intervista Cliente</span></div>
+      <div class="hero-sub">PROFILO DI RISCHIO · ASSEGNAZIONE LIVELLO · PIANO FINANZIARIO</div>
+    </div>
+    <div class="content">
+      <div class="panel">
+        <div class="panel-header"><div class="panel-title">Dati Anagrafici e Profilo</div></div>
+        <div class="panel-body">
+          <div class="form-grid">
+            <div class="form-group"><label class="form-label">Nome cliente *</label><input class="form-input" id="iv-nome" placeholder="es. Mario Rossi"></div>
+            <div class="form-group"><label class="form-label">Data di nascita</label><input class="form-input" type="date" id="iv-nascita"></div>
+            <div class="form-group"><label class="form-label">Città</label><input class="form-input" id="iv-citta" placeholder="es. Bologna"></div>
+            <div class="form-group"><label class="form-label">Email</label><input class="form-input" type="email" id="iv-email" placeholder="cliente@email.com"></div>
+            <div class="form-group"><label class="form-label">Fonte del capitale *</label>
+              <select class="form-input form-select" id="iv-fonte">
+                <option value="">Seleziona...</option>
+                <option>Liquidità disponibile</option>
+                <option>Eredità / donazione</option>
+                <option>Disinvestimento</option>
+                <option>Vendita immobile</option>
+                <option>TFR / liquidazione</option>
+                <option>Risparmio accumulato</option>
+                <option>Altro</option>
+              </select>
+            </div>
+            <div class="form-group"><label class="form-label">Reddito principale</label>
+              <select class="form-input form-select" id="iv-reddito">
+                <option value="">Seleziona...</option>
+                <option>Lavoro dipendente</option>
+                <option>Lavoro autonomo / impresa</option>
+                <option>Pensione</option>
+                <option>Rendite / investimenti</option>
+                <option>Nessun reddito attivo</option>
+              </select>
+            </div>
+            <div class="form-group"><label class="form-label">Altri investimenti fuori portafoglio</label>
+              <select class="form-input form-select" id="iv-altri">
+                <option value="no">No</option>
+                <option value="si_basso">Sì — importo basso (&lt;50k)</option>
+                <option value="si_medio">Sì — importo medio (50k-200k)</option>
+                <option value="si_alto">Sì — importo alto (&gt;200k)</option>
+              </select>
+            </div>
+            <div class="form-group"><label class="form-label">Necessità liquidità entro 3 anni</label>
+              <select class="form-input form-select" id="iv-liquidita">
+                <option value="no">No</option>
+                <option value="parziale">Sì — parziale (meno del 30%)</option>
+                <option value="totale">Sì — totale o quasi</option>
+              </select>
+            </div>
+            <div class="form-group"><label class="form-label">Orizzonte temporale *</label>
+              <select class="form-input form-select" id="iv-orizzonte">
+                <option value="">Seleziona...</option>
+                <option value="1">1-3 anni</option>
+                <option value="2">3-5 anni</option>
+                <option value="3">5-10 anni</option>
+                <option value="4">Oltre 10 anni</option>
+              </select>
+            </div>
+            <div class="form-group"><label class="form-label">Tolleranza perdita massima *</label>
+              <select class="form-input form-select" id="iv-perdita">
+                <option value="">Seleziona...</option>
+                <option value="1">Fino a -5%</option>
+                <option value="2">Fino a -15%</option>
+                <option value="3">Fino a -25%</option>
+                <option value="4">Fino a -40%</option>
+                <option value="5">Oltre -40%</option>
+              </select>
+            </div>
+            <div class="form-group"><label class="form-label">Obiettivo principale *</label>
+              <select class="form-input form-select" id="iv-obiettivo">
+                <option value="">Seleziona...</option>
+                <option value="protezione">Protezione capitale</option>
+                <option value="reddito">Reddito / cedola</option>
+                <option value="crescita">Crescita nel tempo</option>
+                <option value="trading">Trading / rendimento massimo</option>
+              </select>
+            </div>
+            <div class="form-group"><label class="form-label">Preferenza ESG / sostenibilità</label>
+              <select class="form-input form-select" id="iv-esg">
+                <option value="no">No preferenza</option>
+                <option value="si">Sì — priorità ESG</option>
+                <option value="parziale">Parziale — se disponibile</option>
+              </select>
+            </div>
+            <div class="form-group"><label class="form-label">Preferenza distribuzione</label>
+              <select class="form-input form-select" id="iv-distribuzione">
+                <option value="">Seleziona...</option>
+                <option value="cedola">Con Cedola (Distribuzione)</option>
+                <option value="acc">Senza Cedola (Accumulazione)</option>
+                <option value="indifferente">Indifferente</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- MODALITA INVESTIMENTO -->
+          <div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--border)">
+            <div class="section-title">💶 Modalità Investimento</div>
+            <div class="form-grid">
+              <div class="form-group"><label class="form-label">Modalità *</label>
+                <select class="form-input form-select" id="iv-modalita" onchange="updateModalita()">
+                  <option value="">Seleziona...</option>
+                  <option value="unica">Unica soluzione</option>
+                  <option value="pac">Solo PAC mensile</option>
+                  <option value="misto">Misto (unica + PAC)</option>
+                </select>
+              </div>
+              <div class="form-group" id="iv-capitale-wrap"><label class="form-label">Capitale iniziale €</label><input class="form-input" type="number" id="iv-capitale" placeholder="es. 100000"></div>
+              <div class="form-group" id="iv-pac-wrap" style="display:none"><label class="form-label">PAC mensile €</label><input class="form-input" type="number" id="iv-pac" placeholder="es. 500"></div>
+              <div class="form-group" id="iv-durata-wrap" style="display:none"><label class="form-label">Durata PAC (mesi)</label><input class="form-input" type="number" id="iv-durata" placeholder="es. 120"></div>
+            </div>
+          </div>
+
+          <!-- RISULTATO -->
+          <div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--border)">
+            <div style="display:flex;gap:8px;margin-bottom:16px">
+              <button class="btn-gold" onclick="calcProfile()">Calcola Profilo →</button>
+            </div>
+            <div id="iv-result" style="display:none"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</main>
+</div>
+
+<script>
+let DATA = null; // rwm_signals.json
+let LEVELS = null;
+let CLIENTS = null;
+let currentClient = null;
+let currentTab = 'portafoglio';
+// ── LOCALSTORAGE PERSISTENZA ──────────────────────────────────────
+const LS_PREFIX = 'compass_client_';
+const LS_ALL_KEY = 'compass_all_clients';
+
+function lsSaveClient(cl){
+  try{
+    localStorage.setItem(LS_PREFIX+cl.id, JSON.stringify(cl));
+    // Aggiorna anche indice globale
+    let idx = lsLoadIndex();
+    idx[cl.id] = true;
+    localStorage.setItem(LS_ALL_KEY, JSON.stringify(idx));
+  }catch(e){ console.warn('localStorage save error:', e); }
+}
+
+function lsLoadClient(id){
+  try{
+    const raw = localStorage.getItem(LS_PREFIX+id);
+    return raw ? JSON.parse(raw) : null;
+  }catch(e){ return null; }
+}
+
+function lsLoadIndex(){
+  try{
+    const raw = localStorage.getItem(LS_ALL_KEY);
+    return raw ? JSON.parse(raw) : {};
+  }catch(e){ return {}; }
+}
+
+function lsMergeClients(clients){
+  // Sovrascrive i dati base con quelli salvati in localStorage
+  return clients.map(cl => {
+    const saved = lsLoadClient(cl.id);
+    return saved ? {...cl, ...saved} : cl;
+  });
+}
+
+function lsReset(){
+  if(!confirm('Resettare tutti i dati locali? I clienti torneranno ai valori di default.')) return;
+  Object.keys(localStorage).filter(k=>k.startsWith(LS_PREFIX)||k===LS_ALL_KEY)
+    .forEach(k=>localStorage.removeItem(k));
+  location.reload();
+}
+
+function lsExport(){
+  const all = {};
+  Object.keys(localStorage).filter(k=>k.startsWith(LS_PREFIX))
+    .forEach(k=>{ try{ all[k]=JSON.parse(localStorage.getItem(k)); }catch(e){} });
+  const blob = new Blob([JSON.stringify(all,null,2)],{type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'compass_backup_'+new Date().toISOString().slice(0,10)+'.json';
+  a.click();
+}
+
+
+
+const BASE = 'data/';
+const CLIENT_BASE = 'https://.github.io/compass/client.html?id=';
+
+// ── LOAD ──────────────────────────────────────────────────────────
+async function loadAll(){
+  try{
+    const [s,l,c] = await Promise.all([
+      fetch(BASE+'rwm_signals.json?t='+Date.now()).then(r=>r.ok?r.json():null).catch(()=>null),
+      fetch(BASE+'levels.json?t='+Date.now()).then(r=>r.json()),
+      fetch(BASE+'clients.json?t='+Date.now()).then(r=>r.json()),
+    ]);
+    DATA   = s;
+    LEVELS = l.levels;
+    CLIENTS= lsMergeClients(c.clients);
+
+    document.getElementById('view-loading').style.display='none';
+    document.getElementById('statusDot').style.background = DATA?'#22C55E':'#F59E0B';
+    document.getElementById('statusTxt').textContent = DATA?'LIVE':'NO SEGNALI';
+    if(DATA){
+      const gen = new Date(DATA.generated);
+      document.getElementById('lastUpd').textContent = gen.toLocaleString('it-IT');
+      document.getElementById('kpi-etf').textContent = DATA.analyzed||'—';
+      document.getElementById('kpi-buy').textContent = (DATA.stats?.buy_hold||0);
+    }
+    renderSidebar();
+    renderCards();
+    showView('clients');
+
+    // KPI
+    const attivi = CLIENTS.filter(c=>c.capitale>0).length;
+    const aum = CLIENTS.reduce((s,c)=>s+c.capitale,0);
+    document.getElementById('kpi-clienti').textContent = attivi||CLIENTS.length;
+    document.getElementById('kpi-aum').textContent = aum>0?'€'+aum.toLocaleString('it-IT'):'Da configurare';
+    document.getElementById('kpi-update').textContent = DATA?(new Date(DATA.generated)).toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'}):'—';
+
+  }catch(e){
+    console.error(e);
+    document.getElementById('view-loading').innerHTML='<div class="spinner"></div>Errore caricamento dati. Verifica che rwm_signals.json sia presente.';
+  }
+}
+
+function getLevelById(id){return LEVELS.find(l=>l.id===id);}
+function getClientById(id){return CLIENTS.find(c=>c.id===id);}
+function getSignal(ticker){return DATA?.etfs?.[ticker]||null;}
+
+function levelColor(id){
+  const l = getLevelById(id);
+  return l?.colore||'#6B7280';
+}
+
+function sigBadge(segnale){
+  if(!segnale)return '<span class="signal-badge sb-none">—</span>';
+  const s=segnale.toUpperCase();
+  const cls=s==='BUY'||s==='ACCUMULA'||s==='HOLD'?'sb-buy':s==='WATCH'?'sb-watch':'sb-sell';
+  return `<span class="signal-badge ${cls}">${segnale}</span>`;
+}
+
+function rf(v,dec=1){return v==null?'—':(v>0?'+':'')+v.toFixed(dec)+'%';}
+function rc(v){return v==null?'ret-z':v>0?'ret-p':'ret-n';}
+
+// ── SIDEBAR ──────────────────────────────────────────────────────
+function renderSidebar(){
+  const cedola = CLIENTS.filter(c=>c.id.includes('C'));
+  const acc    = CLIENTS.filter(c=>c.id.includes('A'));
+  ['sidebar-cedola','sidebar-acc'].forEach((id,i)=>{
+    const list = i===0?cedola:acc;
+    document.getElementById(id).innerHTML = list.map(cl=>{
+      const lv = getLevelById(cl.livello);
+      const sig = cl.portafoglio?.length>0?'green':'gray';
+      const color = lv?.colore||'#6B7280';
+      const initials = cl.id.slice(-2);
+      return `<div class="client-item" onclick="openClient('${cl.id}')" data-id="${cl.id}">
+        <div class="client-avatar" style="background:${color}20;color:${color}">${initials}</div>
+        <div class="client-info">
+          <div class="client-name">${cl.nome}</div>
+          <div class="client-level">${lv?.nome||cl.livello}</div>
+        </div>
+        <div class="client-signal sig-${sig}"></div>
+      </div>`;
+    }).join('');
+  });
+}
+
+// ── CARDS ────────────────────────────────────────────────────────
+function renderCards(){
+  ['cards-cedola','cards-acc'].forEach((id,i)=>{
+    const list = CLIENTS.filter(c=>i===0?c.id.includes('C'):c.id.includes('A'));
+    document.getElementById(id).innerHTML = list.map(cl=>clientCard(cl)).join('');
+  });
+}
+
+function clientCard(cl){
+  const lv = getLevelById(cl.livello);
+  const color = lv?.colore||'#6B7280';
+  const initials = cl.id.slice(-2);
+  const aum = cl.capitale>0?'€'+cl.capitale.toLocaleString('it-IT'):'Da conf.';
+  const rend = lv?.rendimento_atteso;
+  const varPct = lv?.var_pct;
+  const cedolaAnn = cl.capitale>0&&rend?Math.round(cl.capitale*(rend/100)):null;
+
+  // Segnale dominante dal portafoglio
+  let segnaleDom = cl.capitale>0?'BUY':'—';
+
+  return `<div class="client-card" onclick="openClient('${cl.id}')" style="--card-c:${color}">
+    <div style="height:3px;background:${color}"></div>
+    <div class="card-head">
+      <div class="card-avatar" style="background:${color}20;color:${color}">${initials}</div>
+      <div>
+        <div class="card-name">${cl.nome}</div>
+        <div class="card-level">${lv?.nome||cl.livello} · ${lv?.tipo==='Dist'?'🔴 Cedola':'🔵 Acc'}</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="card-metrics">
+        <div class="cm"><div class="cml">AUM</div><div class="cmv">${aum}</div></div>
+        <div class="cm"><div class="cml">Rend.Att.</div><div class="cmv" style="color:var(--green)">${rend?rend+'%':'—'}</div></div>
+        <div class="cm"><div class="cml">VaR 95%</div><div class="cmv" style="color:var(--red)">${varPct?varPct+'%':'—'}</div></div>
+      </div>
+      <div class="card-signal">
+        ${sigBadge(segnaleDom)}
+        ${cedolaAnn?`<span style="font-size:9px;color:var(--text2)">Cedola est.: <b style="color:var(--gold)">€${cedolaAnn.toLocaleString('it-IT')}/anno</b></span>`:''}
+      </div>
+    </div>
+    <div class="card-footer">
+      <div class="cf-btn cf-primary" onclick="event.stopPropagation();openClient('${cl.id}')">Dashboard</div>
+      <div class="cf-btn cf-secondary" onclick="event.stopPropagation();window.open('${CLIENT_BASE}${cl.id}','_blank')">Portale Cliente ↗</div>
+    </div>
+  </div>`;
+}
+
+// ── OPEN CLIENT ──────────────────────────────────────────────────
+function openClient(id){
+  currentClient = getClientById(id);
+  if(!currentClient) return;
+  const lv = getLevelById(currentClient.livello);
+  const color = lv?.colore||'#6B7280';
+
+  // Active sidebar
+  document.querySelectorAll('.client-item').forEach(el=>{
+    el.classList.toggle('active', el.dataset.id===id);
+  });
+
+  // Hero
+  document.getElementById('detail-hero').innerHTML = `
+    <div class="hero-title">${currentClient.nome} — <span>${lv?.nome||currentClient.livello}</span></div>
+    <div class="hero-sub">${lv?.tipo==='Dist'?'🔴 DISTRIBUZIONE · CEDOLA':'🔵 ACCUMULAZIONE'} · ${lv?.obiettivo||''}</div>
+    <div class="hero-kpis">
+      <div class="hkpi"><div class="hkpi-label">Capitale</div><div class="hkpi-val gold">€${(currentClient.capitale||0).toLocaleString('it-IT')}</div></div>
+      <div class="hkpi"><div class="hkpi-label">PAC Mensile</div><div class="hkpi-val">${currentClient.pac_mensile>0?'€'+currentClient.pac_mensile:'—'}</div></div>
+      <div class="hkpi"><div class="hkpi-label">Rend. Atteso</div><div class="hkpi-val gold">${lv?.rendimento_atteso||'—'}%</div></div>
+      <div class="hkpi"><div class="hkpi-label">VaR 95%</div><div class="hkpi-val">${lv?.var_pct||'—'}%</div></div>
+      <div class="hkpi"><div class="hkpi-label">Modalità</div><div class="hkpi-val">${currentClient.modalita||'—'}</div></div>
+    </div>`;
+
+  // Reset tabs
+  document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('active',i===0));
+  document.querySelectorAll('.tab-content').forEach((t,i)=>t.classList.toggle('active',i===0));
+  currentTab='portafoglio';
+
+  renderPortafoglio();
+  renderSegnali();
+  renderCedola();
+  renderSettings();
+
+  showView('detail');
+}
+
+// ── PORTAFOGLIO ──────────────────────────────────────────────────
+function renderPortafoglio(){
+  if(!currentClient) return;
+  const lv = getLevelById(currentClient.livello);
+
+  // Alloc bars
+  const alloc = lv?.alloc||{};
+  const colors = {monetario:'#0EA5E9',obbligaz:'#6366F1',hy:'#F59E0B',azionario:'#22C55E'};
+  const labels = {monetario:'Monetario',obbligaz:'Obbligaz.',hy:'High Yield',azionario:'Azionario'};
+  document.getElementById('alloc-bars').innerHTML = Object.entries(alloc).map(([k,v])=>
+    v>0?`<div class="alloc-seg" style="width:${v}%;background:${colors[k]}"></div>`:''
+  ).join('');
+  document.getElementById('alloc-legend').innerHTML = Object.entries(alloc).map(([k,v])=>
+    v>0?`<div class="al-item"><div class="al-dot" style="background:${colors[k]}"></div>${labels[k]} ${v}%</div>`:''
+  ).join('');
+
+  // Stats
+  const cap = currentClient.capitale||0;
+  const rend = lv?.rendimento_atteso||0;
+  const varP = lv?.var_pct||0;
+  const cedola = Math.round(cap*rend/100);
+  const varEuro = Math.round(cap*varP/100);
+  document.getElementById('ptf-stats').innerHTML = `
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <div class="cm"><div class="cml">Rendimento atteso</div><div class="cmv" style="color:var(--green)">${rend}%</div></div>
+      <div class="cm"><div class="cml">VaR 95% 1 anno</div><div class="cmv" style="color:var(--red)">${varP}% (€${varEuro.toLocaleString('it-IT')})</div></div>
+      <div class="cm"><div class="cml">Cedola/Rend. annua</div><div class="cmv" style="color:var(--gold)">€${cedola.toLocaleString('it-IT')}</div></div>
+      <div class="cm"><div class="cml">N. ETF in portafoglio</div><div class="cmv">${currentClient.portafoglio?.length||0}</div></div>
+      <div class="cm"><div class="cml">Profilo</div><div class="cmv">${lv?.nome||'—'}</div></div>
+      <div class="cm"><div class="cml">Tipo</div><div class="cmv">${lv?.tipo==='Dist'?'🔴 Distribuzione':'🔵 Accumulazione'}</div></div>
+    </div>`;
+
+  // Table
+  const ptf = currentClient.portafoglio||[];
+  if(!ptf.length){
+    document.getElementById('ptf-table').innerHTML=`<tr><td colspan="10" style="text-align:center;padding:20px;color:var(--text2)">Nessun portafoglio — clicca "Rigenera da Segnali"</td></tr>`;
+    return;
+  }
+  const cap2 = currentClient.capitale||0;
+  document.getElementById('ptf-table').innerHTML = ptf.map(p=>{
+    const sig = getSignal(p.ticker);
+    const importo = Math.round(cap2*p.peso/100);
+    const cedolaAnn = sig?Math.round(importo*(sig.yield_annuo||0)/100):0;
+    const ret1d = sig?.ret_1d;
+    return `<tr>
+      <td style="color:var(--blue);font-weight:500">${p.ticker}</td>
+      <td style="color:var(--text2);font-size:10px">${sig?.nome||p.nome||'—'}</td>
+      <td style="font-size:10px;color:var(--text2)">${sig?.categoria||'—'}</td>
+      <td style="font-weight:500">${p.peso.toFixed(1)}%</td>
+      <td>€${importo.toLocaleString('it-IT')}</td>
+      <td>${sigBadge(sig?.segnale)}</td>
+      <td style="color:var(--text2)">${sig?.score||'—'}</td>
+      <td style="color:var(--gold)">${sig?.yield_annuo?sig.yield_annuo+'%':'—'}</td>
+      <td style="color:var(--gold)">${cedolaAnn>0?'€'+cedolaAnn.toLocaleString('it-IT'):'—'}</td>
+      <td class="${rc(ret1d)}">${rf(ret1d,2)}</td>
+    </tr>`;
+  }).join('');
+}
+
+// ── BUILD PORTFOLIO ───────────────────────────────────────────────
+function buildPortfolio(){
+  if(!currentClient||!DATA) return;
+  const lv = getLevelById(currentClient.livello);
+  if(!lv) return;
+
+  const pool = lv.etf_pool||[];
+  const maxEtf = lv.n_etf_max||6;
+
+  // ── REGOLE DIVERSIFICAZIONE ──────────────────────────────────
+  // Classificazione leva e mercato per ogni ticker
+  const LEVA_TICKERS = new Set([
+    'L2SP.MI','2LVE.MI','UC44.MI','2NVD.MI','2TSL.MI','2AAP.MI','2AMZ.MI',
+    '3USL.MI','3EUL.MI','QQQ3.MI','3NVD.MI','3TSL.MI','3MSF.MI','GLD3.MI',
+    '5MVW.MI','3SUE.MI','WNAS.MI','EXSH.DE'
+  ]);
+  const MERCATO_MAP = {
+    'CSPX.MI':'usa','IUSA.MI':'usa','VUSA.MI':'usa','EQQQ.MI':'usa_tech',
+    'IUIT.MI':'usa_tech','XDWT.MI':'world','SWDA.MI':'world','VWCE.DE':'world',
+    'EXXW.DE':'world','EXX5.DE':'europa','EXV1.DE':'europa','MEUD.MI':'europa',
+    'IS3N.MI':'em','VAPX.MI':'asia','JPNH.MI':'giappone','ISPA.DE':'europa',
+    'NTSX.MI':'usa','NTSG.MI':'world','WRTY.MI':'usa_small','NTSZ.MI':'em',
+    'SMH.MI':'semi','SEME.MI':'semi','CHIP.MI':'semi','FCHP.DE':'semi',
+    'QQQ3.MI':'usa_tech','3USL.MI':'usa','L2SP.MI':'usa','2LVE.MI':'europa',
+    '3EUL.MI':'europa','EQQQ.MI':'usa_tech','USTEC.MI':'usa_tech',
+  };
+  function getMercato(t){ return MERCATO_MAP[t]||t.replace('.MI','').replace('.DE',''); }
+  function isLeva(t){ return LEVA_TICKERS.has(t); }
+
+  // ── RACCOLTA CANDIDATI ──────────────────────────────────────
+  const allCandidates = pool.map(t=>({ticker:t,sig:getSignal(t)}))
+    .filter(x=>x.sig)
+    .sort((a,b)=>(b.sig.score||0)-(a.sig.score||0));
+
+  const buyList   = allCandidates.filter(x=>['BUY','HOLD','ACCUMULA'].includes(x.sig.segnale));
+  const watchList = allCandidates.filter(x=>x.sig.segnale==='WATCH');
+  const allSorted = [...buyList, ...watchList];
+
+  if(!allSorted.length){
+    alert('Nessun ETF con segnale attivo nel pool di questo livello. Riprova dopo l\'aggiornamento notturno.');
+    return;
+  }
+
+  // ── SELEZIONE CON REGOLE ────────────────────────────────────
+  const selected = [];
+  const mercatiUsati = {};
+  let levaCount = 0;
+  const MAX_LEVA = 1;          // max 1 ETF leva
+  const MAX_PER_MERCATO = 2;   // max 2 ETF stesso mercato/indice
+
+  for(const x of allSorted){
+    if(selected.length >= maxEtf) break;
+    const t = x.ticker;
+
+    // Regola leva
+    if(isLeva(t)){
+      if(levaCount >= MAX_LEVA) continue;
+      levaCount++;
+    } else {
+      // Regola mercato
+      const m = getMercato(t);
+      const cnt = mercatiUsati[m]||0;
+      if(cnt >= MAX_PER_MERCATO) continue;
+      mercatiUsati[m] = cnt+1;
+    }
+    selected.push(x);
+  }
+
+  // Se ancora sotto minimo, rilassa regola mercato e riprova
+  if(selected.length < Math.min(4, maxEtf)){
+    const alreadyIn = new Set(selected.map(x=>x.ticker));
+    for(const x of allSorted){
+      if(selected.length >= maxEtf) break;
+      if(!alreadyIn.has(x.ticker)){ selected.push(x); alreadyIn.add(x.ticker); }
+    }
+  }
+
+  // ── PESI PROPORZIONALI ALL'ALLOCAZIONE TARGET ────────────────
+  // Mappa logica → macro-categoria allocazione del livello
+  const LOGICA_ALLOC = {
+    'monetario': 'monetario',
+    'obbligaz':  'obbligaz',
+    'reit':      'azionario',
+    'commodity': 'azionario',
+    'leva':      'azionario',
+    'azionario': 'azionario',
+  };
+  // Determina la macro-categoria di ogni ETF selezionato
+  function getEtfAlloc(ticker){
+    const sig = getSignal(ticker);
+    const logica = sig?.logica || 'azionario';
+    // High Yield dal nome categoria
+    if(sig?.categoria && sig.categoria.toLowerCase().includes('high yield')) return 'hy';
+    return LOGICA_ALLOC[logica] || 'azionario';
+  }
+
+  const alloc = lv.alloc || {};
+  // Conta quanti ETF per ogni macro-categoria
+  const etfPerAlloc = {};
+  selected.forEach(x=>{
+    const a = getEtfAlloc(x.ticker);
+    etfPerAlloc[a] = (etfPerAlloc[a]||0) + 1;
+  });
+
+  // Assegna peso: quota_allocazione / num_etf_in_quella_categoria
+  currentClient.portafoglio = selected.map(x=>{
+    const a = getEtfAlloc(x.ticker);
+    const quotaAlloc = alloc[a] || (100/selected.length);
+    const nInCategoria = etfPerAlloc[a] || 1;
+    const peso = Math.round((quotaAlloc / nInCategoria) * 10) / 10;
+    return { ticker: x.ticker, nome: x.sig.nome||x.ticker, peso };
+  });
+
+  // Aggiusta arrotondamento finale
+  const tot = currentClient.portafoglio.reduce((s,p)=>s+p.peso, 0);
+  const diff = Math.round((100-tot)*10)/10;
+  if(diff !== 0) currentClient.portafoglio[0].peso =
+    Math.round((currentClient.portafoglio[0].peso+diff)*10)/10;
+
+  lsSaveClient(currentClient);
+  renderPortafoglio();
+  renderCedola();
+  const levi = selected.filter(x=>isLeva(x.ticker)).length;
+  alert('✅ Portafoglio generato: ' + selected.length + ' ETF\n' +
+        'BUY: ' + selected.filter(x=>x.sig&&['BUY','HOLD','ACCUMULA'].includes(x.sig.segnale)).length +
+        ' · WATCH: ' + selected.filter(x=>x.sig&&x.sig.segnale==='WATCH').length +
+        ' · Leva: ' + levi +
+        '\nRegole: max 1 leva · max 2 per mercato');
+}
+
+// ── SEGNALI ──────────────────────────────────────────────────────
+function renderSegnali(){
+  if(!currentClient||!DATA) return;
+  const lv = getLevelById(currentClient.livello);
+  const pool = lv?.etf_pool||[];
+
+  const items = pool.map(t=>({ticker:t,sig:getSignal(t)}))
+    .filter(x=>x.sig)
+    .sort((a,b)=>(b.sig.score||0)-(a.sig.score||0));
+
+  document.getElementById('segnali-list').innerHTML = `
+    <div style="margin-bottom:10px;font-size:9px;color:var(--text2)">
+      Pool: ${pool.length} ETF · Con segnale: ${items.length} · 
+      BUY/HOLD: ${items.filter(x=>['BUY','HOLD','ACCUMULA'].includes(x.sig.segnale)).length} · 
+      WATCH: ${items.filter(x=>x.sig.segnale==='WATCH').length} · 
+      SELL: ${items.filter(x=>['SELL','RIDUCI'].includes(x.sig.segnale)).length}
+    </div>
+    ${items.map(x=>`
+      <div class="etf-row">
+        <div class="etf-ticker">${x.ticker}</div>
+        <div class="etf-nome">${x.sig.nome}</div>
+        <div class="etf-sig ${x.sig.segnale==='BUY'||x.sig.segnale==='HOLD'||x.sig.segnale==='ACCUMULA'?'sb-buy':x.sig.segnale==='WATCH'?'sb-watch':'sb-sell'}">${x.sig.segnale}</div>
+        <div class="etf-score">${x.sig.score}</div>
+        <div style="font-size:9px;color:var(--gold);width:50px;text-align:right">${x.sig.yield_annuo?x.sig.yield_annuo+'%':'—'}</div>
+        <div class="${rc(x.sig.ret_1d)} etf-peso">${rf(x.sig.ret_1d,2)}</div>
+      </div>`).join('')}`;
+}
+
+// ── CEDOLA ────────────────────────────────────────────────────────
+function renderCedola(){
+  if(!currentClient) return;
+  const lv = getLevelById(currentClient.livello);
+  const cap = currentClient.capitale||0;
+  const pac = currentClient.pac_mensile||0;
+  const rend = lv?.rendimento_atteso||0;
+  const isDist = lv?.tipo==='Dist';
+
+  // Calcola cedola dal portafoglio se disponibile
+  let cedolaAnn = 0;
+  if(currentClient.portafoglio?.length>0 && cap>0){
+    currentClient.portafoglio.forEach(p=>{
+      const sig = getSignal(p.ticker);
+      if(sig?.yield_annuo){
+        cedolaAnn += Math.round(cap*p.peso/100 * sig.yield_annuo/100);
+      }
+    });
+  } else {
+    cedolaAnn = Math.round(cap*rend/100);
+  }
+
+  const cedolaMens = Math.round(cedolaAnn/12);
+  const cedolaTrim = Math.round(cedolaAnn/4);
+
+  // PAC simulazione
+  let pacHtml='';
+  if(pac>0){
+    const durata = currentClient.pac_durata_mesi||120;
+    const r = rend/100/12;
+    const fv5  = pac*((Math.pow(1+r,60)-1)/r);
+    const fv10 = pac*((Math.pow(1+r,120)-1)/r);
+    const fv20 = pac*((Math.pow(1+r,240)-1)/r);
+    pacHtml=`
+      <div class="panel" style="margin-top:16px">
+        <div class="panel-header"><div class="panel-title">Simulazione PAC — €${pac.toLocaleString('it-IT')}/mese</div></div>
+        <div class="panel-body">
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px">
+            <div class="cm"><div class="cml">5 anni (60 versamenti)</div>
+              <div class="cmv" style="color:var(--green)">€${Math.round(fv5).toLocaleString('it-IT')}</div>
+              <div style="font-size:9px;color:var(--text2)">Versato: €${(pac*60).toLocaleString('it-IT')}</div>
+            </div>
+            <div class="cm"><div class="cml">10 anni (120 versamenti)</div>
+              <div class="cmv" style="color:var(--green)">€${Math.round(fv10).toLocaleString('it-IT')}</div>
+              <div style="font-size:9px;color:var(--text2)">Versato: €${(pac*120).toLocaleString('it-IT')}</div>
+            </div>
+            <div class="cm"><div class="cml">20 anni (240 versamenti)</div>
+              <div class="cmv" style="color:var(--green)">€${Math.round(fv20).toLocaleString('it-IT')}</div>
+              <div style="font-size:9px;color:var(--text2)">Versato: €${(pac*240).toLocaleString('it-IT')}</div>
+            </div>
+          </div>
+          <div style="font-size:9px;color:var(--text2);margin-top:8px">* Simulazione basata su rendimento atteso ${rend}% annuo. Non garantito.</div>
+        </div>
+      </div>`;
+  }
+
+  document.getElementById('cedola-content').innerHTML = `
+    <div class="cedola-box">
+      <div class="cedola-title">${isDist?'STIMA CEDOLA ANNUA':'RENDIMENTO ATTESO ANNUO'}</div>
+      <div class="cedola-val">€${cedolaAnn.toLocaleString('it-IT')}</div>
+      <div class="cedola-sub">Su capitale di €${cap.toLocaleString('it-IT')} · Yield medio ponderato ~${rend}%</div>
+      <div class="cedola-grid">
+        ${isDist?`
+        <div class="ced-item"><div class="ced-label">Mensile</div><div class="ced-val" style="color:var(--gold2)">€${cedolaMens.toLocaleString('it-IT')}</div></div>
+        <div class="ced-item"><div class="ced-label">Trimestrale</div><div class="ced-val" style="color:var(--gold2)">€${cedolaTrim.toLocaleString('it-IT')}</div></div>
+        <div class="ced-item"><div class="ced-label">Annuale</div><div class="ced-val" style="color:var(--gold2)">€${cedolaAnn.toLocaleString('it-IT')}</div></div>
+        `:`
+        <div class="ced-item"><div class="ced-label">Capitalizzazione 5a</div><div class="ced-val" style="color:var(--gold2)">€${Math.round(cap*Math.pow(1+rend/100,5)).toLocaleString('it-IT')}</div></div>
+        <div class="ced-item"><div class="ced-label">Capitalizzazione 10a</div><div class="ced-val" style="color:var(--gold2)">€${Math.round(cap*Math.pow(1+rend/100,10)).toLocaleString('it-IT')}</div></div>
+        <div class="ced-item"><div class="ced-label">Capitalizzazione 20a</div><div class="ced-val" style="color:var(--gold2)">€${Math.round(cap*Math.pow(1+rend/100,20)).toLocaleString('it-IT')}</div></div>
+        `}
+      </div>
+    </div>
+    <div style="font-size:9px;color:var(--text2);margin-top:8px;padding:0 4px">* Stima basata su yield medio ponderato degli ETF in portafoglio. Non costituisce garanzia di rendimento.</div>
+    ${pacHtml}`;
+}
+
+// ── SETTINGS ─────────────────────────────────────────────────────
+function renderSettings(){
+  if(!currentClient) return;
+  const cl = currentClient;
+  document.getElementById('settings-form').innerHTML=`
+    <div class="form-group"><label class="form-label">Nome</label><input class="form-input" id="st-nome" value="${cl.nome}"></div>
+    <div class="form-group"><label class="form-label">Livello</label>
+      <select class="form-input form-select" id="st-livello">
+        ${LEVELS.map(l=>`<option value="${l.id}" ${l.id===cl.livello?'selected':''}>${l.id} — ${l.nome}</option>`).join('')}
+      </select>
+    </div>
+    <div class="form-group"><label class="form-label">Capitale €</label><input class="form-input" type="number" id="st-capitale" value="${cl.capitale||0}"></div>
+    <div class="form-group"><label class="form-label">PAC Mensile €</label><input class="form-input" type="number" id="st-pac" value="${cl.pac_mensile||0}"></div>
+    <div class="form-group"><label class="form-label">Modalità</label>
+      <select class="form-input form-select" id="st-modalita">
+        <option value="unica" ${cl.modalita==='unica'?'selected':''}>Unica soluzione</option>
+        <option value="pac" ${cl.modalita==='pac'?'selected':''}>Solo PAC</option>
+        <option value="misto" ${cl.modalita==='misto'?'selected':''}>Misto</option>
+      </select>
+    </div>
+    <div class="form-group"><label class="form-label">Data apertura</label><input class="form-input" type="date" id="st-data" value="${cl.data_apertura||''}"></div>
+    <div class="form-group full"><label class="form-label">Note</label><textarea class="form-input" id="st-note" rows="2">${cl.note||''}</textarea></div>`;
+
+  document.getElementById('client-link-box').innerHTML=`
+    <div class="link-box">
+      <div class="link-url">${CLIENT_BASE}${cl.id}</div>
+      <div class="link-copy" onclick="copyLink('${CLIENT_BASE}${cl.id}')">Copia</div>
+    </div>`;
+}
+
+function saveSettings(){
+  if(!currentClient) return;
+  currentClient.nome = document.getElementById('st-nome').value;
+  currentClient.livello = document.getElementById('st-livello').value;
+  currentClient.capitale = parseFloat(document.getElementById('st-capitale').value)||0;
+  currentClient.pac_mensile = parseFloat(document.getElementById('st-pac').value)||0;
+  currentClient.modalita = document.getElementById('st-modalita').value;
+  currentClient.data_apertura = document.getElementById('st-data').value;
+  currentClient.note = document.getElementById('st-note').value;
+  lsSaveClient(currentClient);
+  renderSidebar();
+  renderCards();
+  renderPortafoglio();
+  renderCedola();
+  alert('✅ Impostazioni salvate nel browser (persistenti)');
+}
+
+function copyLink(url){
+  navigator.clipboard.writeText(url).then(()=>alert('Link copiato!'));
+}
+
+function openClientPortal(){
+  if(!currentClient) return;
+  window.open(CLIENT_BASE+currentClient.id,'_blank');
+}
+
+// ── INTERVIEW ────────────────────────────────────────────────────
+function updateModalita(){
+  const m = document.getElementById('iv-modalita').value;
+  document.getElementById('iv-capitale-wrap').style.display = m==='pac'?'none':'block';
+  document.getElementById('iv-pac-wrap').style.display = m==='unica'?'none':'block';
+  document.getElementById('iv-durata-wrap').style.display = m==='unica'?'none':'block';
+}
+
+function calcProfile(){
+  const orizzonte = parseInt(document.getElementById('iv-orizzonte').value||0);
+  const perdita   = parseInt(document.getElementById('iv-perdita').value||0);
+  const obiettivo = document.getElementById('iv-obiettivo').value;
+  const distribuzione = document.getElementById('iv-distribuzione').value;
+  const liquidita = document.getElementById('iv-liquidita').value;
+
+  if(!orizzonte||!perdita||!obiettivo||!distribuzione){
+    alert('Compila i campi obbligatori (*)');
+    return;
+  }
+
+  // Score rischio 1-9
+  let score = 0;
+  score += orizzonte * 1.5;
+  score += perdita * 1.5;
+  if(obiettivo==='protezione')    score -= 2;
+  if(obiettivo==='reddito')       score += 0;
+  if(obiettivo==='crescita')      score += 1;
+  if(obiettivo==='trading')       score += 2;
+  if(liquidita==='totale')        score -= 2;
+  if(liquidita==='parziale')      score -= 1;
+
+  let livello_num = Math.max(1, Math.min(9, Math.round(score)));
+  const prefix = distribuzione==='acc'?'A':'C';
+  const livelloId = prefix+livello_num;
+
+  const lv = getLevelById(livelloId) || getLevelById(prefix+'5');
+  const capitale = parseFloat(document.getElementById('iv-capitale').value)||0;
+  const pac = parseFloat(document.getElementById('iv-pac').value)||0;
+  const rend = lv?.rendimento_atteso||0;
+  const cedola = capitale>0?Math.round(capitale*rend/100):0;
+
+  document.getElementById('iv-result').style.display='block';
+  document.getElementById('iv-result').innerHTML=`
+    <div style="background:var(--navy);border-radius:var(--radius);padding:18px;color:#fff;margin-bottom:12px">
+      <div style="font-size:9px;letter-spacing:2px;color:rgba(255,255,255,.4);margin-bottom:6px">PROFILO ASSEGNATO</div>
+      <div style="font-family:'Fraunces',serif;font-size:24px;font-weight:300;color:${lv?.colore};">${lv?.nome||livelloId}</div>
+      <div style="font-size:10px;color:rgba(255,255,255,.4);margin-top:4px">${lv?.obiettivo||''}</div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:14px">
+        <div style="background:rgba(255,255,255,.05);border-radius:8px;padding:10px">
+          <div style="font-size:8px;color:rgba(255,255,255,.3);margin-bottom:2px">REND. ATTESO</div>
+          <div style="color:#22C55E;font-size:16px">${rend}%</div>
+        </div>
+        <div style="background:rgba(255,255,255,.05);border-radius:8px;padding:10px">
+          <div style="font-size:8px;color:rgba(255,255,255,.3);margin-bottom:2px">VAR 95%</div>
+          <div style="color:#EF4444;font-size:16px">${lv?.var_pct||'—'}%</div>
+        </div>
+        <div style="background:rgba(255,255,255,.05);border-radius:8px;padding:10px">
+          <div style="font-size:8px;color:rgba(255,255,255,.3);margin-bottom:2px">CEDOLA/REND. ANN.</div>
+          <div style="color:var(--gold2);font-size:16px">${cedola>0?'€'+cedola.toLocaleString('it-IT'):'—'}</div>
+        </div>
+        <div style="background:rgba(255,255,255,.05);border-radius:8px;padding:10px">
+          <div style="font-size:8px;color:rgba(255,255,255,.3);margin-bottom:2px">TIPO</div>
+          <div style="font-size:14px">${lv?.tipo==='Dist'?'🔴 Cedola':'🔵 Acc'}</div>
+        </div>
+      </div>
+    </div>
+    <div style="display:flex;gap:8px">
+      <button class="btn-gold" onclick="applyProfile('${lv?.id||livelloId}')">Applica a Cliente Esistente →</button>
+    </div>`;
+}
+
+function applyProfile(livelloId){
+  const id = prompt('ID Cliente (es. ClienteC5):');
+  if(!id) return;
+  const cl = getClientById(id);
+  if(!cl){ alert('Cliente non trovato'); return; }
+  cl.livello = livelloId;
+  cl.capitale = parseFloat(document.getElementById('iv-capitale').value)||0;
+  cl.pac_mensile = parseFloat(document.getElementById('iv-pac').value)||0;
+  cl.modalita = document.getElementById('iv-modalita').value||'unica';
+  renderSidebar();
+  renderCards();
+  alert(`✅ Profilo ${livelloId} applicato a ${cl.nome}`);
+  showView('clients');
+}
+
+// ── NAVIGATION ───────────────────────────────────────────────────
+function showView(v){
+  document.getElementById('view-clients').style.display   = v==='clients'?'block':'none';
+  document.getElementById('view-detail').style.display    = v==='detail'?'block':'none';
+  document.getElementById('view-interview').style.display = v==='interview'?'block':'none';
+  document.querySelectorAll('.nav-pill').forEach(el=>{
+    el.classList.remove('active');
+    if((v==='clients'&&el.textContent==='Clienti')||(v==='interview'&&el.textContent==='Nuova Intervista'))
+      el.classList.add('active');
+  });
+}
+
+function showTab(id, el){
+  currentTab=id;
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('tab-'+id).classList.add('active');
+}
+
+loadAll();
+setInterval(loadAll, 10*60*1000);
+</script>
+</body>
+</html>
