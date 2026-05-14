@@ -1,0 +1,37 @@
+name: COMPASS — fetch segnali ETF
+
+on:
+  schedule:
+    - cron: '30 18 * * 1-5'   # 20:30 CET (18:30 UTC) ogni giorno feriale
+  workflow_dispatch:            # esecuzione manuale
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dipendenze
+        run: pip install -r requirements.txt
+
+      - name: Esegui fetch_cps.py
+        run: python fetch_cps.py
+
+      - name: Commit rwm_signals.json
+        run: |
+          git config user.name  "compass-bot"
+          git config user.email "compass-bot@users.noreply.github.com"
+          git add data/rwm_signals.json
+          git diff --cached --quiet || git commit -m "📊 Segnali CPS $(date -u '+%Y-%m-%d %H:%M UTC')"
+          git push
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
