@@ -1,0 +1,1172 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>COMPASS — Advisor Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;0,9..144,700;1,9..144,300&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F5F3EE;--surface:#FAFAF7;--navy:#0A1628;--navy2:#122040;
+  --gold:#C9A84C;--gold2:#E8C96A;--text:#1A1A2A;--text2:#6B7280;
+  --border:#E2DDD6;--border2:#EDE9E2;
+  --green:#16A34A;--green-bg:#DCFCE7;--green-bd:#86EFAC;
+  --red:#DC2626;--red-bg:#FEE2E2;--red-bd:#FCA5A5;
+  --orange:#D97706;--orange-bg:#FEF3C7;--orange-bd:#FCD34D;
+  --blue:#1D4ED8;--blue-bg:#DBEAFE;--blue-bd:#93C5FD;
+  --shadow:0 2px 8px rgba(10,22,40,.08);
+  --radius:12px;--radius-sm:8px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:"DM Mono",monospace;background:var(--bg);color:var(--text);min-height:100vh;}
+button{font-family:"DM Mono",monospace;cursor:pointer;border:none;background:none;}
+input,select,textarea{font-family:"DM Mono",monospace;}
+a{text-decoration:none;}
+
+/* NAVBAR */
+.navbar{background:var(--navy);height:54px;display:flex;align-items:center;padding:0 20px;gap:10px;position:sticky;top:0;z-index:200;box-shadow:0 2px 20px rgba(0,0,0,.3);}
+.brand{display:flex;align-items:center;gap:10px;flex-shrink:0;}
+.brand-compass{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--gold),var(--gold2));display:flex;align-items:center;justify-content:center;font-size:15px;}
+.brand-name{font-family:"Fraunces",serif;font-size:15px;font-weight:600;color:#fff;}
+.brand-sub{font-size:8px;color:rgba(255,255,255,.3);letter-spacing:2px;text-transform:uppercase;}
+.nav-sep{width:1px;height:20px;background:rgba(255,255,255,.1);flex-shrink:0;}
+.nav-right{margin-left:auto;display:flex;align-items:center;gap:7px;flex-wrap:nowrap;}
+.nav-pill{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);color:rgba(255,255,255,.6);font-size:9px;padding:4px 10px;border-radius:20px;cursor:pointer;white-space:nowrap;transition:all .15s;}
+.nav-pill:hover{background:rgba(255,255,255,.15);color:#fff;}
+.nav-pill.active{background:var(--gold);border-color:var(--gold);color:var(--navy);font-weight:500;}
+.nav-pill.etf-btn{background:rgba(29,78,216,.25);border-color:rgba(147,197,253,.3);color:#93C5FD;}
+.nav-pill.etf-btn:hover{background:rgba(29,78,216,.45);color:#fff;}
+.status-row{display:flex;align-items:center;gap:5px;}
+.status-dot{width:6px;height:6px;border-radius:50%;background:#22C55E;animation:pulse 2s infinite;flex-shrink:0;}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.nav-meta{font-size:8px;color:rgba(255,255,255,.3);letter-spacing:.5px;white-space:nowrap;}
+
+/* LAYOUT */
+.layout{display:grid;grid-template-columns:240px 1fr;min-height:calc(100vh - 54px);}
+.sidebar{background:var(--navy2);border-right:1px solid rgba(255,255,255,.06);padding:12px 10px;display:flex;flex-direction:column;gap:3px;overflow-y:auto;}
+.sidebar-section{font-size:7px;letter-spacing:2px;color:rgba(255,255,255,.25);padding:10px 8px 3px;text-transform:uppercase;}
+.sidebar-section:first-child{padding-top:3px;}
+.client-item{display:flex;align-items:center;gap:7px;padding:7px 9px;border-radius:var(--radius-sm);cursor:pointer;transition:all .15s;border:1px solid transparent;}
+.client-item:hover{background:rgba(255,255,255,.05);}
+.client-item.active{background:rgba(201,168,76,.12);border-color:rgba(201,168,76,.25);}
+.client-avatar{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:500;flex-shrink:0;}
+.client-info{flex:1;overflow:hidden;}
+.client-name{font-size:9px;color:rgba(255,255,255,.75);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.client-level{font-size:7px;color:rgba(255,255,255,.3);margin-top:1px;}
+.client-signal{width:5px;height:5px;border-radius:50%;flex-shrink:0;}
+.sig-green{background:#22C55E;}.sig-orange{background:#F59E0B;}.sig-gray{background:#6B7280;}
+
+.main{overflow-y:auto;background:var(--bg);}
+
+/* HERO */
+.hero-strip{background:var(--navy);padding:18px 24px;border-bottom:1px solid rgba(255,255,255,.06);}
+.hero-title{font-family:"Fraunces",serif;font-size:20px;font-weight:300;color:#fff;margin-bottom:3px;}
+.hero-title span{color:var(--gold2);}
+.hero-sub{font-size:9px;color:rgba(255,255,255,.3);letter-spacing:1px;}
+.hero-kpis{display:flex;gap:20px;margin-top:12px;flex-wrap:wrap;}
+.hkpi{border-left:2px solid rgba(201,168,76,.3);padding-left:10px;}
+.hkpi-label{font-size:7px;color:rgba(255,255,255,.3);letter-spacing:1.5px;text-transform:uppercase;}
+.hkpi-val{font-size:16px;font-weight:300;color:#fff;margin-top:1px;}
+.hkpi-val.gold{color:var(--gold2);}
+
+.content{padding:20px 24px;}
+
+/* LIVELLI GRID — homepage principale */
+.livelli-section{margin-bottom:28px;}
+.livelli-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+.livelli-title{font-size:9px;letter-spacing:2px;color:var(--text2);text-transform:uppercase;display:flex;align-items:center;gap:8px;}
+.livelli-grid{display:grid;grid-template-columns:repeat(9,1fr);gap:6px;}
+.livello-card{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--radius-sm);padding:10px 8px;cursor:pointer;transition:all .18s;position:relative;overflow:hidden;}
+.livello-card:hover{border-color:var(--gold);transform:translateY(-2px);box-shadow:0 6px 20px rgba(201,168,76,.15);}
+.livello-card.has-client{border-color:rgba(201,168,76,.4);background:rgba(201,168,76,.04);}
+.lc-bar{position:absolute;top:0;left:0;right:0;height:2px;}
+.lc-id{font-size:13px;font-weight:600;text-align:center;margin-bottom:3px;}
+.lc-nome{font-size:7px;color:var(--text2);text-align:center;line-height:1.3;margin-bottom:6px;}
+.lc-rend{font-size:10px;font-weight:500;text-align:center;color:var(--green);}
+.lc-var{font-size:7px;color:var(--red);text-align:center;margin-top:1px;}
+.lc-n{font-size:7px;color:var(--text2);text-align:center;margin-top:4px;padding-top:4px;border-top:1px solid var(--border2);}
+
+/* CLIENT CARDS */
+.cards-row{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;margin-bottom:20px;}
+.client-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;cursor:pointer;transition:all .15s;}
+.client-card:hover{border-color:var(--gold);box-shadow:0 4px 20px rgba(201,168,76,.12);}
+.card-head{padding:12px 14px;display:flex;align-items:center;gap:9px;border-bottom:1px solid var(--border2);}
+.card-avatar{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:500;flex-shrink:0;}
+.card-name{font-family:"Fraunces",serif;font-size:12px;font-weight:600;color:var(--text);}
+.card-level{font-size:8px;color:var(--text2);margin-top:1px;}
+.card-body{padding:10px 14px;}
+.card-metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:8px;}
+.cm{background:var(--bg);border-radius:5px;padding:6px 8px;}
+.cml{font-size:7px;color:var(--text2);letter-spacing:.8px;text-transform:uppercase;margin-bottom:1px;}
+.cmv{font-size:12px;font-weight:500;}
+.card-footer{padding:7px 14px;border-top:1px solid var(--border2);display:flex;gap:5px;}
+.cf-btn{flex:1;padding:5px;border-radius:5px;font-size:8px;letter-spacing:.5px;text-transform:uppercase;font-weight:500;text-align:center;cursor:pointer;transition:all .15s;}
+.cf-primary{background:var(--navy);color:#fff;}
+.cf-secondary{background:var(--bg);border:1px solid var(--border);color:var(--text2);}
+.cf-secondary:hover{border-color:var(--gold);color:var(--gold);}
+
+/* SIGNAL BADGE */
+.signal-badge{padding:2px 9px;border-radius:10px;font-size:8px;font-weight:500;border:1px solid;display:inline-block;}
+.sb-buy{background:var(--green-bg);color:var(--green);border-color:var(--green-bd);}
+.sb-hold{background:var(--blue-bg);color:var(--blue);border-color:var(--blue-bd);}
+.sb-watch{background:var(--orange-bg);color:var(--orange);border-color:var(--orange-bd);}
+.sb-sell{background:var(--red-bg);color:var(--red);border-color:var(--red-bd);}
+.sb-none{background:#F3F4F6;color:#6B7280;border-color:#D1D5DB;}
+
+/* PANEL */
+.panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;margin-bottom:14px;}
+.panel-header{padding:12px 16px;border-bottom:1px solid var(--border2);display:flex;align-items:center;justify-content:space-between;}
+.panel-title{font-size:10px;font-weight:500;letter-spacing:.5px;text-transform:uppercase;color:var(--text2);}
+.panel-body{padding:16px;}
+
+/* TABS */
+.tabs{display:flex;gap:2px;border-bottom:1px solid var(--border);margin-bottom:16px;}
+.tab{padding:8px 14px;font-size:9px;letter-spacing:.5px;color:var(--text2);border-bottom:2px solid transparent;cursor:pointer;transition:all .15s;}
+.tab.active{color:var(--gold);border-bottom-color:var(--gold);}
+.tab-content{display:none;}
+.tab-content.active{display:block;}
+
+/* TABLE */
+.tbl-wrap{overflow-x:auto;}
+table{width:100%;border-collapse:collapse;}
+thead th{background:var(--navy);color:rgba(255,255,255,.6);font-size:8px;letter-spacing:1px;text-transform:uppercase;padding:8px 10px;text-align:left;white-space:nowrap;}
+tbody tr{border-bottom:1px solid var(--border2);transition:background .1s;}
+tbody tr:hover{background:rgba(201,168,76,.04);}
+td{padding:8px 10px;font-size:10px;white-space:nowrap;}
+.ret-p{color:var(--green);}.ret-n{color:var(--red);}.ret-z{color:var(--text2);}
+
+/* IND PILLS */
+.ind-pill{display:inline-flex;align-items:center;padding:1px 5px;border-radius:3px;font-size:7px;margin:1px;}
+.ind-on{background:var(--green-bg);color:var(--green);border:1px solid var(--green-bd);}
+.ind-off{background:var(--red-bg);color:var(--red);border:1px solid var(--red-bd);}
+
+/* ALLOC */
+.alloc-bars{display:flex;height:7px;border-radius:4px;overflow:hidden;margin:8px 0;}
+.alloc-seg{height:100%;}
+.alloc-legend{display:flex;gap:10px;flex-wrap:wrap;}
+.al-item{display:flex;align-items:center;gap:3px;font-size:8px;color:var(--text2);}
+.al-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
+
+/* FORM */
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.form-group{display:flex;flex-direction:column;gap:4px;}
+.form-group.full{grid-column:1/-1;}
+.form-label{font-size:8px;letter-spacing:1px;text-transform:uppercase;color:var(--text2);}
+.form-input{background:var(--bg);border:1.5px solid var(--border);color:var(--text);font-size:10px;padding:7px 10px;border-radius:var(--radius-sm);outline:none;transition:border-color .15s;}
+.form-input:focus{border-color:var(--gold);}
+.form-select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%236B7280'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 8px center;}
+.btn-gold{background:linear-gradient(135deg,var(--gold),var(--gold2));color:var(--navy);padding:8px 20px;border-radius:var(--radius-sm);font-size:9px;font-weight:500;letter-spacing:1px;text-transform:uppercase;cursor:pointer;border:none;transition:opacity .15s;}
+.btn-gold:hover{opacity:.88;}
+.btn-outline{background:transparent;border:1.5px solid var(--border);color:var(--text2);padding:8px 20px;border-radius:var(--radius-sm);font-size:9px;letter-spacing:1px;text-transform:uppercase;cursor:pointer;}
+.btn-outline:hover{border-color:var(--gold);color:var(--gold);}
+
+/* CEDOLA BOX */
+.cedola-box{background:linear-gradient(135deg,var(--navy),var(--navy2));border-radius:var(--radius);padding:16px;margin-top:12px;color:#fff;}
+.cedola-val{font-family:"Fraunces",serif;font-size:30px;font-weight:300;color:var(--gold2);line-height:1;}
+.cedola-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:12px;}
+.ced-item{background:rgba(255,255,255,.05);border-radius:7px;padding:8px 10px;}
+.ced-label{font-size:7px;color:rgba(255,255,255,.3);letter-spacing:1px;text-transform:uppercase;margin-bottom:2px;}
+.ced-val{font-size:13px;font-weight:500;}
+
+/* SECTION TITLE */
+.section-title{font-size:8px;letter-spacing:2px;color:var(--text2);text-transform:uppercase;margin-bottom:10px;padding-bottom:7px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:7px;}
+
+.loading{padding:40px;text-align:center;color:var(--text2);font-size:10px;}
+.spinner{width:26px;height:26px;border:2px solid var(--border);border-top-color:var(--gold);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 10px;}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+.link-box{background:var(--navy);border-radius:var(--radius-sm);padding:9px 12px;display:flex;align-items:center;gap:8px;margin-top:8px;}
+.link-url{font-size:9px;color:var(--gold2);flex:1;word-break:break-all;}
+.link-copy{font-size:8px;color:rgba(255,255,255,.4);padding:3px 7px;border:1px solid rgba(255,255,255,.1);border-radius:3px;cursor:pointer;}
+.link-copy:hover{color:#fff;}
+
+/* ══ ETF UNIVERSE MODAL ══════════════════════════════════════════ */
+.etf-modal-overlay{position:fixed;inset:0;background:rgba(10,22,40,.75);z-index:900;display:none;align-items:flex-start;justify-content:center;padding:16px;overflow-y:auto;backdrop-filter:blur(4px);}
+.etf-modal-overlay.open{display:flex;}
+.etf-modal{background:var(--surface);border-radius:var(--radius);width:100%;max-width:1120px;box-shadow:0 24px 60px rgba(0,0,0,.4);display:flex;flex-direction:column;overflow:hidden;margin:auto;}
+.etf-modal-head{background:var(--navy);padding:14px 18px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+.etf-modal-title{font-family:"Fraunces",serif;font-size:15px;font-weight:300;color:#fff;}
+.etf-modal-sub{font-size:8px;color:rgba(255,255,255,.35);margin-top:2px;}
+.etf-modal-close{background:rgba(255,255,255,.1);border:none;color:#fff;width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:15px;}
+.etf-modal-body{overflow-y:auto;padding:18px;max-height:85vh;}
+
+/* Filters */
+.etf-filters{display:flex;gap:7px;margin-bottom:14px;flex-wrap:wrap;align-items:center;}
+.etf-filter-btn{padding:3px 11px;border-radius:20px;font-size:8px;border:1px solid var(--border);color:var(--text2);cursor:pointer;background:var(--surface);transition:all .15s;}
+.etf-filter-btn:hover,.etf-filter-btn.active{background:var(--navy);border-color:var(--navy);color:#fff;}
+.etf-search{background:var(--bg);border:1.5px solid var(--border);color:var(--text);font-size:10px;padding:5px 11px;border-radius:20px;outline:none;width:180px;}
+.etf-search:focus{border-color:var(--gold);}
+
+/* Stats bar */
+.etf-stats-bar{display:flex;gap:10px;margin-bottom:12px;flex-wrap:wrap;align-items:center;}
+.stat-pill{font-size:8px;padding:3px 10px;border-radius:10px;border:1px solid;}
+
+/* ETF table */
+.etf-universe-table{width:100%;border-collapse:collapse;}
+.etf-universe-table thead th{background:var(--navy);color:rgba(255,255,255,.6);font-size:7px;letter-spacing:1px;text-transform:uppercase;padding:7px 9px;text-align:left;white-space:nowrap;position:sticky;top:0;z-index:1;}
+.etf-universe-table tbody tr{border-bottom:1px solid var(--border2);cursor:pointer;transition:background .1s;}
+.etf-universe-table tbody tr:hover{background:var(--bg);}
+.etf-universe-table tbody tr.selected{background:rgba(201,168,76,.07);}
+.etf-universe-table td{padding:7px 9px;vertical-align:middle;}
+
+/* Sparkline */
+.sparkline{display:inline-block;vertical-align:middle;}
+
+/* ── GRAFICO DETTAGLIO — scannerv2 style ── */
+.etf-detail-wrap{display:none;margin-top:16px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;}
+.etf-detail-head{background:var(--navy);padding:12px 16px;display:flex;align-items:center;justify-content:space-between;}
+.etf-detail-name{font-family:"Fraunces",serif;font-size:14px;font-weight:300;color:#fff;}
+.etf-detail-sig{font-size:9px;padding:3px 10px;border-radius:8px;font-weight:500;}
+.etf-detail-body{padding:16px;}
+.etf-kpis-row{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:14px;}
+.etf-kpi{background:var(--bg);border:1px solid var(--border2);border-radius:6px;padding:8px 10px;}
+.etf-kpi-label{font-size:7px;color:var(--text2);letter-spacing:.8px;text-transform:uppercase;margin-bottom:2px;}
+.etf-kpi-val{font-size:12px;font-weight:500;}
+.etf-kpi-sub{font-size:8px;color:var(--text2);margin-top:1px;}
+.chart-container{position:relative;background:var(--navy);border-radius:8px;overflow:hidden;padding:12px;}
+.chart-legend{display:flex;gap:14px;margin-bottom:10px;flex-wrap:wrap;}
+.chart-leg-item{display:flex;align-items:center;gap:5px;font-size:8px;color:rgba(255,255,255,.5);}
+.chart-leg-dot{width:20px;height:2px;border-radius:1px;}
+canvas#etf-chart{width:100%;display:block;}
+
+/* MODALS */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:500;display:flex;align-items:center;justify-content:center;padding:20px;}
+.modal-box{background:var(--surface);border-radius:var(--radius);width:100%;max-width:540px;max-height:80vh;display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,.3);overflow:hidden;}
+.modal-header{padding:14px 18px;background:var(--navy);color:#fff;display:flex;align-items:center;justify-content:space-between;}
+.modal-title{font-family:"Fraunces",serif;font-size:15px;font-weight:300;}
+.modal-close{background:rgba(255,255,255,.1);border:none;color:#fff;width:26px;height:26px;border-radius:50%;cursor:pointer;font-size:13px;}
+.modal-body{overflow-y:auto;padding:10px;}
+.modal-client-row{display:flex;align-items:center;gap:9px;padding:9px 11px;border-radius:7px;cursor:pointer;border:1px solid var(--border);margin-bottom:5px;transition:all .15s;}
+.modal-client-row:hover{border-color:var(--gold);background:rgba(201,168,76,.05);}
+.mcr-avatar{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:500;flex-shrink:0;}
+.mcr-nome{font-size:11px;font-weight:500;color:var(--text);}
+.mcr-level{font-size:8px;color:var(--text2);margin-top:1px;}
+.mcr-capitale{font-size:11px;color:var(--gold);font-weight:500;}
+.modal-empty{padding:24px;text-align:center;color:var(--text2);font-size:10px;}
+
+.select-modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:600;display:flex;align-items:center;justify-content:center;padding:20px;}
+.select-modal-box{background:var(--surface);border-radius:var(--radius);width:100%;max-width:460px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.3);}
+.client-select-row{display:flex;align-items:center;gap:9px;padding:9px 11px;border-radius:7px;cursor:pointer;border:1px solid var(--border);margin-bottom:5px;transition:all .15s;}
+.client-select-row:hover{border-color:var(--gold);background:rgba(201,168,76,.06);}
+
+@media(max-width:900px){
+  .layout{grid-template-columns:1fr;}
+  .sidebar{display:none;}
+  .livelli-grid{grid-template-columns:repeat(5,1fr);}
+  .form-grid{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="brand">
+    <div class="brand-compass">🧭</div>
+    <div>
+      <div class="brand-name">COMPASS</div>
+      <div class="brand-sub">Wealth Management</div>
+    </div>
+  </div>
+  <div class="nav-sep"></div>
+  <div class="nav-right">
+    <div class="status-row">
+      <div class="status-dot" id="statusDot"></div>
+      <div class="nav-meta" id="statusTxt">CARICAMENTO</div>
+    </div>
+    <div class="nav-meta" id="lastUpd">—</div>
+    <button class="nav-pill active" id="nav-home" onclick="showView('home')">🏠 Home</button>
+    <button class="nav-pill" id="nav-clients" onclick="showView('clients')">👥 Clienti</button>
+    <button class="nav-pill etf-btn" onclick="openETFModal()">📊 ETF Universe</button>
+    <button class="nav-pill" onclick="showView('interview')">➕ Intervista</button>
+    <button class="nav-pill" onclick="showModalClienti()" style="background:rgba(201,168,76,.2);border-color:var(--gold);color:var(--gold2)">⭐ Config.</button>
+    <button class="nav-pill" onclick="lsExport()">💾</button>
+    <button class="nav-pill" onclick="lsReset()" style="color:#EF4444">⚠</button>
+  </div>
+</nav>
+
+<div class="layout">
+<aside class="sidebar">
+  <div class="sidebar-section">🔴 Con Cedola</div>
+  <div id="sidebar-cedola"></div>
+  <div class="sidebar-section">🔵 Accumulazione</div>
+  <div id="sidebar-acc"></div>
+</aside>
+
+<main class="main">
+  <div id="view-loading" class="loading"><div class="spinner"></div>Caricamento dati...</div>
+
+  <!-- ══ VIEW: HOME ══ -->
+  <div id="view-home" style="display:none">
+    <div class="hero-strip">
+      <div class="hero-title">COMPASS — <span>Panoramica Portafogli</span></div>
+      <div class="hero-sub">18 LIVELLI · C1→A9 · SEGNALI LIVE</div>
+      <div class="hero-kpis">
+        <div class="hkpi"><div class="hkpi-label">AUM Totale</div><div class="hkpi-val gold" id="kpi-aum">—</div></div>
+        <div class="hkpi"><div class="hkpi-label">Clienti Attivi</div><div class="hkpi-val" id="kpi-clienti">—</div></div>
+        <div class="hkpi"><div class="hkpi-label">ETF Monitorati</div><div class="hkpi-val" id="kpi-etf">—</div></div>
+        <div class="hkpi"><div class="hkpi-label">BUY/HOLD</div><div class="hkpi-val gold" id="kpi-buy">—</div></div>
+        <div class="hkpi"><div class="hkpi-label">Aggiornamento</div><div class="hkpi-val" id="kpi-update">—</div></div>
+      </div>
+    </div>
+    <div class="content">
+
+      <!-- LIVELLI CON CEDOLA -->
+      <div class="livelli-section">
+        <div class="livelli-header">
+          <div class="livelli-title">🔴 Profili Con Cedola — C1 → C9</div>
+        </div>
+        <div class="livelli-grid" id="livelli-cedola"></div>
+      </div>
+
+      <!-- LIVELLI ACCUMULAZIONE -->
+      <div class="livelli-section">
+        <div class="livelli-header">
+          <div class="livelli-title">🔵 Profili Accumulazione — A1 → A9</div>
+        </div>
+        <div class="livelli-grid" id="livelli-acc"></div>
+      </div>
+
+      <!-- CLIENTI CONFIGURATI -->
+      <div id="home-configured-wrap" style="display:none">
+        <div class="section-title">⭐ Clienti Configurati</div>
+        <div class="cards-row" id="home-configured-cards"></div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ══ VIEW: CLIENTS ══ -->
+  <div id="view-clients" style="display:none">
+    <div class="hero-strip">
+      <div class="hero-title">Tutti i <span>Clienti</span></div>
+      <div class="hero-sub">MODELLI C1-A9 · CLICK PER DETTAGLIO</div>
+    </div>
+    <div class="content">
+      <div class="section-title">🔴 Con Cedola</div>
+      <div class="cards-row" id="cards-cedola"></div>
+      <div class="section-title">🔵 Accumulazione</div>
+      <div class="cards-row" id="cards-acc"></div>
+    </div>
+  </div>
+
+  <!-- ══ VIEW: DETAIL ══ -->
+  <div id="view-detail" style="display:none">
+    <div class="hero-strip" id="detail-hero"></div>
+    <div class="content">
+      <div class="tabs">
+        <div class="tab active" onclick="showTab('portafoglio',this)">Portafoglio</div>
+        <div class="tab" onclick="showTab('segnali',this)">Segnali ETF</div>
+        <div class="tab" onclick="showTab('cedola',this)">Cedola / PAC</div>
+        <div class="tab" onclick="showTab('impostazioni',this)">Impostazioni</div>
+      </div>
+
+      <div class="tab-content active" id="tab-portafoglio">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px">
+          <div class="panel">
+            <div class="panel-header"><div class="panel-title">Allocazione Target</div></div>
+            <div class="panel-body">
+              <div class="alloc-bars" id="alloc-bars"></div>
+              <div class="alloc-legend" id="alloc-legend"></div>
+            </div>
+          </div>
+          <div class="panel">
+            <div class="panel-header"><div class="panel-title">Dati Portafoglio</div></div>
+            <div class="panel-body" id="ptf-stats"></div>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">ETF in Portafoglio</div>
+            <button class="btn-gold" style="font-size:8px;padding:4px 12px" onclick="buildPortfolio()">⟳ Rigenera da Segnali</button>
+          </div>
+          <div class="panel-body">
+            <div class="tbl-wrap"><table>
+              <thead><tr><th>Ticker</th><th>Nome</th><th>Peso%</th><th>Importo</th><th>Segnale</th><th>Score</th><th>SMA200</th><th>KAMA</th><th>Yield%</th><th>1D%</th></tr></thead>
+              <tbody id="ptf-table"></tbody>
+            </table></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="tab-content" id="tab-segnali">
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">Segnali ETF del Livello</div>
+            <button class="btn-outline" style="font-size:8px;padding:4px 10px" onclick="exportLivelloCSV()">⬇ Export CSV</button>
+          </div>
+          <div class="panel-body" id="segnali-list"></div>
+        </div>
+      </div>
+
+      <div class="tab-content" id="tab-cedola">
+        <div id="cedola-content"></div>
+      </div>
+
+      <div class="tab-content" id="tab-impostazioni">
+        <div class="panel">
+          <div class="panel-header"><div class="panel-title">Impostazioni Cliente</div></div>
+          <div class="panel-body">
+            <div class="form-grid" id="settings-form"></div>
+            <div style="display:flex;gap:7px;margin-top:14px;flex-wrap:wrap">
+              <button class="btn-outline" onclick="saveSettings()">💾 Salva locale</button>
+              <button class="btn-gold" id="btn-save-gh" onclick="saveSettingsAndSync()">☁️ Salva su GitHub</button>
+              <button class="btn-outline" onclick="openClientPortal()">Portale Cliente ↗</button>
+              <button class="btn-outline" onclick="openTokenModal()" style="font-size:8px;padding:6px 10px">🔑 Token</button>
+            </div>
+            <div id="client-link-box"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ VIEW: INTERVIEW ══ -->
+  <div id="view-interview" style="display:none">
+    <div class="hero-strip">
+      <div class="hero-title">Nuova <span>Intervista Cliente</span></div>
+      <div class="hero-sub">PROFILO RISCHIO · ASSEGNAZIONE LIVELLO</div>
+    </div>
+    <div class="content">
+      <div class="panel">
+        <div class="panel-header"><div class="panel-title">Dati Anagrafici e Profilo</div></div>
+        <div class="panel-body">
+          <div class="form-grid">
+            <div class="form-group"><label class="form-label">Nome *</label><input class="form-input" id="iv-nome" placeholder="Mario Rossi"></div>
+            <div class="form-group"><label class="form-label">Email</label><input class="form-input" type="email" id="iv-email"></div>
+            <div class="form-group"><label class="form-label">Orizzonte temporale *</label>
+              <select class="form-input form-select" id="iv-orizzonte">
+                <option value="">Seleziona...</option>
+                <option value="1">1-3 anni</option><option value="2">3-5 anni</option>
+                <option value="3">5-10 anni</option><option value="4">Oltre 10 anni</option>
+              </select>
+            </div>
+            <div class="form-group"><label class="form-label">Tolleranza perdita *</label>
+              <select class="form-input form-select" id="iv-perdita">
+                <option value="">Seleziona...</option>
+                <option value="1">Fino a -5%</option><option value="2">Fino a -15%</option>
+                <option value="3">Fino a -25%</option><option value="4">Fino a -40%</option><option value="5">Oltre -40%</option>
+              </select>
+            </div>
+            <div class="form-group"><label class="form-label">Obiettivo *</label>
+              <select class="form-input form-select" id="iv-obiettivo">
+                <option value="">Seleziona...</option>
+                <option value="protezione">Protezione capitale</option>
+                <option value="reddito">Reddito / cedola</option>
+                <option value="crescita">Crescita nel tempo</option>
+                <option value="trading">Trading / max rendimento</option>
+              </select>
+            </div>
+            <div class="form-group"><label class="form-label">Distribuzione *</label>
+              <select class="form-input form-select" id="iv-distribuzione">
+                <option value="">Seleziona...</option>
+                <option value="cedola">Con Cedola</option>
+                <option value="acc">Accumulazione</option>
+                <option value="indifferente">Indifferente</option>
+              </select>
+            </div>
+            <div class="form-group"><label class="form-label">Liquidità entro 3 anni</label>
+              <select class="form-input form-select" id="iv-liquidita">
+                <option value="no">No</option>
+                <option value="parziale">Sì — parziale</option>
+                <option value="totale">Sì — totale</option>
+              </select>
+            </div>
+            <div class="form-group"><label class="form-label">Modalità *</label>
+              <select class="form-input form-select" id="iv-modalita" onchange="updateModalita()">
+                <option value="">Seleziona...</option>
+                <option value="unica">Unica soluzione</option>
+                <option value="pac">Solo PAC</option>
+                <option value="misto">Misto</option>
+              </select>
+            </div>
+            <div class="form-group" id="iv-capitale-wrap"><label class="form-label">Capitale €</label><input class="form-input" type="number" id="iv-capitale" placeholder="100000"></div>
+            <div class="form-group" id="iv-pac-wrap" style="display:none"><label class="form-label">PAC mensile €</label><input class="form-input" type="number" id="iv-pac" placeholder="500"></div>
+          </div>
+          <div style="margin-top:14px;display:flex;gap:7px">
+            <button class="btn-gold" onclick="calcProfile()">Calcola Profilo →</button>
+          </div>
+          <div id="iv-result" style="display:none;margin-top:14px"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</main>
+</div>
+
+<!-- ══ ETF UNIVERSE MODAL ══ -->
+<div id="etf-modal" class="etf-modal-overlay" onclick="if(event.target===this)closeETFModal()">
+  <div class="etf-modal">
+    <div class="etf-modal-head">
+      <div>
+        <div class="etf-modal-title">📊 ETF Universe — Segnali Live</div>
+        <div class="etf-modal-sub" id="etf-modal-sub">—</div>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <button class="btn-outline" style="font-size:8px;padding:4px 10px;color:rgba(255,255,255,.6);border-color:rgba(255,255,255,.2)" onclick="exportAllCSV()">⬇ Export CSV</button>
+        <button class="etf-modal-close" onclick="closeETFModal()">✕</button>
+      </div>
+    </div>
+    <div class="etf-modal-body">
+      <div class="etf-filters">
+        <button class="etf-filter-btn active" onclick="filtroETF('',this)">Tutti</button>
+        <button class="etf-filter-btn" onclick="filtroETF('BUY',this)">🟢 BUY</button>
+        <button class="etf-filter-btn" onclick="filtroETF('HOLD',this)">🔵 HOLD</button>
+        <button class="etf-filter-btn" onclick="filtroETF('ACCUMULA',this)">🔵 ACCUMULA</button>
+        <button class="etf-filter-btn" onclick="filtroETF('WATCH',this)">🟡 WATCH</button>
+        <button class="etf-filter-btn" onclick="filtroETF('SELL',this)">🔴 SELL</button>
+        <input class="etf-search" id="etf-search" placeholder="🔍 Cerca ticker o nome..." oninput="renderETFTable()">
+      </div>
+      <div class="etf-stats-bar" id="etf-stats-bar"></div>
+      <div class="tbl-wrap">
+        <table class="etf-universe-table">
+          <thead><tr>
+            <th>Ticker</th><th>Nome</th><th>Segnale</th><th>Score</th>
+            <th>SMA200</th><th>KAMA</th><th>1D%</th><th>Prezzo</th><th>Yield%</th><th>Trend 60g</th>
+          </tr></thead>
+          <tbody id="etf-universe-body"></tbody>
+        </table>
+      </div>
+      <!-- DETTAGLIO GRAFICO -->
+      <div id="etf-detail-wrap" class="etf-detail-wrap">
+        <div class="etf-detail-head">
+          <div>
+            <div class="etf-detail-name" id="etf-detail-name">—</div>
+            <div style="font-size:8px;color:rgba(255,255,255,.4);margin-top:2px" id="etf-detail-cat">—</div>
+          </div>
+          <span class="etf-detail-sig signal-badge" id="etf-detail-sig">—</span>
+        </div>
+        <div class="etf-detail-body">
+          <div class="etf-kpis-row" id="etf-kpis-row"></div>
+          <div class="chart-container">
+            <div class="chart-legend">
+              <div class="chart-leg-item"><div class="chart-leg-dot" style="background:#4ADE80;height:2px"></div>Prezzo</div>
+              <div class="chart-leg-item"><div class="chart-leg-dot" style="background:#C9A84C;border-top:2px dashed #C9A84C;"></div>KAMA</div>
+              <div class="chart-leg-item"><div class="chart-leg-dot" style="background:#6B7280;border-top:2px dashed #6B7280;"></div>SMA200</div>
+            </div>
+            <canvas id="etf-chart" height="180"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL CLIENTI CONFIGURATI -->
+<div id="modal-configurati" class="modal-overlay" style="display:none" onclick="if(event.target===this)closeModal()">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div class="modal-title">⭐ Clienti Configurati</div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body" id="modal-body-configurati"></div>
+  </div>
+</div>
+
+<!-- MODAL SELEZIONE CLIENTE -->
+<div id="modal-select-client" class="select-modal-overlay" style="display:none" onclick="if(event.target===this)this.style.display='none'">
+  <div class="select-modal-box">
+    <div style="padding:14px 18px;background:var(--navy);color:#fff;display:flex;align-items:center;justify-content:space-between">
+      <div style="font-family:'Fraunces',serif;font-size:14px;font-weight:300">Seleziona Cliente</div>
+      <button onclick="document.getElementById('modal-select-client').style.display='none'" style="background:rgba(255,255,255,.1);border:none;color:#fff;width:26px;height:26px;border-radius:50%;cursor:pointer">✕</button>
+    </div>
+    <div style="padding:14px" id="select-client-list"></div>
+  </div>
+</div>
+
+<!-- MODAL TOKEN -->
+<div id="gh-token-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:700;align-items:center;justify-content:center;padding:20px">
+  <div style="background:var(--surface);border-radius:var(--radius);width:100%;max-width:480px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.3)">
+    <div style="padding:14px 18px;background:var(--navy);color:#fff;display:flex;align-items:center;justify-content:space-between">
+      <div style="font-family:'Fraunces',serif;font-size:14px">🔑 GitHub Token</div>
+      <button onclick="closeTokenModal()" style="background:rgba(255,255,255,.1);border:none;color:#fff;width:26px;height:26px;border-radius:50%;cursor:pointer">✕</button>
+    </div>
+    <div style="padding:18px">
+      <p style="font-size:10px;color:var(--text2);margin-bottom:10px;line-height:1.7">GitHub → Settings → Developer settings → Personal access tokens → repo scope.</p>
+      <input id="gh-token-input" type="password" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx"
+        style="width:100%;background:var(--bg);border:1.5px solid var(--border);color:var(--text);font-size:10px;padding:8px 10px;border-radius:7px;outline:none;font-family:'DM Mono',monospace;margin-bottom:10px">
+      <div style="display:flex;gap:7px">
+        <button class="btn-gold" onclick="saveToken()">Salva</button>
+        <button class="btn-outline" onclick="closeTokenModal()">Annulla</button>
+        <button class="btn-outline" style="color:var(--red);border-color:var(--red)" onclick="ghSetToken('');closeTokenModal();alert('Token rimosso')">Rimuovi</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── STATO ──────────────────────────────────────────────────────────
+let DATA=null,LEVELS=null,CLIENTS=null,currentClient=null,currentTab='portafoglio';
+let etfFiltroSegnale='',etfChart=null,etfSelectedTicker=null;
+const BASE='data/';
+const CLIENT_BASE='https://giorgiogoldoni.github.io/compass/client.html?id=';
+
+// ── LOCALSTORAGE ────────────────────────────────────────────────────
+const LS_PREFIX='compass_client_',LS_ALL_KEY='compass_all_clients';
+function lsSaveClient(cl){try{localStorage.setItem(LS_PREFIX+cl.id,JSON.stringify(cl));let idx=lsLoadIndex();idx[cl.id]=true;localStorage.setItem(LS_ALL_KEY,JSON.stringify(idx));}catch(e){}}
+function lsLoadClient(id){try{const r=localStorage.getItem(LS_PREFIX+id);return r?JSON.parse(r):null;}catch(e){return null;}}
+function lsLoadIndex(){try{const r=localStorage.getItem(LS_ALL_KEY);return r?JSON.parse(r):{};}catch(e){return{};}}
+function lsMergeClients(clients){return clients.map(cl=>{const s=lsLoadClient(cl.id);return s?{...cl,...s}:cl;});}
+function lsReset(){if(!confirm('Resettare tutti i dati locali?'))return;Object.keys(localStorage).filter(k=>k.startsWith(LS_PREFIX)||k===LS_ALL_KEY).forEach(k=>localStorage.removeItem(k));location.reload();}
+function lsExport(){const all={};Object.keys(localStorage).filter(k=>k.startsWith(LS_PREFIX)).forEach(k=>{try{all[k]=JSON.parse(localStorage.getItem(k));}catch(e){}});const blob=new Blob([JSON.stringify(all,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='compass_backup_'+new Date().toISOString().slice(0,10)+'.json';a.click();}
+
+// ── LOAD ────────────────────────────────────────────────────────────
+async function loadAll(){
+  try{
+    const [s,l,c]=await Promise.all([
+      fetch(BASE+'rwm_signals.json?t='+Date.now()).then(r=>r.ok?r.json():null).catch(()=>null),
+      fetch(BASE+'levels.json?t='+Date.now()).then(r=>r.json()),
+      fetch(BASE+'clients.json?t='+Date.now()).then(r=>r.json()),
+    ]);
+    DATA=s;LEVELS=l.levels;CLIENTS=lsMergeClients(c.clients);
+    document.getElementById('view-loading').style.display='none';
+    document.getElementById('statusDot').style.background=DATA?'#22C55E':'#F59E0B';
+    document.getElementById('statusTxt').textContent=DATA?'LIVE':'NO SEGNALI';
+    if(DATA){
+      document.getElementById('lastUpd').textContent=new Date(DATA.generated).toLocaleString('it-IT',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});
+      document.getElementById('kpi-etf').textContent=(DATA.analyzed||0)+' ETF';
+      document.getElementById('kpi-buy').textContent=(DATA.stats?.buy_hold||0);
+    }
+    const attivi=CLIENTS.filter(c=>c.capitale>0).length;
+    const aum=CLIENTS.reduce((s,c)=>s+(c.capitale||0),0);
+    document.getElementById('kpi-clienti').textContent=attivi||'—';
+    document.getElementById('kpi-aum').textContent=aum>0?'€'+aum.toLocaleString('it-IT'):'—';
+    document.getElementById('kpi-update').textContent=DATA?new Date(DATA.generated).toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'}):'—';
+    renderSidebar();renderLivelliGrid();renderCards();renderHomeConfigured();
+    showView('home');
+  }catch(e){console.error(e);document.getElementById('view-loading').innerHTML='<div style="padding:40px;text-align:center;color:var(--text2)">Errore caricamento dati.</div>';}
+}
+
+// ── HELPERS ─────────────────────────────────────────────────────────
+function getLevelById(id){return LEVELS?.find(l=>l.id===id);}
+function getClientById(id){return CLIENTS?.find(c=>c.id===id);}
+function getSignal(ticker){return DATA?.etfs?.[ticker]||null;}
+function rf(v,d=1){return v==null?'—':(v>0?'+':'')+v.toFixed(d)+'%';}
+function rc(v){return v==null?'ret-z':v>0?'ret-p':v<0?'ret-n':'ret-z';}
+
+function sigBadge(segnale){
+  if(!segnale)return'<span class="signal-badge sb-none">—</span>';
+  const s=segnale.toUpperCase();
+  const cls=s==='BUY'?'sb-buy':s==='HOLD'||s==='ACCUMULA'?'sb-hold':s==='WATCH'?'sb-watch':'sb-sell';
+  return`<span class="signal-badge ${cls}">${segnale}</span>`;
+}
+
+function scoreBar(score){
+  // score 0-100
+  const pct=Math.max(0,Math.min(100,score||0));
+  const color=pct>=75?'#16A34A':pct>=50?'#D97706':'#DC2626';
+  return`<div style="display:flex;align-items:center;gap:5px">
+    <div style="flex:1;height:4px;background:var(--border2);border-radius:2px;overflow:hidden">
+      <div style="width:${pct}%;height:100%;background:${color};border-radius:2px"></div>
+    </div>
+    <span style="font-size:8px;color:var(--text2);width:28px;text-align:right">${pct.toFixed(0)}</span>
+  </div>`;
+}
+
+// ── LIVELLI GRID (homepage) ─────────────────────────────────────────
+function renderLivelliGrid(){
+  const cedolaIds=['C1','C2','C3','C4','C5','C6','C7','C8','C9'];
+  const accIds=['A1','A2','A3','A4','A5','A6','A7','A8','A9'];
+  ['livelli-cedola','livelli-acc'].forEach((elId,i)=>{
+    const ids=i===0?cedolaIds:accIds;
+    document.getElementById(elId).innerHTML=ids.map(id=>{
+      const lv=getLevelById(id);if(!lv)return'';
+      const color=lv.colore||'#6B7280';
+      // Conta clienti configurati su questo livello
+      const nClienti=CLIENTS.filter(c=>c.livello===id&&c.capitale>0).length;
+      return`<div class="livello-card${nClienti>0?' has-client':''}" onclick="showLivello('${id}')">
+        <div class="lc-bar" style="background:${color}"></div>
+        <div class="lc-id" style="color:${color}">${id}</div>
+        <div class="lc-nome">${lv.nome.replace(' Cedola','').replace(' Acc','')}</div>
+        <div class="lc-rend">${lv.rendimento_atteso||'—'}%</div>
+        <div class="lc-var">VaR ${lv.var_pct||'—'}%</div>
+        <div class="lc-n">${nClienti>0?'👤 '+nClienti+' clienti':lv.n_etf_max+' ETF max'}</div>
+      </div>`;
+    }).join('');
+  });
+}
+
+function showLivello(id){
+  // Trova il cliente corrispondente e apri dettaglio, o apri il primo cliente di quel livello
+  const cl=CLIENTS.find(c=>c.id==='Cliente'+id)||CLIENTS.find(c=>c.livello===id);
+  if(cl)openClient(cl.id);
+}
+
+// ── CLIENTI CONFIGURATI HOMEPAGE ────────────────────────────────────
+function renderHomeConfigured(){
+  const configurati=CLIENTS.filter(cl=>cl.capitale>0).sort((a,b)=>b.capitale-a.capitale);
+  const wrap=document.getElementById('home-configured-wrap');
+  if(!configurati.length){wrap.style.display='none';return;}
+  wrap.style.display='block';
+  document.getElementById('home-configured-cards').innerHTML=configurati.map(cl=>clientCard(cl)).join('');
+}
+
+// ── SIDEBAR ─────────────────────────────────────────────────────────
+function renderSidebar(){
+  ['sidebar-cedola','sidebar-acc'].forEach((id,i)=>{
+    const list=CLIENTS.filter(c=>i===0?c.id.includes('C'):c.id.includes('A'));
+    document.getElementById(id).innerHTML=list.map(cl=>{
+      const lv=getLevelById(cl.livello);const color=lv?.colore||'#6B7280';
+      return`<div class="client-item" onclick="openClient('${cl.id}')" data-id="${cl.id}">
+        <div class="client-avatar" style="background:${color}20;color:${color}">${cl.id.slice(-2)}</div>
+        <div class="client-info"><div class="client-name">${cl.nome}</div><div class="client-level">${lv?.nome||cl.livello}</div></div>
+        <div class="client-signal ${cl.portafoglio?.length>0?'sig-green':cl.capitale>0?'sig-orange':'sig-gray'}"></div>
+      </div>`;
+    }).join('');
+  });
+}
+
+// ── CARDS ───────────────────────────────────────────────────────────
+function renderCards(){
+  ['cards-cedola','cards-acc'].forEach((id,i)=>{
+    const list=CLIENTS.filter(c=>i===0?c.id.includes('C'):c.id.includes('A'));
+    document.getElementById(id).innerHTML=list.map(cl=>clientCard(cl)).join('');
+  });
+}
+
+function clientCard(cl){
+  const lv=getLevelById(cl.livello);const color=lv?.colore||'#6B7280';
+  const aum=cl.capitale>0?'€'+cl.capitale.toLocaleString('it-IT'):'Da conf.';
+  const rend=lv?.rendimento_atteso;
+  const cedolaAnn=cl.capitale>0&&rend?Math.round(cl.capitale*(rend/100)):null;
+  return`<div class="client-card" onclick="openClient('${cl.id}')">
+    <div style="height:2px;background:${color}"></div>
+    <div class="card-head">
+      <div class="card-avatar" style="background:${color}20;color:${color}">${cl.id.slice(-2)}</div>
+      <div><div class="card-name">${cl.nome}</div><div class="card-level">${lv?.nome||cl.livello} · ${lv?.tipo==='Dist'?'🔴':'🔵'}</div></div>
+    </div>
+    <div class="card-body">
+      <div class="card-metrics">
+        <div class="cm"><div class="cml">AUM</div><div class="cmv" style="font-size:11px">${aum}</div></div>
+        <div class="cm"><div class="cml">Rend.</div><div class="cmv" style="color:var(--green)">${rend?rend+'%':'—'}</div></div>
+        <div class="cm"><div class="cml">VaR</div><div class="cmv" style="color:var(--red)">${lv?.var_pct?lv.var_pct+'%':'—'}</div></div>
+      </div>
+      ${cedolaAnn?`<div style="font-size:9px;color:var(--text2)">Cedola est.: <b style="color:var(--gold)">€${cedolaAnn.toLocaleString('it-IT')}/anno</b></div>`:''}
+    </div>
+    <div class="card-footer">
+      <div class="cf-btn cf-primary" onclick="event.stopPropagation();openClient('${cl.id}')">Dashboard</div>
+      <div class="cf-btn cf-secondary" onclick="event.stopPropagation();window.open('${CLIENT_BASE}${cl.id}','_blank')">Portale ↗</div>
+    </div>
+  </div>`;
+}
+
+// ── OPEN CLIENT ──────────────────────────────────────────────────────
+function openClient(id){
+  currentClient=getClientById(id);if(!currentClient)return;
+  const lv=getLevelById(currentClient.livello);
+  document.querySelectorAll('.client-item').forEach(el=>el.classList.toggle('active',el.dataset.id===id));
+  document.getElementById('detail-hero').innerHTML=`
+    <div class="hero-title">${currentClient.nome} — <span>${lv?.nome||currentClient.livello}</span></div>
+    <div class="hero-sub">${lv?.tipo==='Dist'?'🔴 DISTRIBUZIONE':'🔵 ACCUMULAZIONE'} · ${lv?.obiettivo||''}</div>
+    <div class="hero-kpis">
+      <div class="hkpi"><div class="hkpi-label">Capitale</div><div class="hkpi-val gold">€${(currentClient.capitale||0).toLocaleString('it-IT')}</div></div>
+      <div class="hkpi"><div class="hkpi-label">PAC</div><div class="hkpi-val">${currentClient.pac_mensile>0?'€'+currentClient.pac_mensile+'/m':'—'}</div></div>
+      <div class="hkpi"><div class="hkpi-label">Rend. Atteso</div><div class="hkpi-val gold">${lv?.rendimento_atteso||'—'}%</div></div>
+      <div class="hkpi"><div class="hkpi-label">VaR 95%</div><div class="hkpi-val">${lv?.var_pct||'—'}%</div></div>
+      <div class="hkpi"><div class="hkpi-label">ETF Pool</div><div class="hkpi-val">${lv?.etf_pool?.length||'—'}</div></div>
+    </div>`;
+  document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('active',i===0));
+  document.querySelectorAll('.tab-content').forEach((t,i)=>t.classList.toggle('active',i===0));
+  currentTab='portafoglio';
+  renderPortafoglio();renderSegnali();renderCedola();renderSettings();
+  showView('detail');
+}
+
+// ── PORTAFOGLIO ──────────────────────────────────────────────────────
+function renderPortafoglio(){
+  if(!currentClient)return;
+  const lv=getLevelById(currentClient.livello);
+  const alloc=lv?.alloc||{};
+  const colors={monetario:'#0EA5E9',obbligaz:'#6366F1',hy:'#F59E0B',azionario:'#22C55E'};
+  const labels={monetario:'Monetario',obbligaz:'Obbligaz.',hy:'High Yield',azionario:'Azionario'};
+  document.getElementById('alloc-bars').innerHTML=Object.entries(alloc).map(([k,v])=>v>0?`<div class="alloc-seg" style="width:${v}%;background:${colors[k]}"></div>`:'').join('');
+  document.getElementById('alloc-legend').innerHTML=Object.entries(alloc).map(([k,v])=>v>0?`<div class="al-item"><div class="al-dot" style="background:${colors[k]}"></div>${labels[k]} ${v}%</div>`:'').join('');
+  const cap=currentClient.capitale||0;const rend=lv?.rendimento_atteso||0;const varP=lv?.var_pct||0;
+  document.getElementById('ptf-stats').innerHTML=`
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+      <div class="cm"><div class="cml">Rendimento atteso</div><div class="cmv" style="color:var(--green)">${rend}%</div></div>
+      <div class="cm"><div class="cml">VaR 95%</div><div class="cmv" style="color:var(--red)">${varP}% (€${Math.round(cap*varP/100).toLocaleString('it-IT')})</div></div>
+      <div class="cm"><div class="cml">Cedola/Rend. annua</div><div class="cmv" style="color:var(--gold)">€${Math.round(cap*rend/100).toLocaleString('it-IT')}</div></div>
+      <div class="cm"><div class="cml">N. ETF</div><div class="cmv">${currentClient.portafoglio?.length||0}</div></div>
+    </div>`;
+  const ptf=currentClient.portafoglio||[];
+  if(!ptf.length){document.getElementById('ptf-table').innerHTML=`<tr><td colspan="10" style="text-align:center;padding:20px;color:var(--text2)">Nessun portafoglio — clicca "Rigenera da Segnali"</td></tr>`;return;}
+  const cap2=currentClient.capitale||0;
+  document.getElementById('ptf-table').innerHTML=ptf.map(p=>{
+    const sig=getSignal(p.ticker);
+    const importo=Math.round(cap2*p.peso/100);
+    const score=sig?.score||0;
+    // SMA200 e KAMA dal chart del segnale
+    const hasSMA=sig?.chart?.sma200?.length>0;
+    const hasKAMA=sig?.chart?.kama_fast?.length>0;
+    const lastClose=sig?.chart?.closes?.slice(-1)[0];
+    const lastSMA=sig?.chart?.sma200?.slice(-1)[0];
+    const lastKAMA=sig?.chart?.kama_fast?.slice(-1)[0];
+    const aboveSMA=lastClose&&lastSMA?lastClose>lastSMA:null;
+    const aboveKAMA=lastClose&&lastKAMA?lastClose>lastKAMA:null;
+    return`<tr>
+      <td style="color:var(--blue);font-weight:500;cursor:pointer" onclick="openETFModal();setTimeout(()=>showETFDetail('${p.ticker}'),300)">${p.ticker}</td>
+      <td style="color:var(--text2);font-size:9px;max-width:140px;overflow:hidden;text-overflow:ellipsis">${sig?.nome||p.nome||'—'}</td>
+      <td style="font-weight:500">${p.peso.toFixed(1)}%</td>
+      <td>€${importo.toLocaleString('it-IT')}</td>
+      <td>${sigBadge(sig?.segnale)}</td>
+      <td>${scoreBar(score)}</td>
+      <td>${aboveSMA===null?'—':aboveSMA?'<span class="ind-pill ind-on">✓</span>':'<span class="ind-pill ind-off">✗</span>'}</td>
+      <td>${aboveKAMA===null?'—':aboveKAMA?'<span class="ind-pill ind-on">✓</span>':'<span class="ind-pill ind-off">✗</span>'}</td>
+      <td style="color:var(--gold)">${sig?.yield_annuo?sig.yield_annuo+'%':'—'}</td>
+      <td class="${rc(sig?.ret_1d)}">${rf(sig?.ret_1d,2)}</td>
+    </tr>`;
+  }).join('');
+}
+
+// ── BUILD PORTFOLIO ───────────────────────────────────────────────────
+function buildPortfolio(){
+  if(!currentClient||!DATA)return;
+  const lv=getLevelById(currentClient.livello);if(!lv)return;
+  const pool=lv.etf_pool||[];const maxEtf=lv.n_etf_max||6;
+  const LEVA=new Set(['L2SP.MI','2LVE.MI','UC44.MI','2NVD.MI','3USL.MI','3EUL.MI','QQQ3.MI','3NVD.MI']);
+  const getBuyScore=sig=>{if(!sig)return-1;const s=sig.segnale?.toUpperCase();if(s==='BUY')return 3;if(s==='HOLD'||s==='ACCUMULA')return 2;if(s==='WATCH')return 1;return 0;};
+  const allCand=pool.map(t=>({ticker:t,sig:getSignal(t)})).filter(x=>x.sig&&getBuyScore(x.sig)>0).sort((a,b)=>(getBuyScore(b.sig)-getBuyScore(a.sig))||(b.sig.score-a.sig.score));
+  if(!allCand.length){alert('Nessun ETF con segnale attivo nel pool. Riprova dopo l'aggiornamento notturno.');return;}
+  const selected=[];let levaCount=0;const mercati={};
+  const getMercato=t=>t.replace('.MI','').replace('.DE','').slice(0,4);
+  for(const x of allCand){
+    if(selected.length>=maxEtf)break;
+    if(LEVA.has(x.ticker)){if(levaCount>=1)continue;levaCount++;}
+    else{const m=getMercato(x.ticker);if((mercati[m]||0)>=2)continue;mercati[m]=(mercati[m]||0)+1;}
+    selected.push(x);
+  }
+  if(selected.length<Math.min(4,maxEtf)){const alreadyIn=new Set(selected.map(x=>x.ticker));for(const x of allCand){if(selected.length>=maxEtf)break;if(!alreadyIn.has(x.ticker)){selected.push(x);alreadyIn.add(x.ticker);}}}
+  const alloc=lv.alloc||{};
+  const getEtfAlloc=ticker=>{const sig=getSignal(ticker);if(sig?.categoria?.toLowerCase().includes('high yield'))return'hy';const logicaMap={monetario:'monetario',obbligaz:'obbligaz',reit:'azionario',commodity:'azionario',leva:'azionario',azionario:'azionario'};return logicaMap[sig?.logica||'azionario']||'azionario';};
+  const etfPerAlloc={};selected.forEach(x=>{const a=getEtfAlloc(x.ticker);etfPerAlloc[a]=(etfPerAlloc[a]||0)+1;});
+  currentClient.portafoglio=selected.map(x=>{const a=getEtfAlloc(x.ticker);const quota=alloc[a]||(100/selected.length);const peso=Math.round((quota/(etfPerAlloc[a]||1))*10)/10;return{ticker:x.ticker,nome:x.sig.nome||x.ticker,peso};});
+  const tot=currentClient.portafoglio.reduce((s,p)=>s+p.peso,0);const diff=Math.round((100-tot)*10)/10;if(diff!==0)currentClient.portafoglio[0].peso=Math.round((currentClient.portafoglio[0].peso+diff)*10)/10;
+  lsSaveClient(currentClient);renderPortafoglio();renderCedola();
+  alert(`✅ Portafoglio generato: ${selected.length} ETF`);
+}
+
+// ── SEGNALI ───────────────────────────────────────────────────────────
+function renderSegnali(){
+  if(!currentClient||!DATA)return;
+  const lv=getLevelById(currentClient.livello);const pool=lv?.etf_pool||[];
+  const items=pool.map(t=>({ticker:t,sig:getSignal(t)})).filter(x=>x.sig).sort((a,b)=>(b.sig.score||0)-(a.sig.score||0));
+  document.getElementById('segnali-list').innerHTML=`
+    <div style="margin-bottom:10px;font-size:8px;color:var(--text2)">Pool: ${pool.length} · Con segnale: ${items.length} · BUY: ${items.filter(x=>x.sig.segnale==='BUY').length} · HOLD/ACCUMULA: ${items.filter(x=>['HOLD','ACCUMULA'].includes(x.sig.segnale)).length} · WATCH: ${items.filter(x=>x.sig.segnale==='WATCH').length} · SELL: ${items.filter(x=>x.sig.segnale==='SELL').length}</div>
+    ${items.map(x=>{
+      const lastClose=x.sig.chart?.closes?.slice(-1)[0];
+      const lastSMA=x.sig.chart?.sma200?.slice(-1)[0];
+      const lastKAMA=x.sig.chart?.kama_fast?.slice(-1)[0];
+      const aboveSMA=lastClose&&lastSMA?lastClose>lastSMA:null;
+      const aboveKAMA=lastClose&&lastKAMA?lastClose>lastKAMA:null;
+      return`<div style="display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--border2);cursor:pointer" onclick="openETFModal();setTimeout(()=>showETFDetail('${x.ticker}'),300)">
+        <span style="font-size:10px;font-weight:500;color:var(--blue);width:80px;flex-shrink:0">${x.ticker}</span>
+        <span style="font-size:9px;color:var(--text2);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${x.sig.nome}</span>
+        ${sigBadge(x.sig.segnale)}
+        <div style="width:80px">${scoreBar(x.sig.score)}</div>
+        ${aboveSMA===null?'':`<span class="ind-pill ${aboveSMA?'ind-on':'ind-off'}">SMA</span>`}
+        ${aboveKAMA===null?'':`<span class="ind-pill ${aboveKAMA?'ind-on':'ind-off'}">KAMA</span>`}
+        <span class="${rc(x.sig.ret_1d)}" style="font-size:9px;width:45px;text-align:right">${rf(x.sig.ret_1d,2)}</span>
+      </div>`;
+    }).join('')}`;
+}
+
+function exportLivelloCSV(){
+  if(!currentClient||!DATA)return;
+  const lv=getLevelById(currentClient.livello);const pool=lv?.etf_pool||[];
+  const items=pool.map(t=>({ticker:t,sig:getSignal(t)})).filter(x=>x.sig);
+  let csv='Ticker,Nome,Segnale,Score,Prezzo,1D%,Yield%,SMA200,KAMA\n';
+  items.forEach(x=>{
+    const sig=x.sig;
+    const lastClose=sig.chart?.closes?.slice(-1)[0]||'—';
+    const lastSMA=sig.chart?.sma200?.slice(-1)[0]||'—';
+    const lastKAMA=sig.chart?.kama_fast?.slice(-1)[0]||'—';
+    csv+=`${x.ticker},"${sig.nome}",${sig.segnale},${sig.score},${sig.price||'—'},${sig.ret_1d||0},${sig.yield_annuo||'—'},${lastSMA},${lastKAMA}\n`;
+  });
+  const blob=new Blob([csv],{type:'text/csv'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`compass_${currentClient.livello}_${new Date().toISOString().slice(0,10)}.csv`;a.click();
+}
+
+// ── CEDOLA ────────────────────────────────────────────────────────────
+function renderCedola(){
+  if(!currentClient)return;
+  const lv=getLevelById(currentClient.livello);const cap=currentClient.capitale||0;const pac=currentClient.pac_mensile||0;const rend=lv?.rendimento_atteso||0;const isDist=lv?.tipo==='Dist';
+  let cedolaAnn=0;
+  if(currentClient.portafoglio?.length>0&&cap>0)currentClient.portafoglio.forEach(p=>{const sig=getSignal(p.ticker);if(sig?.yield_annuo)cedolaAnn+=Math.round(cap*p.peso/100*sig.yield_annuo/100);});
+  else cedolaAnn=Math.round(cap*rend/100);
+  const cedolaMens=Math.round(cedolaAnn/12);const cedolaTrim=Math.round(cedolaAnn/4);
+  let pacHtml='';
+  if(pac>0){const r=rend/100/12;const fv5=pac*((Math.pow(1+r,60)-1)/r);const fv10=pac*((Math.pow(1+r,120)-1)/r);const fv20=pac*((Math.pow(1+r,240)-1)/r);
+    pacHtml=`<div class="panel" style="margin-top:14px"><div class="panel-header"><div class="panel-title">Simulazione PAC — €${pac.toLocaleString('it-IT')}/mese</div></div><div class="panel-body"><div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px">
+      <div class="cm"><div class="cml">5 anni</div><div class="cmv" style="color:var(--green)">€${Math.round(fv5).toLocaleString('it-IT')}</div></div>
+      <div class="cm"><div class="cml">10 anni</div><div class="cmv" style="color:var(--green)">€${Math.round(fv10).toLocaleString('it-IT')}</div></div>
+      <div class="cm"><div class="cml">20 anni</div><div class="cmv" style="color:var(--green)">€${Math.round(fv20).toLocaleString('it-IT')}</div></div>
+    </div></div></div>`;}
+  document.getElementById('cedola-content').innerHTML=`
+    <div class="cedola-box">
+      <div style="font-size:8px;letter-spacing:2px;color:rgba(255,255,255,.4);text-transform:uppercase;margin-bottom:6px">${isDist?'STIMA CEDOLA ANNUA':'RENDIMENTO ATTESO ANNUO'}</div>
+      <div class="cedola-val">€${cedolaAnn.toLocaleString('it-IT')}</div>
+      <div style="font-size:9px;color:rgba(255,255,255,.4);margin-top:3px">Su €${cap.toLocaleString('it-IT')} · ~${rend}%</div>
+      <div class="cedola-grid">
+        ${isDist?`<div class="ced-item"><div class="ced-label">Mensile</div><div class="ced-val" style="color:var(--gold2)">€${cedolaMens.toLocaleString('it-IT')}</div></div>
+          <div class="ced-item"><div class="ced-label">Trimestrale</div><div class="ced-val" style="color:var(--gold2)">€${cedolaTrim.toLocaleString('it-IT')}</div></div>
+          <div class="ced-item"><div class="ced-label">Annuale</div><div class="ced-val" style="color:var(--gold2)">€${cedolaAnn.toLocaleString('it-IT')}</div></div>`
+        :`<div class="ced-item"><div class="ced-label">5 anni</div><div class="ced-val" style="color:var(--gold2)">€${Math.round(cap*Math.pow(1+rend/100,5)).toLocaleString('it-IT')}</div></div>
+          <div class="ced-item"><div class="ced-label">10 anni</div><div class="ced-val" style="color:var(--gold2)">€${Math.round(cap*Math.pow(1+rend/100,10)).toLocaleString('it-IT')}</div></div>
+          <div class="ced-item"><div class="ced-label">20 anni</div><div class="ced-val" style="color:var(--gold2)">€${Math.round(cap*Math.pow(1+rend/100,20)).toLocaleString('it-IT')}</div></div>`}
+      </div>
+    </div>${pacHtml}`;}
+
+// ── SETTINGS ──────────────────────────────────────────────────────────
+function renderSettings(){
+  if(!currentClient)return;const cl=currentClient;
+  document.getElementById('settings-form').innerHTML=`
+    <div class="form-group"><label class="form-label">Nome</label><input class="form-input" id="st-nome" value="${cl.nome}"></div>
+    <div class="form-group"><label class="form-label">Livello</label>
+      <select class="form-input form-select" id="st-livello">
+        ${LEVELS.map(l=>`<option value="${l.id}" ${l.id===cl.livello?'selected':''} >${l.id} — ${l.nome}</option>`).join('')}
+      </select></div>
+    <div class="form-group"><label class="form-label">Capitale €</label><input class="form-input" type="number" id="st-capitale" value="${cl.capitale||0}"></div>
+    <div class="form-group"><label class="form-label">PAC Mensile €</label><input class="form-input" type="number" id="st-pac" value="${cl.pac_mensile||0}"></div>
+    <div class="form-group"><label class="form-label">Modalità</label>
+      <select class="form-input form-select" id="st-modalita">
+        <option value="unica" ${cl.modalita==='unica'?'selected':''}>Unica soluzione</option>
+        <option value="pac" ${cl.modalita==='pac'?'selected':''}>Solo PAC</option>
+        <option value="misto" ${cl.modalita==='misto'?'selected':''}>Misto</option>
+      </select></div>
+    <div class="form-group"><label class="form-label">Data apertura</label><input class="form-input" type="date" id="st-data" value="${cl.data_apertura||''}"></div>
+    <div class="form-group full"><label class="form-label">Note</label><textarea class="form-input" id="st-note" rows="2">${cl.note||''}</textarea></div>`;
+  document.getElementById('client-link-box').innerHTML=`<div class="link-box"><div class="link-url">${CLIENT_BASE}${cl.id}</div><div class="link-copy" onclick="navigator.clipboard.writeText('${CLIENT_BASE}${cl.id}').then(()=>alert('Link copiato!'))">Copia</div></div>`;
+}
+function readSettingsForm(){if(!currentClient)return;currentClient.nome=document.getElementById('st-nome').value;currentClient.livello=document.getElementById('st-livello').value;currentClient.capitale=parseFloat(document.getElementById('st-capitale').value)||0;currentClient.pac_mensile=parseFloat(document.getElementById('st-pac').value)||0;currentClient.modalita=document.getElementById('st-modalita').value;currentClient.data_apertura=document.getElementById('st-data').value;currentClient.note=document.getElementById('st-note').value;}
+function saveSettings(){if(!currentClient)return;readSettingsForm();lsSaveClient(currentClient);renderSidebar();renderCards();renderPortafoglio();renderCedola();renderLivelliGrid();renderHomeConfigured();alert('✅ Salvato nel browser');}
+async function saveSettingsAndSync(){
+  if(!currentClient)return;
+  if(!ghGetToken()){if(confirm('Token GitHub non configurato. Inserirlo?'))openTokenModal();return;}
+  readSettingsForm();lsSaveClient(currentClient);
+  const btn=document.getElementById('btn-save-gh');if(btn){btn.textContent='⏳ Salvataggio...';btn.disabled=true;}
+  const ok=await ghSaveClients();
+  if(btn){btn.textContent=ok?'✅ Salvato!':'⚠ Errore';btn.style.background=ok?'#22C55E':'#EF4444';btn.disabled=false;setTimeout(()=>{btn.textContent='☁️ Salva su GitHub';btn.style.background='';},3000);}
+  renderSidebar();renderCards();renderPortafoglio();renderCedola();renderLivelliGrid();renderHomeConfigured();
+}
+function openClientPortal(){if(currentClient)window.open(CLIENT_BASE+currentClient.id,'_blank');}
+
+// ── ETF UNIVERSE MODAL ────────────────────────────────────────────────
+function openETFModal(){
+  document.getElementById('etf-modal').classList.add('open');
+  etfFiltroSegnale='';document.querySelectorAll('.etf-filter-btn').forEach((b,i)=>b.classList.toggle('active',i===0));
+  document.getElementById('etf-search').value='';
+  renderETFTable();
+}
+function closeETFModal(){document.getElementById('etf-modal').classList.remove('open');document.getElementById('etf-detail-wrap').style.display='none';}
+function filtroETF(s,btn){etfFiltroSegnale=s;document.querySelectorAll('.etf-filter-btn').forEach(b=>b.classList.remove('active'));if(btn)btn.classList.add('active');renderETFTable();}
+
+function renderETFTable(){
+  if(!DATA?.etfs)return;
+  const cerca=(document.getElementById('etf-search')?.value||'').toLowerCase();
+  let lista=Object.values(DATA.etfs);
+  if(etfFiltroSegnale)lista=lista.filter(e=>e.segnale===etfFiltroSegnale);
+  if(cerca)lista=lista.filter(e=>e.ticker.toLowerCase().includes(cerca)||e.nome.toLowerCase().includes(cerca));
+  lista.sort((a,b)=>(b.score||0)-(a.score||0));
+  const all=Object.values(DATA.etfs);
+  document.getElementById('etf-modal-sub').textContent=`${DATA.analyzed} ETF analizzati · ${new Date(DATA.generated).toLocaleString('it-IT')}`;
+  document.getElementById('etf-stats-bar').innerHTML=`
+    <span class="stat-pill" style="background:var(--green-bg);color:var(--green);border-color:var(--green-bd)">🟢 BUY: ${all.filter(e=>e.segnale==='BUY').length}</span>
+    <span class="stat-pill" style="background:var(--blue-bg);color:var(--blue);border-color:var(--blue-bd)">🔵 HOLD/ACC: ${all.filter(e=>['HOLD','ACCUMULA'].includes(e.segnale)).length}</span>
+    <span class="stat-pill" style="background:var(--orange-bg);color:var(--orange);border-color:var(--orange-bd)">🟡 WATCH: ${all.filter(e=>e.segnale==='WATCH').length}</span>
+    <span class="stat-pill" style="background:var(--red-bg);color:var(--red);border-color:var(--red-bd)">🔴 SELL: ${all.filter(e=>e.segnale==='SELL').length}</span>
+    <span style="font-size:8px;color:var(--text2);margin-left:4px">Mostrati: ${lista.length}</span>`;
+  document.getElementById('etf-universe-body').innerHTML=lista.map(e=>{
+    const lastClose=e.chart?.closes?.slice(-1)[0];const lastSMA=e.chart?.sma200?.slice(-1)[0];const lastKAMA=e.chart?.kama_fast?.slice(-1)[0];
+    const aboveSMA=lastClose&&lastSMA?lastClose>lastSMA:null;const aboveKAMA=lastClose&&lastKAMA?lastClose>lastKAMA:null;
+    const sigCls=e.segnale==='BUY'?'sb-buy':e.segnale==='HOLD'||e.segnale==='ACCUMULA'?'sb-hold':e.segnale==='WATCH'?'sb-watch':'sb-sell';
+    const spark=drawSparkline(e.chart?.closes||[]);
+    return`<tr class="${etfSelectedTicker===e.ticker?'selected':''}" onclick="showETFDetail('${e.ticker}')">
+      <td style="font-weight:500;color:var(--blue)">${e.ticker}</td>
+      <td style="color:var(--text2);max-width:140px;overflow:hidden;text-overflow:ellipsis">${e.nome}</td>
+      <td><span class="signal-badge ${sigCls}">${e.segnale}</span></td>
+      <td>${scoreBar(e.score)}</td>
+      <td>${aboveSMA===null?'—':aboveSMA?'<span class="ind-pill ind-on">✓</span>':'<span class="ind-pill ind-off">✗</span>'}</td>
+      <td>${aboveKAMA===null?'—':aboveKAMA?'<span class="ind-pill ind-on">✓</span>':'<span class="ind-pill ind-off">✗</span>'}</td>
+      <td class="${rc(e.ret_1d)}">${rf(e.ret_1d,2)}</td>
+      <td>${e.price!=null?e.price.toFixed(2):'—'}</td>
+      <td style="color:var(--gold)">${e.yield_annuo?e.yield_annuo+'%':'—'}</td>
+      <td>${spark}</td>
+    </tr>`;
+  }).join('');
+}
+
+// ── SPARKLINE ─────────────────────────────────────────────────────────
+function drawSparkline(prices){
+  if(!prices||prices.length<2)return'<span style="color:var(--text2);font-size:8px">—</span>';
+  const w=80,h=22,pad=2;const mn=Math.min(...prices),mx=Math.max(...prices);const range=mx-mn||1;
+  const pts=prices.map((p,i)=>{const x=pad+(i/(prices.length-1))*(w-pad*2);const y=h-pad-((p-mn)/range)*(h-pad*2);return`${x.toFixed(1)},${y.toFixed(1)}`;}).join(' ');
+  const last=prices[prices.length-1],first=prices[0];const color=last>=first?'#16A34A':'#DC2626';
+  return`<svg width="${w}" height="${h}" class="sparkline"><polyline points="${pts}" fill="none" stroke="${color}" stroke-width="1.5" stroke-linejoin="round"/></svg>`;
+}
+
+// ── GRAFICO DETTAGLIO — scannerv2 style ────────────────────────────────
+function showETFDetail(ticker){
+  const sig=getSignal(ticker);if(!sig)return;
+  etfSelectedTicker=ticker;
+  // Aggiorna selezione tabella
+  document.querySelectorAll('.etf-universe-table tbody tr').forEach(tr=>{
+    tr.classList.toggle('selected',tr.querySelector('td')?.textContent===ticker);
+  });
+  const wrap=document.getElementById('etf-detail-wrap');wrap.style.display='block';
+  // Head
+  const sigCls=sig.segnale==='BUY'?'sb-buy':sig.segnale==='HOLD'||sig.segnale==='ACCUMULA'?'sb-hold':sig.segnale==='WATCH'?'sb-watch':'sb-sell';
+  document.getElementById('etf-detail-name').textContent=`${ticker} — ${sig.nome}`;
+  document.getElementById('etf-detail-cat').textContent=`${sig.categoria||'—'} · ${sig.logica||''} · Livelli: ${sig.livelli||'—'}`;
+  const sigEl=document.getElementById('etf-detail-sig');sigEl.textContent=sig.segnale;sigEl.className=`etf-detail-sig signal-badge ${sigCls}`;
+  // KPIs
+  const closes=sig.chart?.closes||[];const sma200s=sig.chart?.sma200||[];const kamaFasts=sig.chart?.kama_fast||[];
+  const lastP=closes.slice(-1)[0];const lastSMA=sma200s.slice(-1)[0];const lastKAMA=kamaFasts.slice(-1)[0];
+  const aboveSMA=lastP&&lastSMA?lastP>lastSMA:null;const aboveKAMA=lastP&&lastKAMA?lastP>lastKAMA:null;
+  document.getElementById('etf-kpis-row').innerHTML=`
+    <div class="etf-kpi"><div class="etf-kpi-label">Prezzo</div><div class="etf-kpi-val">€${sig.price?.toFixed(2)||lastP?.toFixed(2)||'—'}</div><div class="etf-kpi-sub">${rf(sig.ret_1d,2)} 1D</div></div>
+    <div class="etf-kpi"><div class="etf-kpi-label">Score</div><div class="etf-kpi-val">${sig.score?.toFixed(0)||'—'}</div><div class="etf-kpi-sub">0–100</div></div>
+    <div class="etf-kpi"><div class="etf-kpi-label">SMA200</div><div class="etf-kpi-val ${aboveSMA===false?'ret-n':'ret-p'}">${lastSMA?.toFixed(2)||'—'}</div><div class="etf-kpi-sub">${aboveSMA===null?'—':aboveSMA?'Prezzo sopra ✓':'Prezzo sotto ✗'}</div></div>
+    <div class="etf-kpi"><div class="etf-kpi-label">KAMA</div><div class="etf-kpi-val ${aboveKAMA===false?'ret-n':'ret-p'}">${lastKAMA?.toFixed(2)||'—'}</div><div class="etf-kpi-sub">${aboveKAMA===null?'—':aboveKAMA?'Sopra KAMA ✓':'Sotto KAMA ✗'}</div></div>
+    <div class="etf-kpi"><div class="etf-kpi-label">Yield</div><div class="etf-kpi-val" style="color:var(--gold)">${sig.yield_annuo?sig.yield_annuo+'%':'—'}</div><div class="etf-kpi-sub">${sig.motivo||''}</div></div>`;
+  // Grafico
+  const canvas=document.getElementById('etf-chart');
+  canvas.width=canvas.offsetWidth||900;canvas.height=200;
+  const ctx=canvas.getContext('2d');
+  const W=canvas.width,H=200,P={t:16,r:60,b:28,l:65};
+  const w=W-P.l-P.r,h=H-P.t-P.b;
+  if(!closes.length){ctx.clearRect(0,0,W,H);return;}
+  const allVals=[...closes,...sma200s.filter(Boolean),...kamaFasts.filter(Boolean)];
+  const mn=Math.min(...allVals)*0.997,mx=Math.max(...allVals)*1.003;
+  const xS=i=>P.l+(i/(closes.length-1))*w;
+  const yS=v=>P.t+h-((v-mn)/(mx-mn))*h;
+  ctx.clearRect(0,0,W,H);
+  // Background
+  ctx.fillStyle='#0A1628';ctx.fillRect(0,0,W,H);
+  // Grid
+  ctx.strokeStyle='rgba(255,255,255,.06)';ctx.lineWidth=0.5;
+  [0,.25,.5,.75,1].forEach(t=>{
+    const y=P.t+h*t;ctx.beginPath();ctx.moveTo(P.l,y);ctx.lineTo(P.l+w,y);ctx.stroke();
+    ctx.fillStyle='rgba(255,255,255,.3)';ctx.font='9px DM Mono,monospace';ctx.textAlign='right';
+    ctx.fillText('€'+(mn+(mx-mn)*(1-t)).toFixed(2),P.l-3,y+3);
+  });
+  // SMA200
+  if(sma200s.length>1){
+    ctx.strokeStyle='rgba(107,114,128,.7)';ctx.lineWidth=1;ctx.setLineDash([5,4]);
+    ctx.beginPath();let first200=true;
+    sma200s.forEach((v,i)=>{if(!v)return;if(first200){ctx.moveTo(xS(i),yS(v));first200=false;}else ctx.lineTo(xS(i),yS(v));});
+    ctx.stroke();ctx.setLineDash([]);
+    if(lastSMA){ctx.fillStyle='rgba(107,114,128,.8)';ctx.font='8px DM Mono,monospace';ctx.textAlign='left';ctx.fillText('SMA200 '+lastSMA.toFixed(2),P.l+w+3,yS(lastSMA)+3);}
+  }
+  // KAMA
+  if(kamaFasts.length>1){
+    ctx.strokeStyle='rgba(201,168,76,.8)';ctx.lineWidth=1.5;ctx.setLineDash([4,3]);
+    ctx.beginPath();let firstK=true;
+    kamaFasts.forEach((v,i)=>{if(!v)return;if(firstK){ctx.moveTo(xS(i),yS(v));firstK=false;}else ctx.lineTo(xS(i),yS(v));});
+    ctx.stroke();ctx.setLineDash([]);
+    if(lastKAMA){ctx.fillStyle='rgba(201,168,76,.9)';ctx.font='8px DM Mono,monospace';ctx.textAlign='left';ctx.fillText('KAMA '+lastKAMA.toFixed(2),P.l+w+3,yS(lastKAMA)+3);}
+  }
+  // BUY/SELL signals
+  if(sig.chart?.signals){
+    sig.chart.signals.forEach(s=>{
+      const i=sig.chart.dates?.indexOf(s.date);if(i<0)return;
+      const x=xS(i),y=yS(closes[i]||mn);
+      ctx.beginPath();ctx.arc(x,y,4,0,Math.PI*2);
+      ctx.fillStyle=s.type==='BUY'?'#22C55E':'#EF4444';ctx.fill();
+    });
+  }
+  // Area prezzo
+  const lastC=closes[closes.length-1],firstC=closes[0];
+  const lineColor=lastC>=firstC?'#4ADE80':'#F87171';
+  const areaColor=lastC>=firstC?'rgba(74,222,128,.08)':'rgba(248,113,113,.08)';
+  ctx.beginPath();ctx.moveTo(xS(0),yS(closes[0]));closes.forEach((p,i)=>{if(i>0)ctx.lineTo(xS(i),yS(p));});
+  ctx.lineTo(xS(closes.length-1),H-P.b);ctx.lineTo(P.l,H-P.b);ctx.closePath();
+  ctx.fillStyle=areaColor;ctx.fill();
+  ctx.beginPath();ctx.moveTo(xS(0),yS(closes[0]));closes.forEach((p,i)=>{if(i>0)ctx.lineTo(xS(i),yS(p));});
+  ctx.strokeStyle=lineColor;ctx.lineWidth=2;ctx.stroke();
+  // Punto finale
+  ctx.beginPath();ctx.arc(xS(closes.length-1),yS(lastC),4,0,Math.PI*2);ctx.fillStyle=lineColor;ctx.fill();
+  // Asse X — date ogni ~20 punti
+  ctx.fillStyle='rgba(255,255,255,.3)';ctx.font='8px DM Mono,monospace';ctx.textAlign='center';
+  const dates=sig.chart?.dates||[];const step=Math.max(1,Math.floor(closes.length/5));
+  for(let i=0;i<closes.length;i+=step){if(dates[i])ctx.fillText(dates[i].slice(5),xS(i),H-8);}
+  // Scorri
+  wrap.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+// ── EXPORT CSV TUTTI ETF ──────────────────────────────────────────────
+function exportAllCSV(){
+  if(!DATA?.etfs)return;
+  let csv='Ticker,Nome,Categoria,Segnale,Score,Prezzo,1D%,Yield%,SMA200,KAMA,Motivo\n';
+  Object.values(DATA.etfs).sort((a,b)=>(b.score||0)-(a.score||0)).forEach(e=>{
+    const lastSMA=e.chart?.sma200?.slice(-1)[0]||'—';
+    const lastKAMA=e.chart?.kama_fast?.slice(-1)[0]||'—';
+    csv+=`${e.ticker},"${e.nome}","${e.categoria||'—'}",${e.segnale},${e.score||0},${e.price||'—'},${e.ret_1d||0},${e.yield_annuo||'—'},${lastSMA},${lastKAMA},"${e.motivo||'—'}"\n`;
+  });
+  const blob=new Blob([csv],{type:'text/csv'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`compass_etf_universe_${new Date().toISOString().slice(0,10)}.csv`;a.click();
+}
+
+// ── NAVIGATION ────────────────────────────────────────────────────────
+function showView(v){
+  ['home','clients','detail','interview'].forEach(id=>{document.getElementById('view-'+id).style.display=v===id?'block':'none';});
+  ['nav-home','nav-clients'].forEach(id=>{document.getElementById(id)?.classList.remove('active');});
+  if(v==='home')document.getElementById('nav-home')?.classList.add('active');
+  if(v==='clients')document.getElementById('nav-clients')?.classList.add('active');
+}
+function showTab(id,el){currentTab=id;document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));el.classList.add('active');document.getElementById('tab-'+id).classList.add('active');}
+
+// ── MODAL CONFIGURATI ─────────────────────────────────────────────────
+function showModalClienti(){
+  const configurati=CLIENTS.filter(cl=>cl.capitale>0).sort((a,b)=>b.capitale-a.capitale);
+  const body=document.getElementById('modal-body-configurati');
+  if(!configurati.length){body.innerHTML='<div class="modal-empty">Nessun cliente configurato.</div>';}
+  else{body.innerHTML=configurati.map(cl=>{const lv=getLevelById(cl.livello);const color=lv?.colore||'#6B7280';const rend=lv?.rendimento_atteso||0;return`<div class="modal-client-row" onclick="closeModal();openClient('${cl.id}')"><div class="mcr-avatar" style="background:${color}20;color:${color}">${cl.id.slice(-2)}</div><div style="flex:1"><div class="mcr-nome">${cl.nome}</div><div class="mcr-level">${lv?.nome||cl.livello} · ${cl.portafoglio?.length||0} ETF</div></div><div style="text-align:right"><div class="mcr-capitale">€${cl.capitale.toLocaleString('it-IT')}</div><div style="font-size:8px;color:var(--text2)">~€${Math.round(cl.capitale*rend/100).toLocaleString('it-IT')}/a</div></div></div>`;}).join('');}
+  document.getElementById('modal-configurati').style.display='flex';
+}
+function closeModal(){document.getElementById('modal-configurati').style.display='none';}
+
+// ── INTERVIEW ─────────────────────────────────────────────────────────
+function updateModalita(){const m=document.getElementById('iv-modalita').value;document.getElementById('iv-capitale-wrap').style.display=m==='pac'?'none':'block';document.getElementById('iv-pac-wrap').style.display=m==='unica'?'none':'block';}
+function calcProfile(){
+  const orizzonte=parseInt(document.getElementById('iv-orizzonte').value||0);const perdita=parseInt(document.getElementById('iv-perdita').value||0);const obiettivo=document.getElementById('iv-obiettivo').value;const distribuzione=document.getElementById('iv-distribuzione').value;const liquidita=document.getElementById('iv-liquidita').value;
+  if(!orizzonte||!perdita||!obiettivo||!distribuzione){alert('Compila i campi obbligatori (*)');return;}
+  let score=orizzonte*1.5+perdita*1.5;if(obiettivo==='protezione')score-=2;if(obiettivo==='crescita')score+=1;if(obiettivo==='trading')score+=2;if(liquidita==='totale')score-=2;if(liquidita==='parziale')score-=1;
+  const num=Math.max(1,Math.min(9,Math.round(score)));const prefix=distribuzione==='acc'?'A':'C';const livelloId=prefix+num;
+  const lv=getLevelById(livelloId)||getLevelById(prefix+'5');const capitale=parseFloat(document.getElementById('iv-capitale').value)||0;const pac=parseFloat(document.getElementById('iv-pac').value)||0;const rend=lv?.rendimento_atteso||0;const cedola=capitale>0?Math.round(capitale*rend/100):0;
+  document.getElementById('iv-result').style.display='block';
+  document.getElementById('iv-result').innerHTML=`<div style="background:var(--navy);border-radius:var(--radius);padding:16px;color:#fff"><div style="font-size:8px;letter-spacing:2px;color:rgba(255,255,255,.4);margin-bottom:5px">PROFILO ASSEGNATO</div><div style="font-family:'Fraunces',serif;font-size:22px;font-weight:300;color:${lv?.colore||'#fff'}">${lv?.nome||livelloId}</div><div style="font-size:9px;color:rgba(255,255,255,.4);margin-top:3px">${lv?.obiettivo||''}</div><div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:12px"><div style="background:rgba(255,255,255,.05);border-radius:7px;padding:8px"><div style="font-size:7px;color:rgba(255,255,255,.3);margin-bottom:2px">REND.</div><div style="color:#22C55E;font-size:14px">${rend}%</div></div><div style="background:rgba(255,255,255,.05);border-radius:7px;padding:8px"><div style="font-size:7px;color:rgba(255,255,255,.3);margin-bottom:2px">VAR 95%</div><div style="color:#EF4444;font-size:14px">${lv?.var_pct||'—'}%</div></div><div style="background:rgba(255,255,255,.05);border-radius:7px;padding:8px"><div style="font-size:7px;color:rgba(255,255,255,.3);margin-bottom:2px">CEDOLA EST.</div><div style="color:var(--gold2);font-size:14px">${cedola>0?'€'+cedola.toLocaleString('it-IT'):'—'}</div></div><div style="background:rgba(255,255,255,.05);border-radius:7px;padding:8px"><div style="font-size:7px;color:rgba(255,255,255,.3);margin-bottom:2px">TIPO</div><div style="font-size:12px">${lv?.tipo==='Dist'?'🔴 Cedola':'🔵 Acc'}</div></div></div></div><div style="margin-top:8px"><button class="btn-gold" onclick="applyProfile('${lv?.id||livelloId}')">Applica a Cliente →</button></div>`;}
+function applyProfile(livelloId){
+  document.getElementById('select-client-list').innerHTML=CLIENTS.map(cl=>{const lv=getLevelById(cl.livello);const color=lv?.colore||'#6B7280';return`<div class="client-select-row" onclick="doApplyProfile('${cl.id}','${livelloId}')"><div style="width:28px;height:28px;border-radius:50%;background:${color}20;color:${color};display:flex;align-items:center;justify-content:center;font-size:9px;flex-shrink:0">${cl.id.slice(-2)}</div><div style="flex:1"><div style="font-size:11px;font-weight:500;color:var(--text)">${cl.nome}</div><div style="font-size:8px;color:var(--text2)">${lv?.nome||cl.livello}</div></div><div style="font-size:10px;color:var(--gold)">${cl.capitale>0?'€'+cl.capitale.toLocaleString('it-IT'):'—'}</div></div>`;}).join('');
+  document.getElementById('modal-select-client').style.display='flex';
+}
+function doApplyProfile(clientId,livelloId){
+  document.getElementById('modal-select-client').style.display='none';
+  const cl=getClientById(clientId);if(!cl)return;
+  cl.livello=livelloId;cl.capitale=parseFloat(document.getElementById('iv-capitale').value)||0;cl.pac_mensile=parseFloat(document.getElementById('iv-pac').value)||0;cl.modalita=document.getElementById('iv-modalita').value||'unica';cl.nome=document.getElementById('iv-nome').value||cl.nome;
+  lsSaveClient(cl);renderSidebar();renderCards();renderLivelliGrid();renderHomeConfigured();
+  alert(`Profilo ${livelloId} applicato a ${cl.nome}`);openClient(clientId);showView('detail');
+}
+
+// ── GITHUB ────────────────────────────────────────────────────────────
+const GH_OWNER='Giorgiogoldoni',GH_REPO='compass',GH_PATH='data/clients.json',GH_TOKEN_KEY='compass_github_token';
+function ghGetToken(){return localStorage.getItem(GH_TOKEN_KEY)||'';}
+function ghSetToken(t){localStorage.setItem(GH_TOKEN_KEY,t);}
+async function ghSaveClients(){
+  const token=ghGetToken();if(!token)return false;
+  try{
+    const infoRes=await fetch(`https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/contents/${GH_PATH}`,{headers:{'Authorization':'token '+token,'Accept':'application/vnd.github.v3+json'}});
+    if(!infoRes.ok)return false;const info=await infoRes.json();
+    const content=JSON.stringify({clients:CLIENTS},null,2);const encoded=btoa(unescape(encodeURIComponent(content)));
+    const putRes=await fetch(`https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/contents/${GH_PATH}`,{method:'PUT',headers:{'Authorization':'token '+token,'Content-Type':'application/json'},body:JSON.stringify({message:'COMPASS: aggiornamento clienti '+new Date().toISOString().slice(0,10),content:encoded,sha:info.sha})});
+    return putRes.ok;
+  }catch(e){console.error(e);return false;}
+}
+function openTokenModal(){document.getElementById('gh-token-modal').style.display='flex';document.getElementById('gh-token-input').value=ghGetToken();}
+function closeTokenModal(){document.getElementById('gh-token-modal').style.display='none';}
+function saveToken(){const t=document.getElementById('gh-token-input').value.trim();if(t){ghSetToken(t);closeTokenModal();alert('✅ Token salvato');}}
+
+// ── INIT ──────────────────────────────────────────────────────────────
+loadAll();
+setInterval(loadAll,10*60*1000);
+</script>
+</body>
+</html>
