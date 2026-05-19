@@ -602,6 +602,7 @@ td{padding:7px 9px;font-size:10px;white-space:nowrap;}
               <button class="btn-gold" id="btn-save-gh" onclick="saveSettingsAndSync()">☁️ Salva su GitHub</button>
               <button class="btn-outline" onclick="openClientPortal()">Portale Cliente ↗</button>
               <button class="btn-outline" onclick="openTokenModal()" style="font-size:8px;padding:6px 9px">🔑 Token</button>
+              <button class="btn-outline" onclick="eliminaCliente()" style="font-size:8px;padding:6px 9px;color:#EF4444;border-color:#EF4444">🗑️ Elimina Cliente</button>
             </div>
             <div id="client-link-box"></div>
           </div>
@@ -714,6 +715,23 @@ function lsLoadIndex(){try{const r=localStorage.getItem(LS_ALL_KEY);return r?JSO
 function lsMergeClients(clients){return clients.map(cl=>{const s=lsLoadClient(cl.id);return s?{...cl,...s}:cl;});}
 function lsReset(){if(!confirm('Resettare tutti i dati locali?'))return;Object.keys(localStorage).filter(k=>k.startsWith(LS_PREFIX)||k===LS_ALL_KEY).forEach(k=>localStorage.removeItem(k));location.reload();}
 function lsExport(){const all={};Object.keys(localStorage).filter(k=>k.startsWith(LS_PREFIX)).forEach(k=>{try{all[k]=JSON.parse(localStorage.getItem(k));}catch(e){}});const blob=new Blob([JSON.stringify(all,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='compass_backup_'+new Date().toISOString().slice(0,10)+'.json';a.click();}
+
+function eliminaCliente(){
+  if(!currentClient)return;
+  const nome=currentClient.nome||currentClient.id;
+  if(!confirm('Eliminare definitivamente il cliente "'+nome+'"?\nQuesto rimuove tutti i dati locali. Non può essere annullato.'))return;
+  // Rimuovi dal localStorage
+  localStorage.removeItem(LS_PREFIX+currentClient.id);
+  const idx=lsLoadIndex();delete idx[currentClient.id];
+  localStorage.setItem(LS_ALL_KEY,JSON.stringify(idx));
+  // Resetta il cliente nell'array (ripristina i valori di default dal JSON)
+  const i=CLIENTS.findIndex(c=>c.id===currentClient.id);
+  if(i>=0){CLIENTS[i]={...CLIENTS[i],capitale:0,pac_mensile:0,portafoglio:[],note:'',modalita:'unica',data_apertura:'',livello:CLIENTS[i].livello};}
+  currentClient=null;
+  renderSidebar();renderCards();renderLivelliGrid();renderHomeConfigured();
+  showView('home');
+  alert('Cliente "'+nome+'" eliminato.');
+}
 
 // ── LOAD ────────────────────────────────────────────────────────────
 async function loadAll(){
@@ -848,13 +866,31 @@ function getEtfCategoriaLabel(cat){
 function livelloCardHTML(lv){
   const color=lv.colore||'#6B7280';
   const nClienti=CLIENTS?CLIENTS.filter(c=>c.livello===lv.id&&c.capitale>0).length:0;
+  const isDist=lv.tipo==='Dist';
+  const pool=lv.etf_pool||[];
+  const sigs=pool.map(t=>getSignal(t)).filter(Boolean).filter(s=>s.segnale!=='STOP'&&s.segnale!=='USCITA');
+  const scoreMedia=sigs.length>0?Math.round(sigs.reduce((s,e)=>s+calcScore(e),0)/sigs.length):null;
+  const nBuy=sigs.filter(s=>s.segnale==='BUY'||s.segnale==='WATCH').length;
+  const etfDist=pool.filter(t=>{const s=getSignal(t);return s&&(s.tipo==='Dist'||s.yield_annuo>0);});
+  const etfAcc=pool.filter(t=>{const s=getSignal(t);return s&&s.tipo!=='Dist'&&!(s.yield_annuo>0);});
+  const slabel=scoreMedia!=null?scoreLabel(scoreMedia):{label:'—',color:'#6B7280'};
   return'<div class="livello-card'+(nClienti>0?' has-client':'')+'" onclick="showLivello(\''+lv.id+'\')" title="'+lv.nome+'">'+
     '<div class="lc-bar" style="background:'+color+'"></div>'+
-    '<div class="lc-id" style="color:'+color+'">'+lv.id+'</div>'+
+    '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:2px">'+
+      '<div class="lc-id" style="color:'+color+'">'+lv.id+'</div>'+
+      (scoreMedia!=null?'<div style="font-size:8px;font-weight:600;color:'+slabel.color+'">'+scoreMedia+'</div>':'')+
+    '</div>'+
     '<div class="lc-nome">'+lv.nome.replace(' Cedola','').replace(' Acc','')+'</div>'+
-    '<div class="lc-rend">'+(lv.rendimento_atteso||'—')+'%</div>'+
-    '<div class="lc-var">VaR '+(lv.var_pct||'—')+'%</div>'+
-    '<div class="lc-n">'+(nClienti>0?'👤 '+nClienti:lv.n_etf_max+' ETF')+'</div>'+
+    '<div style="display:flex;gap:6px;margin:4px 0">'+
+      '<div style="flex:1"><div class="lc-rend">'+(lv.rendimento_atteso||'—')+'%</div><div style="font-size:7px;color:var(--text2)">Rend.</div></div>'+
+      '<div style="flex:1"><div class="lc-var">'+(lv.var_pct||'—')+'%</div><div style="font-size:7px;color:var(--text2)">VaR</div></div>'+
+      '<div style="flex:1"><div style="font-size:10px;font-weight:500;color:var(--green)">'+nBuy+'</div><div style="font-size:7px;color:var(--text2)">attivi</div></div>'+
+    '</div>'+
+    '<div style="display:flex;gap:3px;flex-wrap:wrap;margin-top:3px">'+
+      (etfDist.length?'<span style="font-size:7px;padding:1px 5px;border-radius:3px;background:rgba(201,168,76,.15);color:var(--gold)">🔴 '+etfDist.length+' Dist</span>':'')+
+      (etfAcc.length?'<span style="font-size:7px;padding:1px 5px;border-radius:3px;background:rgba(29,78,216,.1);color:#60A5FA">🔵 '+etfAcc.length+' Acc</span>':'')+
+      (nClienti>0?'<span style="font-size:7px;padding:1px 5px;border-radius:3px;background:rgba(201,168,76,.2);color:var(--gold2)">👤 '+nClienti+'</span>':'')+
+    '</div>'+
   '</div>';
 }
 
@@ -869,8 +905,35 @@ function renderLivelliGrid(){
 }
 
 function showLivello(id){
-  const cl=CLIENTS&&(CLIENTS.find(c=>c.id==='Cliente'+id)||CLIENTS.find(c=>c.livello===id));
-  if(cl)openClient(cl.id);
+  // Prima cerca cliente configurato con quel livello
+  const cl=CLIENTS&&CLIENTS.find(c=>c.livello===id&&c.capitale>0);
+  if(cl){openClient(cl.id);return;}
+  // Altrimenti apri come portafoglio modello (senza cliente)
+  apriPortafoglioModello(id);
+}
+
+function apriPortafoglioModello(livelloId){
+  const lv=getLevelById(livelloId);if(!lv)return;
+  // Crea un cliente temporaneo modello
+  const modello={id:'_modello_'+livelloId,nome:'Portafoglio Modello '+livelloId,livello:livelloId,capitale:0,pac_mensile:0,portafoglio:[],modalita:'unica',note:'',_modello:true};
+  currentClient=modello;
+  const color=lv.colore||'#6B7280';
+  document.getElementById('detail-hero').innerHTML=
+    '<div class="hero-title">Portafoglio <span>'+livelloId+' — '+lv.nome+'</span></div>'+
+    '<div class="hero-sub">'+(lv.tipo==='Dist'?'🔴 DISTRIBUZIONE':'🔵 ACCUMULAZIONE')+' · '+( lv.obiettivo||'')+'</div>'+
+    '<div class="hero-kpis">'+
+      '<div class="hkpi"><div class="hkpi-label">Rendimento Atteso</div><div class="hkpi-val gold">'+lv.rendimento_atteso+'%</div></div>'+
+      '<div class="hkpi"><div class="hkpi-label">VaR 95%</div><div class="hkpi-val" style="color:var(--red)">'+lv.var_pct+'%</div></div>'+
+      '<div class="hkpi"><div class="hkpi-label">ETF Pool</div><div class="hkpi-val">'+(lv.etf_pool?.length||'—')+'</div></div>'+
+      '<div class="hkpi"><div class="hkpi-label">Max ETF</div><div class="hkpi-val">'+lv.n_etf_max+'</div></div>'+
+    '</div>';
+  showView('detail');
+  showTab('portafoglio',document.querySelector('.tab'));
+  document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('active',i===0));
+  document.querySelectorAll('.tab-content').forEach((t,i)=>t.classList.toggle('active',i===0));
+  // Genera portafoglio modello automaticamente
+  buildPortfolio();
+  renderSegnali();renderCedola();
 }
 
 // ── HOME CONFIGURED ──────────────────────────────────────────────────
@@ -957,38 +1020,77 @@ function renderPortafoglio(){
   if(!currentClient)return;
   const lv=getLevelById(currentClient.livello);
   const alloc=lv?.alloc||{};
-  const colors={monetario:'#0EA5E9',obbligaz:'#6366F1',hy:'#F59E0B',azionario:'#22C55E'};
-  const labels={monetario:'Monetario',obbligaz:'Obbligaz.',hy:'High Yield',azionario:'Azionario'};
-  document.getElementById('alloc-bars').innerHTML=Object.entries(alloc).map(([k,v])=>v>0?'<div class="alloc-seg" style="width:'+v+'%;background:'+colors[k]+'"></div>':'').join('');
-  document.getElementById('alloc-legend').innerHTML=Object.entries(alloc).map(([k,v])=>v>0?'<div class="al-item"><div class="al-dot" style="background:'+colors[k]+'"></div>'+labels[k]+' '+v+'%</div>':'').join('');
+  const isDist=lv?.tipo==='Dist';
+
+  // Barre allocazione 10 categorie
+  const allocColors={monetario:'#0EA5E9',obbligaz_ig:'#6366F1',hy:'#F59E0B',em_bond:'#A855F7',az_globale:'#22C55E',az_europa:'#10B981',az_usa:'#3B82F6',az_em:'#F97316',tematico:'#EC4899',leva:'#EF4444'};
+  const allocLabels={monetario:'Monetario',obbligaz_ig:'Obbl. IG',hy:'High Yield',em_bond:'EM Bond',az_globale:'Az. Globale',az_europa:'Az. Europa',az_usa:'Az. USA',az_em:'Az. EM',tematico:'Tematico',leva:'Leva'};
+  document.getElementById('alloc-bars').innerHTML=Object.entries(alloc).map(([k,v])=>v>0?'<div class="alloc-seg" style="width:'+v+'%;background:'+(allocColors[k]||'#ccc')+'"></div>':'').join('');
+  document.getElementById('alloc-legend').innerHTML=Object.entries(alloc).map(([k,v])=>v>0?'<div class="al-item"><div class="al-dot" style="background:'+(allocColors[k]||'#ccc')+'"></div>'+(allocLabels[k]||k)+' '+v+'%</div>':'').join('');
+
   const cap=currentClient.capitale||0;const rend=lv?.rendimento_atteso||0;const varP=lv?.var_pct||0;
-  document.getElementById('ptf-stats').innerHTML=
-    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">'+
-      '<div class="cm"><div class="cml">Rendimento atteso</div><div class="cmv" style="color:var(--green)">'+rend+'%</div></div>'+
-      '<div class="cm"><div class="cml">VaR 95%</div><div class="cmv" style="color:var(--red)">'+varP+'% (€'+Math.round(cap*varP/100).toLocaleString('it-IT')+')</div></div>'+
-      '<div class="cm"><div class="cml">Cedola/Rend. annua</div><div class="cmv" style="color:var(--gold)">€'+Math.round(cap*rend/100).toLocaleString('it-IT')+'</div></div>'+
-      '<div class="cm"><div class="cml">N. ETF</div><div class="cmv">'+(currentClient.portafoglio?.length||0)+'</div></div>'+
-    '</div>';
   const ptf=currentClient.portafoglio||[];
-  if(!ptf.length){document.getElementById('ptf-table').innerHTML='<tr><td colspan="10" style="text-align:center;padding:18px;color:var(--text2)">Nessun portafoglio — clicca Rigenera da Segnali</td></tr>';return;}
-  document.getElementById('ptf-table').innerHTML=ptf.map(p=>{
-    const sig=getSignal(p.ticker);
-    const importo=Math.round(cap*p.peso/100);
-    const lc=getLastClose(sig),ls=getLastSMA(sig),lk=getLastKAMA(sig);
-    const aboveSMA=lc&&ls?lc>ls:null;const aboveKAMA=lc&&lk?lc>lk:null;
-    return'<tr>'+
-      '<td style="color:var(--blue);font-weight:500;cursor:pointer" onclick="openETFModal();setTimeout(()=>showETFDetail(\''+p.ticker+'\'),300)">'+p.ticker+'</td>'+
-      '<td style="color:var(--text2);font-size:9px;max-width:130px;overflow:hidden;text-overflow:ellipsis">'+(sig?.nome||p.nome||'—')+'</td>'+
-      '<td style="font-weight:500">'+p.peso.toFixed(1)+'%</td>'+
-      '<td>€'+importo.toLocaleString('it-IT')+'</td>'+
-      '<td>'+sigBadge(sig?.segnale)+'</td>'+
-      '<td>'+scoreChipHTML(sig)+'</td>'+
-      '<td>'+(aboveSMA===null?'—':aboveSMA?'<span class="ind-pill ind-on">✓</span>':'<span class="ind-pill ind-off">✗</span>')+'</td>'+
-      '<td>'+(aboveKAMA===null?'—':aboveKAMA?'<span class="ind-pill ind-on">✓</span>':'<span class="ind-pill ind-off">✗</span>')+'</td>'+
-      '<td style="color:var(--gold)">'+(sig?.yield_annuo?sig.yield_annuo+'%':'—')+'</td>'+
-      '<td class="'+rc(sig?.ret_1d)+'">'+rf(sig?.ret_1d,2)+'</td>'+
-    '</tr>';
-  }).join('');
+
+  // Score medio portafoglio
+  const scoresMedio=ptf.length>0?Math.round(ptf.reduce((s,p)=>{const sig=getSignal(p.ticker);return s+(sig?calcScore(sig):0);},0)/ptf.length):null;
+
+  document.getElementById('ptf-stats').innerHTML=
+    '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px">'+
+      '<div class="cm"><div class="cml">Rendimento</div><div class="cmv" style="color:var(--green)">'+rend+'%</div></div>'+
+      '<div class="cm"><div class="cml">VaR 95%</div><div class="cmv" style="color:var(--red)">'+varP+'%</div></div>'+
+      '<div class="cm"><div class="cml">'+(isDist?'Cedola ann.':'Rendimento')+'</div><div class="cmv" style="color:var(--gold)">'+(cap>0?'€'+Math.round(cap*rend/100).toLocaleString('it-IT'):'—')+'</div></div>'+
+      '<div class="cm"><div class="cml">Score medio</div><div class="cmv">'+(scoresMedio!=null?scoresMedio:' —')+'</div></div>'+
+    '</div>';
+
+  if(!ptf.length){
+    document.getElementById('ptf-table').innerHTML='<tr><td colspan="10" style="text-align:center;padding:18px;color:var(--text2)">Nessun portafoglio — clicca ⟳ Rigenera da Segnali</td></tr>';
+    return;
+  }
+
+  // Separa ETF per tipo: Dist (yield > 0) e Acc
+  const ptfDist=ptf.filter(p=>{const s=getSignal(p.ticker);return s&&(s.tipo==='Dist'||s.yield_annuo>0);});
+  const ptfAcc=ptf.filter(p=>{const s=getSignal(p.ticker);return !(s&&(s.tipo==='Dist'||s.yield_annuo>0));});
+
+  function rowsHTML(lista){
+    return lista.map(p=>{
+      const sig=getSignal(p.ticker);
+      const importo=cap>0?Math.round(cap*p.peso/100):null;
+      const lc=getLastClose(sig),ls=getLastSMA(sig),lk=getLastKAMA(sig);
+      const aboveSMA=lc&&ls?lc>ls:null;const aboveKAMA=lc&&lk?lc>lk:null;
+      return'<tr>'+
+        '<td style="color:var(--blue);font-weight:500;cursor:pointer" onclick="openETFModal();setTimeout(()=>showETFDetail(\''+p.ticker+'\'),300)">'+p.ticker+'</td>'+
+        '<td style="color:var(--text2);font-size:9px;max-width:130px;overflow:hidden;text-overflow:ellipsis">'+(sig?.nome||p.nome||'—')+'</td>'+
+        '<td style="font-weight:500">'+p.peso.toFixed(1)+'%</td>'+
+        '<td>'+(importo?'€'+importo.toLocaleString('it-IT'):'—')+'</td>'+
+        '<td>'+sigBadge(sig?.segnale)+'</td>'+
+        '<td>'+scoreChipHTML(sig)+'</td>'+
+        '<td>'+(aboveSMA===null?'—':aboveSMA?'<span class="ind-pill ind-on">✓</span>':'<span class="ind-pill ind-off">✗</span>')+'</td>'+
+        '<td>'+(aboveKAMA===null?'—':aboveKAMA?'<span class="ind-pill ind-on">✓</span>':'<span class="ind-pill ind-off">✗</span>')+'</td>'+
+        '<td style="color:var(--gold)">'+(sig?.yield_annuo?sig.yield_annuo+'%':'—')+'</td>'+
+        '<td class="'+rc(sig?.ret_1d)+'">'+rf(sig?.ret_1d,2)+'</td>'+
+      '</tr>';
+    }).join('');
+  }
+
+  // Calcola cedola totale per sezione Dist
+  let cedolaSez='';
+  if(isDist&&ptfDist.length>0&&cap>0){
+    const cedTot=ptfDist.reduce((s,p)=>{const sig=getSignal(p.ticker);return s+(sig?.yield_annuo?Math.round(cap*p.peso/100*sig.yield_annuo/100):0);},0);
+    cedolaSez='<tr style="background:rgba(201,168,76,.06)"><td colspan="3" style="padding:5px 8px;font-size:8px;color:var(--gold)">Cedola stimata ETF Dist</td><td colspan="7" style="padding:5px 8px;font-size:10px;font-weight:500;color:var(--gold)">€'+cedTot.toLocaleString('it-IT')+'/anno</td></tr>';
+  }
+
+  let html='';
+  if(ptfDist.length>0){
+    html+='<tr style="background:rgba(201,168,76,.08)"><td colspan="10" style="padding:5px 8px;font-size:8px;letter-spacing:1px;color:var(--gold)">🔴 ETF DISTRIBUZIONE ('+ptfDist.length+')</td></tr>';
+    html+=rowsHTML(ptfDist);
+    html+=cedolaSez;
+  }
+  if(ptfAcc.length>0){
+    html+='<tr style="background:rgba(29,78,216,.06)"><td colspan="10" style="padding:5px 8px;font-size:8px;letter-spacing:1px;color:#60A5FA">🔵 ETF ACCUMULAZIONE ('+ptfAcc.length+')</td></tr>';
+    html+=rowsHTML(ptfAcc);
+  }
+  if(!ptfDist.length&&!ptfAcc.length) html=rowsHTML(ptf);
+  document.getElementById('ptf-table').innerHTML=html;
 }
 
 // ── BUILD PORTFOLIO ───────────────────────────────────────────────────
@@ -997,6 +1099,7 @@ function buildPortfolio(){
   const lv=getLevelById(currentClient.livello);if(!lv)return;
   const pool=lv.etf_pool||[];const maxEtf=lv.n_etf_max||6;
   const alloc=lv.alloc||{};
+  const isDist=lv.tipo==='Dist';
 
   // Mappa ticker → 10 categorie granulari
   const getEtfAlloc=ticker=>{
@@ -1013,19 +1116,28 @@ function buildPortfolio(){
 
   if(!allCand.length){alert('Nessun ETF con segnale attivo nel pool. Riprova dopo aggiornamento notturno.');return;}
 
+  // Ordina candidati: per livelli C preferisci Dist (yield>0), per A preferisci Acc
+  // Boost score +10 per ETF del tipo corretto
+  const boostCand=allCand.map(x=>{
+    const isDistEtf=x.sig?.tipo==='Dist'||(x.sig?.yield_annuo||0)>0;
+    const boost=(isDist&&isDistEtf)||(!isDist&&!isDistEtf)?10:0;
+    return{...x,_score:(x.sig?.score||0)+boost};
+  }).sort((a,b)=>(b._score-a._score)||((b.sig?.mom1m||0)-(a.sig?.mom1m||0)));
+
   // Seleziona rispettando: max 1 leva, max 2 per stesso mercato base
+  // Per livelli C: prendi prima almeno 2 ETF Dist se disponibili
   const selected=[];let levaCount=0;const mercati={};
-  const getMercato=t=>t.replace(/\.(MI|DE|PA)$/,'').slice(0,4);
-  for(const x of allCand){
+  const getMercato=t=>t.replace(/\.(MI|DE|PA|L|SW|AS)$/,'').slice(0,4);
+  for(const x of boostCand){
     if(selected.length>=maxEtf)break;
-    if(LEVA.has(x.ticker)){if(levaCount>=1)continue;levaCount++;}
+    if(LEVA_TICKERS.has(x.ticker)){if(levaCount>=1)continue;levaCount++;}
     else{const m=getMercato(x.ticker);if((mercati[m]||0)>=2)continue;mercati[m]=(mercati[m]||0)+1;}
     selected.push(x);
   }
   // Fallback se troppo pochi
   if(selected.length<Math.min(3,maxEtf)){
     const alreadyIn=new Set(selected.map(x=>x.ticker));
-    for(const x of allCand){
+    for(const x of boostCand){
       if(selected.length>=maxEtf)break;
       if(!alreadyIn.has(x.ticker)){selected.push(x);alreadyIn.add(x.ticker);}
     }
