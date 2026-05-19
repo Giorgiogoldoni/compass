@@ -1,5 +1,5 @@
 {
-  "generated": "2026-05-19T16:05:00.787806",
+  "generated": "2026-05-19T21:10:37.604053",
   "total": 85,
   "errors": 0,
   "etfs": {
@@ -40,8 +40,8 @@
       "nome": "Leverage Shares 3x NVIDIA ETC",
       "tipo": "Acc",
       "yield_pct": 0.0,
-      "perf_1a": 155.84,
-      "price": 65.98
+      "perf_1a": 155.45,
+      "price": 65.88
     },
     "3USL.MI": {
       "ticker": "3USL.MI",
@@ -64,8 +64,8 @@
       "nome": "WisdomTree Agriculture",
       "tipo": "Dist",
       "yield_pct": 0.0,
-      "perf_1a": 3.87,
-      "price": 5.661
+      "perf_1a": 3.89,
+      "price": 5.662
     },
     "CMOD.MI": {
       "ticker": "CMOD.MI",
@@ -104,8 +104,8 @@
       "nome": "WisdomTree US Equity Income UCITS ETF",
       "tipo": "Dist",
       "yield_pct": 0.0,
-      "perf_1a": 15.55,
-      "price": 24.77
+      "perf_1a": 16.3,
+      "price": 24.93
     },
     "DHYA.MI": {
       "ticker": "DHYA.MI",
@@ -128,8 +128,8 @@
       "nome": "State Street SPDR S&P Emerging Markets Dividend Aristocrats UCITS ETF",
       "tipo": "Dist",
       "yield_pct": 0.0,
-      "perf_1a": 11.39,
-      "price": 14.778
+      "perf_1a": 11.71,
+      "price": 14.82
     },
     "EQQQ.MI": {
       "ticker": "EQQQ.MI",
@@ -168,8 +168,8 @@
       "nome": "PIMCO Advantage Euro Short-Term",
       "tipo": "Dist",
       "yield_pct": 0.0,
-      "perf_1a": 0.16,
-      "price": 12.32
+      "perf_1a": -0.02,
+      "price": 12.298
     },
     "EUHI.MI": {
       "ticker": "EUHI.MI",
@@ -224,8 +224,8 @@
       "nome": "UBS Solactive Global Pure Gold Miners UCITS ETF USD dis",
       "tipo": "Dist",
       "yield_pct": 0.0,
-      "perf_1a": 75.62,
-      "price": 44.205
+      "perf_1a": 70.02,
+      "price": 42.795
     },
     "HYLD.MI": {
       "ticker": "HYLD.MI",
@@ -256,8 +256,8 @@
       "nome": "iShares Euro Dividend UCITS ETF EUR Dist",
       "tipo": "Dist",
       "yield_pct": 0.0,
-      "perf_1a": 20.55,
-      "price": 25.44
+      "perf_1a": 20.17,
+      "price": 25.36
     },
     "IEAC.MI": {
       "ticker": "IEAC.MI",
@@ -328,8 +328,8 @@
       "nome": "iShares $ Corp Bond 0-3yr ESG SRI UCITS ETF EUR Hedged (Acc)",
       "tipo": "Dist",
       "yield_pct": 0.0,
-      "perf_1a": 1.94,
-      "price": 5.412
+      "perf_1a": 1.83,
+      "price": 5.406
     },
     "IUIT.MI": {
       "ticker": "IUIT.MI",
@@ -344,16 +344,16 @@
       "nome": "iShares Core S&P 500 UCITS ETF USD Dist",
       "tipo": "Dist",
       "yield_pct": 0.0,
-      "perf_1a": 21.1,
-      "price": 63.09
+      "perf_1a": 21.14,
+      "price": 63.11
     },
     "IWDP.MI": {
       "ticker": "IWDP.MI",
       "nome": "iShares Developed Markets Property Yield UCITS ETF USD (Dist)",
       "tipo": "Dist",
       "yield_pct": 0.0,
-      "perf_1a": 7.68,
-      "price": 22.1
+      "perf_1a": 7.71,
+      "price": 22.105
     },
     "JNHD.MI": {
       "ticker": "JNHD.MI",
@@ -368,8 +368,8 @@
       "nome": "Amundi Japan TOPIX II UCITS ETF",
       "tipo": "Acc",
       "yield_pct": 0.0,
-      "perf_1a": 43.96,
-      "price": 316.0
+      "perf_1a": 43.99,
+      "price": 316.07
     },
     "L2SP.MI": {
       "ticker": "L2SP.MI",
@@ -401,7 +401,7 @@
       "tipo": "Acc",
       "yield_pct": 0.0,
       "perf_1a": 19.12,
-      "price": 35.895
+      "price": 35.745
     },
     "NTSZ.MI": {
       "ticker": "NTSZ.MI",
@@ -409,7 +409,7 @@
       "tipo": "Acc",
       "yield_pct": 0.0,
       "perf_1a": 4.45,
-      "price": 26.54
+      "price": 26.695
     },
     "PHAU.MI": {
       "ticker": "PHAU.MI",
@@ -488,8 +488,8 @@
       "nome": "PIMCO Advantage US Short-Term High Yield Corporate Bond UCITS ETF Inc EUR Hedged",
       "tipo": "Dist",
       "yield_pct": 0.0,
-      "perf_1a": 4.43,
-      "price": 71.93
+      "perf_1a": 4.37,
+      "price": 71.89
     },
     "SWDA.MI": {
       "ticker": "SWDA.MI",
@@ -544,8 +544,8 @@
       "nome": "Vanguard FTSE Developed Asia Pacific ex Japan UCITS ETF USD Distributing",
       "tipo": "Dist",
       "yield_pct": 0.0,
-      "perf_1a": 68.05,
-      "price": 37.79
+      "perf_1a": 67.96,
+      "price": 37.77
     },
     "VHYL.MI": {
       "ticker": "VHYL.MI",
@@ -560,8 +560,8 @@
       "nome": "Vanguard S&P 500 UCITS ETF",
       "tipo": "Acc",
       "yield_pct": 0.0,
-      "perf_1a": 21.07,
-      "price": 120.04
+      "perf_1a": 21.09,
+      "price": 120.06
     },
     "VWCE.DE": {
       "ticker": "VWCE.DE",
@@ -592,8 +592,8 @@
       "nome": "WisdomTree Russell 2000 ETP",
       "tipo": "Acc",
       "yield_pct": 0.0,
-      "perf_1a": 26.78,
-      "price": 33.9
+      "perf_1a": 26.03,
+      "price": 33.7
     },
     "WS5X.MI": {
       "ticker": "WS5X.MI",
@@ -601,7 +601,7 @@
       "tipo": "Acc",
       "yield_pct": 0.0,
       "perf_1a": 235.02,
-      "price": 42.77
+      "price": 42.75
     },
     "WSPE.MI": {
       "ticker": "WSPE.MI",
@@ -609,7 +609,7 @@
       "tipo": "Acc",
       "yield_pct": 0.0,
       "perf_1a": 455.1,
-      "price": 27.65
+      "price": 27.405
     },
     "WSPX.MI": {
       "ticker": "WSPX.MI",
@@ -624,8 +624,8 @@
       "nome": "WisdomTree World",
       "tipo": "Acc",
       "yield_pct": 0.0,
-      "perf_1a": 8.18,
-      "price": 23.865
+      "perf_1a": 8.27,
+      "price": 23.885
     },
     "XAIX.MI": {
       "ticker": "XAIX.MI",
@@ -680,8 +680,8 @@
       "nome": "Xtrackers MSCI USA Information Technology UCITS ETF 1D",
       "tipo": "Acc",
       "yield_pct": 0.0,
-      "perf_1a": 38.9,
-      "price": 138.29
+      "perf_1a": 38.72,
+      "price": 138.11
     }
   }
 }
