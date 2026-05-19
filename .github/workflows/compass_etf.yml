@@ -1,0 +1,38 @@
+name: Compass ETF Data
+
+on:
+  schedule:
+    # Ogni giorno alle 20:00 UTC (22:00 ora italiana)
+    - cron: '0 20 * * *'
+  workflow_dispatch:  # run manuale
+
+permissions:
+  contents: write
+
+jobs:
+  fetch-compass-etf:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install yfinance requests
+
+      - name: Run fetch_compass.py
+        run: python fetch_compass.py
+
+      - name: Commit & push
+        run: |
+          git config user.name  "compass-bot"
+          git config user.email "compass-bot@users.noreply.github.com"
+          git add data/compass_etf.json data/levels.json
+          git diff --cached --quiet || git commit -m "compass: aggiornamento ETF dati $(date -u +'%Y-%m-%d %H:%M UTC')"
+          git push
