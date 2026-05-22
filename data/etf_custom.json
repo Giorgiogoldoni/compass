@@ -1,0 +1,7 @@
+{
+  "_istruzioni": "Aggiungi ticker Yahoo Finance in 'aggiungi', rimuovi in 'rimuovi'. Il workflow li legge automaticamente ad ogni run.",
+  "_esempio_aggiungi": "AAPL — non usare ticker non UCITS o non su Yahoo Finance",
+  "_esempio_rimuovi": "TICKER.MI — rimuove dall'universo nel prossimo run",
+  "aggiungi": [],
+  "rimuovi": []
+}
