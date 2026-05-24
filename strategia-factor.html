@@ -1,0 +1,895 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>COMPASS — Strategia Factor Momentum</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --gold:#C9A84C;--gold2:#E8C96A;--gold3:#8B6914;
+  --ink:#0D0D1A;--ink2:#1A1A2E;
+  --paper:#F7F4EE;--paper2:#EDE8DF;
+  --text:#1A1828;--text2:#6B6580;
+  --green:#1A6B3A;--red:#8B1A1A;--blue:#1A3A6B;
+  --border:#D4CDB8;--shadow:rgba(0,0,0,0.08);
+  --factor:#6D28D9;--factor2:#7C3AED;--factor3:#4C1D95;
+  --factor-light:rgba(109,40,217,0.08);
+  --factor-border:rgba(109,40,217,0.25);
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'DM Mono',monospace;background:var(--paper);color:var(--text);font-size:11px;line-height:1.7;}
+
+/* TOOLBAR */
+.toolbar{position:fixed;top:0;left:0;right:0;z-index:1000;background:var(--ink);border-bottom:1px solid var(--gold3);display:flex;align-items:center;justify-content:space-between;padding:0 32px;height:52px;}
+.toolbar-brand{font-family:'Playfair Display',serif;font-size:15px;color:var(--gold);letter-spacing:1px;}
+.toolbar-brand span{color:rgba(255,255,255,0.4);font-size:10px;margin-left:8px;font-family:'DM Mono';}
+.toolbar-actions{display:flex;gap:10px;align-items:center;}
+.btn-outline{background:transparent;color:rgba(255,255,255,0.6);border:1px solid rgba(255,255,255,0.2);padding:7px 14px;font-family:'DM Mono',monospace;font-size:10px;cursor:pointer;border-radius:2px;text-decoration:none;display:inline-block;transition:all .2s;}
+.btn-outline:hover{border-color:var(--gold);color:var(--gold);}
+.btn-factor{background:var(--factor);color:white;border:none;padding:8px 18px;font-family:'DM Mono',monospace;font-size:10px;font-weight:500;letter-spacing:1px;cursor:pointer;border-radius:2px;}
+#update-info{font-size:9px;color:rgba(255,255,255,0.3);letter-spacing:1px;}
+
+/* BOOK */
+.book{max-width:1100px;margin:72px auto 60px;padding:0 32px;}
+
+/* LOADING */
+.loading{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:60vh;gap:16px;color:var(--text2);}
+.loading-spinner{width:32px;height:32px;border:2px solid var(--border);border-top-color:var(--factor);border-radius:50%;animation:spin .8s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+/* COVER */
+.cover{min-height:55vh;display:flex;flex-direction:column;justify-content:center;padding:60px 0 50px;border-bottom:2px solid var(--factor);margin-bottom:60px;position:relative;}
+.cover::after{content:'RAPTOR WEALTH MERIDIAN';position:absolute;top:32px;right:0;font-size:8px;letter-spacing:4px;color:var(--text2);}
+.cover-eyebrow{font-size:9px;letter-spacing:4px;color:var(--factor2);text-transform:uppercase;margin-bottom:16px;}
+.cover-title{font-family:'Playfair Display',serif;font-size:52px;font-weight:700;color:var(--ink);line-height:1.1;margin-bottom:8px;}
+.cover-title em{color:var(--factor3);font-style:italic;}
+.cover-subtitle{font-family:'Playfair Display',serif;font-size:18px;color:var(--text2);font-style:italic;margin-bottom:40px;}
+.cover-tag{display:inline-block;background:var(--factor);color:white;padding:5px 14px;font-size:8px;letter-spacing:3px;font-weight:500;margin-bottom:36px;}
+.cover-stats{display:grid;grid-template-columns:repeat(5,1fr);gap:20px;max-width:800px;}
+.cstat{border-top:2px solid var(--factor);padding-top:10px;}
+.cstat-val{font-family:'Playfair Display',serif;font-size:26px;font-weight:600;color:var(--ink);display:block;}
+.cstat-label{font-size:8px;letter-spacing:2px;color:var(--text2);text-transform:uppercase;margin-top:2px;display:block;}
+
+/* SEZIONI */
+.section-head{display:flex;align-items:baseline;gap:16px;margin-bottom:24px;padding-bottom:12px;border-bottom:1px solid var(--border);}
+.section-eyebrow{font-size:8px;letter-spacing:4px;color:var(--factor2);text-transform:uppercase;}
+.section-h2{font-family:'Playfair Display',serif;font-size:26px;font-weight:700;color:var(--ink);}
+.section-block{margin-bottom:60px;}
+
+/* IWMO BENCHMARK HERO */
+.iwmo-hero{background:var(--ink);color:white;padding:32px 40px;margin-bottom:48px;border-radius:3px;display:grid;grid-template-columns:1fr auto;gap:40px;align-items:center;}
+.iwmo-label{font-size:8px;letter-spacing:4px;color:rgba(255,255,255,0.4);text-transform:uppercase;margin-bottom:8px;}
+.iwmo-name{font-family:'Playfair Display',serif;font-size:22px;font-weight:600;color:white;margin-bottom:4px;}
+.iwmo-desc{font-size:9px;color:rgba(255,255,255,0.5);line-height:1.7;}
+.iwmo-perf{text-align:right;}
+.iwmo-perf-val{font-family:'Playfair Display',serif;font-size:48px;font-weight:700;color:var(--gold);line-height:1;}
+.iwmo-perf-label{font-size:8px;letter-spacing:2px;color:rgba(255,255,255,0.4);margin-top:4px;}
+.results-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:40px;}
+.result-card{background:white;border:1px solid var(--border);padding:20px 22px;border-radius:3px;position:relative;overflow:hidden;}
+.result-card.batte{border-top:3px solid var(--green);}
+.result-card.perde{border-top:3px solid var(--red);}
+.result-badge{position:absolute;top:12px;right:12px;font-size:8px;letter-spacing:2px;padding:3px 8px;border-radius:2px;font-weight:500;}
+.result-badge.batte{background:rgba(26,107,58,0.1);color:var(--green);}
+.result-badge.perde{background:rgba(139,26,26,0.1);color:var(--red);}
+.result-lid{font-family:'Playfair Display',serif;font-size:32px;font-weight:700;color:var(--factor);margin-bottom:2px;}
+.result-nome{font-size:9px;color:var(--text2);margin-bottom:16px;}
+.result-perf{font-family:'Playfair Display',serif;font-size:28px;font-weight:600;margin-bottom:4px;}
+.result-perf.pos{color:var(--green);}
+.result-perf.neg{color:var(--red);}
+.result-vs{font-size:10px;font-weight:500;padding:3px 10px;border-radius:2px;display:inline-block;}
+.result-vs.pos{background:rgba(26,107,58,0.1);color:var(--green);}
+.result-vs.neg{background:rgba(139,26,26,0.1);color:var(--red);}
+.result-metrics{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:14px;padding-top:14px;border-top:1px solid var(--border);}
+.rm-item{text-align:center;}
+.rm-val{font-size:12px;font-weight:600;display:block;}
+.rm-lbl{font-size:7px;letter-spacing:1px;color:var(--text2);text-transform:uppercase;}
+
+/* RANKING TABLE */
+.ranking-table{width:100%;border-collapse:collapse;margin-bottom:40px;}
+.ranking-table th{font-size:8px;letter-spacing:2px;color:var(--text2);text-transform:uppercase;padding:8px 12px;border-bottom:2px solid var(--ink);background:var(--paper2);text-align:left;}
+.ranking-table td{padding:10px 12px;border-bottom:1px solid var(--border);vertical-align:middle;}
+.ranking-table tr:hover td{background:var(--factor-light);}
+.rank-pos{font-family:'Playfair Display',serif;font-size:20px;font-weight:600;color:var(--text2);}
+.rank-pos.top{color:var(--factor);}
+
+/* METODOLOGIA */
+.method-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px;margin-bottom:32px;}
+.method-card{background:white;border:1px solid var(--border);border-top:3px solid var(--factor);padding:20px;}
+.method-card h4{font-size:9px;letter-spacing:2px;color:var(--factor2);text-transform:uppercase;margin-bottom:10px;}
+.method-card p{color:var(--text2);line-height:1.8;font-size:10px;}
+
+/* SCORE PESI */
+.score-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:32px;}
+.score-card{background:white;border:1px solid var(--border);padding:18px;}
+.score-card-title{font-size:9px;letter-spacing:2px;color:var(--factor2);text-transform:uppercase;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center;}
+.score-card-id{font-family:'Playfair Display',serif;font-size:14px;font-weight:600;color:var(--factor);}
+.weight-bar-row{display:flex;align-items:center;gap:8px;margin-bottom:6px;}
+.weight-bar-label{font-size:9px;color:var(--text2);width:52px;text-align:right;flex-shrink:0;}
+.weight-bar-track{flex:1;height:5px;background:var(--paper2);border-radius:3px;overflow:hidden;}
+.weight-bar-fill{height:100%;border-radius:3px;background:var(--factor);}
+.weight-bar-val{font-size:9px;color:var(--text);width:28px;text-align:right;}
+
+/* LEVEL CARDS */
+.level-card{background:white;border:1px solid var(--border);margin-bottom:28px;box-shadow:0 2px 8px var(--shadow);}
+.level-card-header{display:flex;align-items:stretch;border-bottom:1px solid var(--border);}
+.level-stripe{width:6px;flex-shrink:0;background:var(--factor);}
+.level-header-content{flex:1;padding:20px 24px;display:flex;align-items:center;justify-content:space-between;}
+.level-id-large{font-family:'Playfair Display',serif;font-size:36px;font-weight:700;color:var(--factor);line-height:1;margin-right:16px;}
+.level-nome{font-family:'Playfair Display',serif;font-size:16px;font-weight:600;color:var(--ink);margin-bottom:2px;}
+.level-tipo{font-size:8px;letter-spacing:2px;color:var(--text2);text-transform:uppercase;}
+.level-kpis{display:flex;gap:24px;}
+.lkpi{text-align:right;}
+.lkpi-label{font-size:7px;letter-spacing:1px;color:var(--text2);text-transform:uppercase;margin-bottom:2px;}
+.lkpi-val{font-family:'Playfair Display',serif;font-size:20px;font-weight:600;}
+.level-card-body{padding:20px 24px;}
+
+/* ETF TABLE */
+.etf-table{width:100%;border-collapse:collapse;margin-bottom:16px;font-size:10px;}
+.etf-table thead tr{background:var(--paper2);}
+.etf-table th{font-size:7px;letter-spacing:2px;color:var(--text2);text-transform:uppercase;padding:6px 10px;border-bottom:1px solid var(--border);text-align:left;white-space:nowrap;}
+.etf-table td{padding:7px 10px;border-bottom:1px solid rgba(0,0,0,0.04);vertical-align:middle;}
+.etf-table tr:last-child td{border-bottom:none;}
+.etf-table .tk{font-weight:500;color:var(--blue);font-size:11px;}
+.etf-table .nm{color:var(--text2);max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.pos{color:var(--green);font-weight:500;}
+.neg{color:var(--red);font-weight:500;}
+.wt{font-weight:500;}
+
+/* SCORE BADGE */
+.score-badge{display:inline-block;padding:2px 7px;border-radius:2px;font-size:8px;font-weight:600;letter-spacing:1px;}
+.score-badge.high{background:var(--factor-light);color:var(--factor2);}
+.score-badge.mid{background:rgba(201,168,76,0.1);color:var(--gold3);}
+.score-badge.low{background:rgba(139,26,26,0.08);color:var(--red);}
+
+/* ROTATION BADGE */
+.rotation-badge{display:inline-flex;align-items:center;gap:6px;background:var(--factor-light);border:1px solid var(--factor-border);border-radius:2px;padding:4px 10px;font-size:9px;color:var(--factor2);}
+
+/* DIARIO */
+.diario-event{border:1px solid var(--border);border-radius:3px;margin-bottom:12px;overflow:hidden;}
+.diario-header{background:var(--paper2);padding:10px 14px;display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--border);}
+.diario-trigger-regime{color:var(--blue);}
+.diario-trigger-drawdown{color:var(--red);}
+.diario-trigger-rotation{color:var(--factor2);}
+.diario-body{padding:12px 14px;}
+
+/* SCATTER */
+canvas{max-width:100%;}
+
+/* HEATMAP */
+.hmap-wrap{overflow-x:auto;margin-bottom:16px;}
+
+/* ROTATION SUGGERITA */
+.rotation-alert{background:var(--factor-light);border:1px solid var(--factor-border);border-left:4px solid var(--factor);padding:14px 18px;margin-bottom:16px;border-radius:0 3px 3px 0;}
+.rotation-alert-title{font-size:8px;letter-spacing:3px;color:var(--factor2);text-transform:uppercase;margin-bottom:8px;}
+
+/* FOOTER */
+.book-footer{text-align:center;padding:40px 0;border-top:1px solid var(--border);color:var(--text2);font-size:9px;letter-spacing:1px;}
+
+/* PRINT */
+@media print{
+  .toolbar{display:none!important;}
+  body{background:white;margin:0;}
+  .book{margin-top:0;padding:20mm 15mm;max-width:none;}
+  .cover{min-height:auto;padding:20mm 0 15mm;}
+  .level-card{box-shadow:none;page-break-inside:avoid;}
+  @page{size:A4;margin:15mm;}
+}
+</style>
+</head>
+<body>
+
+<div class="toolbar">
+  <div class="toolbar-brand">COMPASS <span>FACTOR MOMENTUM</span></div>
+  <div class="toolbar-actions">
+    <span id="update-info">—</span>
+    <a href="advisor.html" class="btn-outline">← Advisor</a>
+    <a href="libro.html" class="btn-outline">📖 Libro</a>
+    <a href="presentazione.html" class="btn-outline">📊 Presentazione</a>
+    <button class="btn-factor" onclick="window.print()">🖨 Stampa PDF</button>
+  </div>
+</div>
+
+<div class="book">
+  <div id="loading" class="loading">
+    <div class="loading-spinner"></div>
+    <div>Caricamento strategia factor...</div>
+  </div>
+  <div id="content" style="display:none"></div>
+</div>
+
+<script>
+const BASE = 'data/';
+
+const LIVELLI_FACTOR = ['C7','C8','C9','A7','A8','A9'];
+const LIVELLI_NOMI = {
+  C7:'Dinamico Cedola',C8:'Azionario+ Cedola',C9:'Trading Cedola',
+  A7:'Dinamico Acc',A8:'Azionario+ Acc',A9:'Trading Acc',
+};
+
+const FACTOR_WEIGHTS = {
+  C7:{sma200:10,kama:10,mom1m:15,mom3m:35,mom6m:20,rsi:5,adx:5,ao:0},
+  A7:{sma200:10,kama:10,mom1m:15,mom3m:35,mom6m:20,rsi:5,adx:5,ao:0},
+  C8:{sma200:5,kama:5,mom1m:20,mom3m:35,mom6m:20,rsi:5,adx:10,ao:0},
+  A8:{sma200:5,kama:5,mom1m:20,mom3m:35,mom6m:20,rsi:5,adx:10,ao:0},
+  C9:{sma200:0,kama:5,mom1m:25,mom3m:35,mom6m:20,rsi:5,adx:5,ao:5},
+  A9:{sma200:0,kama:5,mom1m:25,mom3m:35,mom6m:20,rsi:5,adx:5,ao:5},
+};
+
+function fmt(n,d=1){return n==null?'—':(n>=0?'+':'')+n.toFixed(d)+'%';}
+function fmtE(n){return n==null?'—':'€'+Math.round(n).toLocaleString('it-IT');}
+function fmtEa(n){return n==null?'—':'€'+Math.round(Math.abs(n)).toLocaleString('it-IT');}
+function fmtD(d){return d?new Date(d).toLocaleDateString('it-IT',{day:'2-digit',month:'short',year:'numeric'}):'—';}
+
+async function loadData(){
+  const r = await fetch(BASE+'compass_factor.json?t='+Date.now());
+  return r.json();
+}
+
+function buildCover(data){
+  const pf = data.portafogli_factor||{};
+  const lids = LIVELLI_FACTOR.filter(l=>pf[l]);
+  const iwmo = data.benchmark_perf_pct||0;
+  const avgPerf = lids.length ? lids.reduce((s,l)=>s+(pf[l].performance_totale_pct||0),0)/lids.length : 0;
+  const battono = lids.filter(l=>(pf[l].performance_totale_pct||0) > iwmo).length;
+  const bestLid = lids.reduce((b,l)=>(pf[l]?.performance_totale_pct||0)>(pf[b]?.performance_totale_pct||0)?l:b, lids[0]);
+  const bestPerf = pf[bestLid]?.performance_totale_pct||0;
+  const gen = data.generated ? new Date(data.generated).toLocaleDateString('it-IT',{day:'2-digit',month:'long',year:'numeric'}) : '—';
+  const genOra = data.generated ? new Date(data.generated).toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'}) : '—';
+  document.getElementById('update-info').innerHTML =
+    `Factor v${data.run_number||1} &nbsp;·&nbsp; ${gen} ${genOra} UTC`;
+
+  return `
+  <div class="cover">
+    <div class="cover-eyebrow">Strategia Quantitativa · Factor Momentum</div>
+    <div class="cover-title">Factor<br><em>Momentum</em><br>Strategy</div>
+    <div class="cover-subtitle">Battere IWMO — iShares MSCI World Momentum Factor</div>
+    <div class="cover-tag">C7 · C8 · C9 · A7 · A8 · A9 · BACKTEST JAN 2025 → OGGI</div>
+    <div class="cover-stats">
+      <div class="cstat">
+        <span class="cstat-val" style="color:var(--gold)">${fmt(iwmo)}</span>
+        <span class="cstat-label">IWMO Benchmark</span>
+      </div>
+      <div class="cstat">
+        <span class="cstat-val" style="color:var(--green)">${fmt(avgPerf)}</span>
+        <span class="cstat-label">Media Factor</span>
+      </div>
+      <div class="cstat">
+        <span class="cstat-val" style="color:var(--green)">${fmt(avgPerf-iwmo)}</span>
+        <span class="cstat-label">Alpha medio</span>
+      </div>
+      <div class="cstat">
+        <span class="cstat-val">${battono}/${lids.length}</span>
+        <span class="cstat-label">Livelli vincenti</span>
+      </div>
+      <div class="cstat">
+        <span class="cstat-val" style="color:var(--factor)">${fmt(bestPerf)}</span>
+        <span class="cstat-label">Miglior livello (${bestLid})</span>
+      </div>
+    </div>
+  </div>`;
+}
+
+function buildIwmoHero(iwmoPerf){
+  return `
+  <div class="iwmo-hero">
+    <div>
+      <div class="iwmo-label">Benchmark Target</div>
+      <div class="iwmo-name">iShares MSCI World Momentum Factor (IWMO.MI)</div>
+      <div class="iwmo-desc">
+        Seleziona automaticamente i 350+ titoli MSCI World con il momentum più elevato.<br>
+        Ribilanciato ogni trimestre. Nessun costo di transazione, nessuna imposta.<br>
+        Il benchmark più difficile da battere nell'universo azionario globale.
+      </div>
+    </div>
+    <div class="iwmo-perf">
+      <div class="iwmo-perf-val">${fmt(iwmoPerf)}</div>
+      <div class="iwmo-perf-label">JAN 2025 → OGGI</div>
+    </div>
+  </div>`;
+}
+
+function buildResults(data){
+  const pf = data.portafogli_factor||{};
+  const iwmo = data.benchmark_perf_pct||0;
+
+  const cards = LIVELLI_FACTOR.map(lid=>{
+    const p = pf[lid]||{};
+    const perf = p.performance_totale_pct||0;
+    const vince = perf > iwmo;
+    const vs = perf - iwmo;
+    const vol = p.volatilita_ann;
+    const mdd = p.max_drawdown;
+    const sh = p.sharpe;
+    const nver = (p.storia||[]).length;
+    const nrot = (p.diario_movimenti||[]).filter(d=>d.trigger?.includes('rotation')).length +
+                 (p.storia||[]).reduce((s,v)=>s+(v.etf_usciti_anticipati||[]).filter(u=>u.motivo==='rotation_momentum').length,0);
+
+    const volCol = vol>25?'var(--red)':vol>15?'#B8860B':'var(--green)';
+    const shCol = sh>1.5?'var(--green)':sh>0.8?'#B8860B':'var(--red)';
+
+    return `
+    <div class="result-card ${vince?'batte':'perde'}">
+      <div class="result-badge ${vince?'batte':'perde'}">${vince?'✅ BATTE IWMO':'❌ SOTTO IWMO'}</div>
+      <div class="result-lid">${lid}</div>
+      <div class="result-nome">${LIVELLI_NOMI[lid]||lid}</div>
+      <div class="result-perf ${perf>=0?'pos':'neg'}">${fmt(perf)}</div>
+      <div class="result-vs ${vs>=0?'pos':'neg'}">vs IWMO: ${fmt(vs)} pp</div>
+      <div class="result-metrics">
+        <div class="rm-item">
+          <span class="rm-val" style="color:${volCol}">${vol!=null?vol.toFixed(1)+'%':'—'}</span>
+          <span class="rm-lbl">Vol/a</span>
+        </div>
+        <div class="rm-item">
+          <span class="rm-val" style="color:var(--red)">${mdd!=null?mdd.toFixed(1)+'%':'—'}</span>
+          <span class="rm-lbl">Max DD</span>
+        </div>
+        <div class="rm-item">
+          <span class="rm-val" style="color:${shCol}">${sh!=null?sh.toFixed(2):'—'}</span>
+          <span class="rm-lbl">Sharpe</span>
+        </div>
+      </div>
+      <div style="margin-top:10px;font-size:9px;color:var(--text2);display:flex;gap:12px">
+        <span>${nver} versioni · ${nver-1} rib.</span>
+        <span style="color:var(--factor2)">${nrot} rotazioni momentum</span>
+      </div>
+    </div>`;
+  }).join('');
+
+  return `<div class="results-grid">${cards}</div>`;
+}
+
+function buildRanking(data){
+  const pf = data.portafogli_factor||{};
+  const iwmo = data.benchmark_perf_pct||0;
+  const sorted = [...LIVELLI_FACTOR].sort((a,b)=>
+    (pf[b]?.performance_totale_pct||0)-(pf[a]?.performance_totale_pct||0));
+
+  const rows = sorted.map((lid,i)=>{
+    const p = pf[lid]||{};
+    const perf = p.performance_totale_pct||0;
+    const vs = perf - iwmo;
+    const vol = p.volatilita_ann;
+    const mdd = p.max_drawdown;
+    const sh = p.sharpe;
+    const cap = p.capitale_attuale||100000;
+    const isC = lid.startsWith('C');
+    const volCol = vol>25?'var(--red)':vol>15?'#B8860B':'var(--green)';
+    const shCol = sh>1.5?'var(--green)':sh>0.8?'#B8860B':'var(--red)';
+    const maxW = 140;
+    const barW = Math.min(maxW, Math.abs(perf)/80*maxW);
+
+    return `<tr>
+      <td><span class="rank-pos ${i<3?'top':''}">${i+1}</span></td>
+      <td style="font-weight:600;color:${isC?'var(--blue)':'var(--green)'};">${lid}</td>
+      <td style="color:var(--text2);font-size:10px">${LIVELLI_NOMI[lid]||'—'}</td>
+      <td>
+        <div style="display:flex;align-items:center;gap:8px">
+          <div style="width:${barW}px;height:4px;background:${perf>=0?'var(--green)':'var(--red)'};border-radius:2px;min-width:4px"></div>
+          <span style="font-family:'Playfair Display',serif;font-size:18px;font-weight:600;color:${perf>=0?'var(--green)':'var(--red)'}">${fmt(perf)}</span>
+        </div>
+      </td>
+      <td>
+        <span style="background:${vs>=0?'rgba(26,107,58,0.1)':'rgba(139,26,26,0.1)'};color:${vs>=0?'var(--green)':'var(--red)'};padding:3px 8px;border-radius:2px;font-size:9px;font-weight:500">${fmt(vs)} pp</span>
+      </td>
+      <td style="color:${volCol};font-weight:500">${vol!=null?vol.toFixed(1)+'%':'—'}</td>
+      <td style="color:var(--red);font-weight:500">${mdd!=null?mdd.toFixed(1)+'%':'—'}</td>
+      <td style="color:${shCol};font-weight:500">${sh!=null?sh.toFixed(2):'—'}</td>
+      <td>${fmtE(cap)}</td>
+    </tr>`;
+  }).join('');
+
+  return `
+  <table class="ranking-table">
+    <thead>
+      <tr>
+        <th>#</th><th>ID</th><th>Portafoglio</th>
+        <th>Performance</th><th>vs IWMO</th>
+        <th>Volatilità/a</th><th>Max DD</th><th>Sharpe</th><th>Capitale</th>
+      </tr>
+    </thead>
+    <tbody>${rows}</tbody>
+  </table>`;
+}
+
+function buildMetodo(){
+  return `
+  <div class="method-grid">
+    <div class="method-card">
+      <h4>1. Score Factor Momentum</h4>
+      <p>Ogni ETF riceve uno score 0-100 dove il momentum domina (mom3M vale 35 punti). RSI, ADX e AO sono integrati. SMA200 conta poco o nulla nei livelli Trading. L'ETF più veloce vince la selezione.</p>
+    </div>
+    <div class="method-card">
+      <h4>2. Rotation Trigger</h4>
+      <p>Ogni 5 giorni di trading confronta il mom3M degli ETF in portafoglio con i candidati nel pool. Se un candidato supera il peggior ETF in portafoglio di +15 punti%, la sostituzione avviene immediatamente (min 30gg dalla versione).</p>
+    </div>
+    <div class="method-card">
+      <h4>3. Regime Reale</h4>
+      <p>Il regime macro viene ricalcolato dai dati reali dei 15 proxy per ogni data storica del backtest — non è hardcoded. Goldilocks, reflazione, stagflazione, risk-off e neutro emergono dai prezzi.</p>
+    </div>
+  </div>`;
+}
+
+function buildScorePesi(){
+  const livelli = [['C7/A7','Dinamico'],['C8/A8','Azionario'],['C9/A9','Trading']];
+  const keys = [['C7','A7'],['C8','A8'],['C9','A9']];
+  const labels = {sma200:'SMA200',kama:'KAMA',mom1m:'Mom 1M',mom3m:'Mom 3M',mom6m:'Mom 6M',rsi:'RSI 14',adx:'ADX 14',ao:'AO'};
+
+  return `
+  <div class="score-grid">
+    ${livelli.map(([nome,tipo],i)=>{
+      const w = FACTOR_WEIGHTS[keys[i][0]];
+      const bars = Object.entries(w).map(([k,v])=>`
+        <div class="weight-bar-row">
+          <div class="weight-bar-label">${labels[k]}</div>
+          <div class="weight-bar-track"><div class="weight-bar-fill" style="width:${v}%;opacity:${v===0?0.2:1}"></div></div>
+          <div class="weight-bar-val">${v}pt</div>
+        </div>`).join('');
+      return `
+      <div class="score-card">
+        <div class="score-card-title">
+          <span>${tipo}</span>
+          <span class="score-card-id">${nome}</span>
+        </div>
+        ${bars}
+      </div>`;
+    }).join('')}
+  </div>`;
+}
+
+function buildScatter(pm, iwmoPerf){
+  return `
+  <div style="background:var(--ink);border-radius:4px;padding:8px;margin-bottom:8px">
+    <canvas id="factor-scatter" height="380" style="width:100%;display:block"></canvas>
+  </div>
+  <div style="font-size:9px;color:var(--text2);text-align:center;margin-bottom:4px">
+    Asse X = Volatilità · Asse Y = Rendimento · Dimensione bolla = |Max Drawdown| · Linea orizzontale = IWMO ${fmt(iwmoPerf)}
+  </div>`;
+}
+
+function buildHeatmap(pm){
+  const allMesi = new Set();
+  LIVELLI_FACTOR.forEach(lid=>Object.keys(pm[lid]?.rendimenti_mensili||{}).forEach(m=>allMesi.add(m)));
+  const mesiSorted = [...allMesi].sort();
+  const mesiLabel = mesiSorted.map(m=>{
+    const [y,mo]=m.split('-');
+    const n=['','Gen','Feb','Mar','Apr','Mag','Giu','Lug','Ago','Set','Ott','Nov','Dic'];
+    return n[+mo]+' '+y.slice(2);
+  });
+
+  function hC(v){
+    if(v==null||Math.abs(v)<0.15)return '#EDE8DF';
+    if(v>0)return v>8?'#173404':v>5?'#27500A':v>3?'#3B6D11':v>1.5?'#639922':'#C0DD97';
+    return v<-8?'#501313':v<-5?'#791F1F':v<-3?'#A32D2D':v<-1.5?'#E24B4A':'#F7C1C1';
+  }
+  function hT(v){
+    if(v==null||Math.abs(v)<0.15)return '#9B9580';
+    return Math.abs(v)>3?'rgba(255,255,255,0.95)':'rgba(0,0,0,0.7)';
+  }
+
+  const cW=42,cH=28,lblW=42,totW=56;
+  let h=`<div style="display:grid;grid-template-columns:${lblW}px repeat(${mesiSorted.length},${cW}px) ${totW}px;gap:2px;font-family:'DM Mono',monospace">`;
+  h+=`<div style="height:36px"></div>`;
+  mesiLabel.forEach(m=>{
+    h+=`<div style="height:36px;display:flex;align-items:center;justify-content:center">
+      <span style="font-size:8px;font-weight:500;color:var(--text2);white-space:nowrap;transform:rotate(-45deg);display:block">${m}</span>
+    </div>`;
+  });
+  h+=`<div style="height:36px;display:flex;align-items:center;justify-content:center">
+    <span style="font-size:8px;font-weight:600;color:var(--text)">TOT</span>
+  </div>`;
+
+  LIVELLI_FACTOR.forEach(lid=>{
+    const p = pm[lid]||{};
+    const rm = p.rendimenti_mensili||{};
+    const isC = lid.startsWith('C');
+    h+=`<div style="height:${cH}px;display:flex;align-items:center;justify-content:flex-end;padding-right:6px;font-size:10px;font-weight:600;color:${isC?'var(--blue)':'var(--green)'}">${lid}</div>`;
+    let cum=1;
+    mesiSorted.forEach(m=>{
+      const v=rm[m]??null;
+      if(v!=null)cum*=(1+v/100);
+      const bg=hC(v),tc=hT(v);
+      const lbl=v!=null&&Math.abs(v)>=0.5?(v>0?'+':'')+v.toFixed(1):'';
+      h+=`<div title="${lid} ${m}: ${v!=null?(v>0?'+':'')+v.toFixed(2)+'%':'—'}"
+        style="height:${cH}px;background:${bg};border-radius:2px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:500;color:${tc}">${lbl}</div>`;
+    });
+    const tot=(cum-1)*100;
+    h+=`<div style="height:${cH}px;background:${hC(tot)};border-radius:2px;border:2px solid rgba(109,40,217,0.3);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:${hT(tot)}">${tot>=0?'+':''}${tot.toFixed(1)}%</div>`;
+  });
+  h+='</div>';
+  return `<div class="hmap-wrap">${h}</div>`;
+}
+
+function buildDiario(lid, ptfData){
+  const diario = ptfData.diario_movimenti||[];
+  const storia = ptfData.storia||[];
+
+  // Raccoglie rotazioni dagli etf_usciti_anticipati di ogni versione
+  const rotazioni = [];
+  storia.forEach(v=>{
+    (v.etf_usciti_anticipati||[]).forEach(u=>{
+      if(u.motivo==='rotation_momentum') rotazioni.push({...u, versione:v.versione});
+    });
+  });
+
+  if(!diario.length && !rotazioni.length) return '';
+
+  const evHTML = diario.map(ev=>{
+    const isRot = ev.trigger?.includes('rotation');
+    const isReg = ev.trigger?.includes('regime');
+    const isDd  = ev.trigger?.includes('drawdown');
+    const trigCls = isRot?'diario-trigger-rotation':isReg?'diario-trigger-regime':'diario-trigger-drawdown';
+
+    const vendHTML = (ev.venduti||[]).map(e=>{
+      const pC=(e.perf_pct||0)>=0?'var(--green)':'var(--red)';
+      return `<tr>
+        <td style="padding:3px 8px;font-weight:500;color:var(--blue)">${e.ticker}</td>
+        <td style="padding:3px 8px;color:var(--text2);font-size:9px">${e.nome||''}</td>
+        <td style="padding:3px 8px;text-align:right">${(e.peso||0).toFixed(1)}%</td>
+        <td style="padding:3px 8px;text-align:right;font-family:'DM Mono';font-size:9px">€${(e.price_entry||0).toFixed(2)}</td>
+        <td style="padding:3px 8px;text-align:right;font-family:'DM Mono';font-size:9px">€${(e.price_exit||0).toFixed(2)}</td>
+        <td style="padding:3px 8px;text-align:right;font-weight:500;color:${pC}">${(e.perf_pct>=0?'+':'')}${(e.perf_pct||0).toFixed(2)}%</td>
+      </tr>`;
+    }).join('');
+
+    const acqHTML = (ev.acquistati||[]).map(e=>`
+      <tr>
+        <td style="padding:3px 8px;font-weight:500;color:var(--green)">${e.ticker}</td>
+        <td style="padding:3px 8px;color:var(--text2);font-size:9px">${e.nome||''}</td>
+        <td style="padding:3px 8px;text-align:right">${(e.peso||0).toFixed(1)}%</td>
+        <td style="padding:3px 8px;text-align:right;font-family:'DM Mono';font-size:9px">€${(e.price_entry||0).toFixed(2)}</td>
+        <td style="padding:3px 8px;text-align:right;font-family:'DM Mono';font-size:9px">—</td>
+        <td style="padding:3px 8px;text-align:right;color:var(--text2);font-size:9px">
+          ${e.score_entry?`score ${e.score_entry}`:''}
+          ${e.mom3m_entry?`· mom3M ${e.mom3m_entry>=0?'+':''}${e.mom3m_entry}%`:''}
+        </td>
+      </tr>`).join('');
+
+    return `
+    <div class="diario-event">
+      <div class="diario-header">
+        <span style="font-size:8px;letter-spacing:1px;color:var(--text2)">📅 ${fmtD(ev.data)}</span>
+        <span style="font-size:8px;color:var(--text2)">V${ev.versione_da}→V${ev.versione_a}</span>
+        <span class="${trigCls}" style="font-size:9px;flex:1;font-weight:500">${ev.trigger||'—'}</span>
+        <span style="font-size:8px;color:var(--text2)">Cap: ${fmtE(ev.capitale_ribilanciamento)}</span>
+      </div>
+      ${vendHTML?`<div style="padding:8px 14px">
+        <div style="font-size:7px;letter-spacing:2px;color:var(--red);margin-bottom:5px">▼ VENDUTO</div>
+        <table style="width:100%;border-collapse:collapse;font-size:10px">
+          <thead><tr style="background:var(--paper2)">
+            <th style="padding:3px 8px;text-align:left;font-size:7px;color:var(--text2)">Ticker</th>
+            <th style="padding:3px 8px;text-align:left;font-size:7px;color:var(--text2)">Nome</th>
+            <th style="padding:3px 8px;text-align:right;font-size:7px;color:var(--text2)">Peso</th>
+            <th style="padding:3px 8px;text-align:right;font-size:7px;color:var(--text2)">Entry</th>
+            <th style="padding:3px 8px;text-align:right;font-size:7px;color:var(--text2)">Exit</th>
+            <th style="padding:3px 8px;text-align:right;font-size:7px;color:var(--text2)">Perf%</th>
+          </tr></thead>
+          <tbody>${vendHTML}</tbody>
+        </table></div>`:''}
+      ${acqHTML?`<div style="padding:8px 14px;border-top:1px solid var(--border)">
+        <div style="font-size:7px;letter-spacing:2px;color:var(--green);margin-bottom:5px">▲ ACQUISTATO</div>
+        <table style="width:100%;border-collapse:collapse;font-size:10px">
+          <thead><tr style="background:var(--paper2)">
+            <th style="padding:3px 8px;text-align:left;font-size:7px;color:var(--text2)">Ticker</th>
+            <th style="padding:3px 8px;text-align:left;font-size:7px;color:var(--text2)">Nome</th>
+            <th style="padding:3px 8px;text-align:right;font-size:7px;color:var(--text2)">Peso</th>
+            <th style="padding:3px 8px;text-align:right;font-size:7px;color:var(--text2)">Entry</th>
+            <th colspan="2" style="padding:3px 8px;text-align:right;font-size:7px;color:var(--text2)">Score / Mom3M</th>
+          </tr></thead>
+          <tbody>${acqHTML}</tbody>
+        </table></div>`:''}
+    </div>`;
+  }).join('');
+
+  const rotHTML = rotazioni.length ? `
+    <div style="margin-top:12px">
+      <div style="font-size:8px;letter-spacing:2px;color:var(--factor2);text-transform:uppercase;margin-bottom:8px">
+        ⚡ Rotazioni Momentum (${rotazioni.length})
+      </div>
+      ${rotazioni.map(r=>`
+        <div class="rotation-badge" style="margin-bottom:6px;display:flex">
+          📅 ${fmtD(r.data)} &nbsp;·&nbsp;
+          <span style="color:var(--red)">${r.ticker}</span>
+          <span style="color:var(--text2)">mom3M ${r.mom3m_out>=0?'+':''}${(r.mom3m_out||0).toFixed(1)}%</span>
+          &nbsp;→&nbsp;
+          <span style="color:var(--green)">${r.replaced_by}</span>
+          <span style="color:var(--text2)">mom3M ${r.mom3m_in>=0?'+':''}${(r.mom3m_in||0).toFixed(1)}%</span>
+          <span style="color:var(--factor2);font-weight:600">&nbsp;gap +${(r.mom3m_in-r.mom3m_out).toFixed(1)}%</span>
+        </div>`).join('')}
+    </div>` : '';
+
+  return `
+  <div style="margin:16px 0">
+    <div style="font-size:8px;letter-spacing:2px;color:var(--text2);text-transform:uppercase;margin-bottom:10px">
+      📋 Diario — ${diario.length} ribilanciament${diario.length===1?'o':'i'} · ${rotazioni.length} rotazioni momentum
+    </div>
+    ${evHTML}
+    ${rotHTML}
+  </div>`;
+}
+
+function buildLevelCard(lid, ptfData, etfScores){
+  const storia = ptfData.storia||[];
+  const verAttiva = storia.find(v=>!v.data_chiusura)||storia[storia.length-1]||{};
+  const comp = (verAttiva.composizione||[]).filter(e=>(e.peso||0)>0||(e.importo||0)>0);
+  const perf = ptfData.performance_totale_pct||0;
+  const eur  = ptfData.performance_totale_eur||0;
+  const cap  = ptfData.capitale_attuale||100000;
+  const vol  = ptfData.volatilita_ann;
+  const mdd  = ptfData.max_drawdown;
+  const sh   = ptfData.sharpe;
+  const nver = storia.length;
+  const nrot = (ptfData.diario_movimenti||[]).filter(d=>d.trigger?.includes('rotation')).length +
+               storia.reduce((s,v)=>s+(v.etf_usciti_anticipati||[]).filter(u=>u.motivo==='rotation_momentum').length,0);
+
+  const volCol = vol>25?'var(--red)':vol>15?'#B8860B':'var(--green)';
+  const shCol  = sh>1.5?'var(--green)':sh>0.8?'#B8860B':'var(--red)';
+  const isC = lid.startsWith('C');
+
+  // Rotation suggerita
+  const rot = ptfData.rotation_suggerita;
+  const rotHTML = rot ? `
+    <div class="rotation-alert">
+      <div class="rotation-alert-title">⚡ Rotation Trigger Attivo</div>
+      <div style="font-size:10px;color:var(--text)">
+        <span style="color:var(--red);font-weight:500">${rot.out}</span>
+        mom3M ${rot.mom3m_out>=0?'+':''}${rot.mom3m_out}%
+        &nbsp;→&nbsp;
+        <span style="color:var(--green);font-weight:500">${rot.in}</span>
+        mom3M ${rot.mom3m_in>=0?'+':''}${rot.mom3m_in}%
+        &nbsp; Gap: <strong style="color:var(--factor2)">+${rot.gap}%</strong>
+      </div>
+      <div style="font-size:9px;color:var(--text2);margin-top:4px">${rot.motivo}</div>
+    </div>` : '';
+
+  const etfRows = comp.map(e=>{
+    const sc = etfScores?.[e.ticker];
+    const p = e.perf_pct||0;
+    const score = e.score_entry || sc?.scores?.[lid] || 0;
+    const m3 = e.mom3m_entry || sc?.mom3m;
+    const scCls = score>=60?'high':score>=35?'mid':'low';
+    return `<tr>
+      <td class="tk">${e.ticker}</td>
+      <td class="nm">${e.nome||'—'}</td>
+      <td class="wt">${(e.peso||0).toFixed(1)}%</td>
+      <td>${fmtE(e.importo)}</td>
+      <td style="font-family:'DM Mono';font-size:9px">€${(e.price_entry||0).toFixed(2)}</td>
+      <td style="font-family:'DM Mono';font-size:9px">${e.price_now?'€'+e.price_now.toFixed(2):'—'}</td>
+      <td class="${p>=0?'pos':'neg'}">${fmt(p,2)}</td>
+      <td><span class="score-badge ${scCls}">${score}</span></td>
+      <td style="font-size:9px;color:${m3>=0?'var(--green)':'var(--red)'}">${m3!=null?(m3>=0?'+':'')+m3.toFixed(1)+'%':'—'}</td>
+    </tr>`;
+  }).join('');
+
+  return `
+  <div class="level-card" id="level-${lid}">
+    <div class="level-card-header">
+      <div class="level-stripe"></div>
+      <div class="level-header-content">
+        <div style="display:flex;align-items:center">
+          <div class="level-id-large">${lid}</div>
+          <div>
+            <div class="level-nome">${LIVELLI_NOMI[lid]||lid}</div>
+            <div class="level-tipo">${isC?'Distribuzione':'Accumulazione'} · ${nver} versioni · ${nver-1} rib. · ${nrot} rot.</div>
+          </div>
+        </div>
+        <div class="level-kpis">
+          <div class="lkpi">
+            <div class="lkpi-label">Performance</div>
+            <div class="lkpi-val" style="color:${perf>=0?'var(--green)':'var(--red)'}">${fmt(perf)}</div>
+          </div>
+          <div class="lkpi">
+            <div class="lkpi-label">Guadagno</div>
+            <div class="lkpi-val" style="font-size:16px;color:${eur>=0?'var(--green)':'var(--red)'}">${eur>=0?'+':'-'}${fmtEa(eur)}</div>
+          </div>
+          <div class="lkpi">
+            <div class="lkpi-label">Vol/a</div>
+            <div class="lkpi-val" style="font-size:16px;color:${volCol}">${vol!=null?vol.toFixed(1)+'%':'—'}</div>
+          </div>
+          <div class="lkpi">
+            <div class="lkpi-label">Max DD</div>
+            <div class="lkpi-val" style="font-size:16px;color:var(--red)">${mdd!=null?mdd.toFixed(1)+'%':'—'}</div>
+          </div>
+          <div class="lkpi">
+            <div class="lkpi-label">Sharpe</div>
+            <div class="lkpi-val" style="font-size:16px;color:${shCol}">${sh!=null?sh.toFixed(2):'—'}</div>
+          </div>
+          <div class="lkpi">
+            <div class="lkpi-label">Capitale</div>
+            <div class="lkpi-val" style="font-size:14px">${fmtE(cap)}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="level-card-body">
+      ${rotHTML}
+      <table class="etf-table">
+        <thead>
+          <tr>
+            <th>Ticker</th><th>Nome</th><th>Peso</th><th>Importo</th>
+            <th>Entry</th><th>Prezzo ora</th><th>Perf%</th>
+            <th>Score Factor</th><th>Mom 3M</th>
+          </tr>
+        </thead>
+        <tbody>${etfRows}</tbody>
+      </table>
+      ${buildDiario(lid, ptfData)}
+    </div>
+  </div>`;
+}
+
+function renderScatter(pf, iwmoPerf){
+  const canvas = document.getElementById('factor-scatter');
+  if(!canvas) return;
+  canvas.width = canvas.offsetWidth||1000;
+  canvas.height = 380;
+  const ctx = canvas.getContext('2d');
+  const W=canvas.width,H=380,P={t:20,r:90,b:40,l:70};
+  const w=W-P.l-P.r,h=H-P.t-P.b;
+
+  const pts = LIVELLI_FACTOR.map(lid=>{
+    const p=pf[lid]||{};
+    return{lid,perf:p.performance_totale_pct||0,vol:p.volatilita_ann||0,mdd:Math.abs(p.max_drawdown||5),isC:lid.startsWith('C')};
+  }).filter(p=>p.vol>0);
+
+  const maxVol = Math.max(...pts.map(p=>p.vol))*1.15||50;
+  const maxPerf = Math.max(...pts.map(p=>p.perf))*1.12||80;
+  const maxMdd  = Math.max(...pts.map(p=>p.mdd))||30;
+
+  const xS=v=>P.l+(v/maxVol)*w;
+  const yS=v=>P.t+h-(v/maxPerf)*h;
+
+  ctx.fillStyle='#0A1628';ctx.fillRect(0,0,W,H);
+
+  // Grid
+  ctx.strokeStyle='rgba(255,255,255,0.05)';ctx.lineWidth=0.5;
+  [0,.25,.5,.75,1].forEach(t=>{
+    const y=P.t+h*t;ctx.beginPath();ctx.moveTo(P.l,y);ctx.lineTo(P.l+w,y);ctx.stroke();
+    ctx.fillStyle='rgba(255,255,255,0.3)';ctx.font='8px DM Mono,monospace';ctx.textAlign='right';
+    ctx.fillText((maxPerf*(1-t)).toFixed(0)+'%',P.l-4,y+3);
+    const x=P.l+w*t;ctx.beginPath();ctx.moveTo(x,P.t);ctx.lineTo(x,P.t+h);ctx.stroke();
+    ctx.textAlign='center';ctx.fillText((maxVol*t).toFixed(0)+'%',x,P.t+h+14);
+  });
+
+  // Linea IWMO
+  if(iwmoPerf!=null){
+    const yIwmo=yS(iwmoPerf);
+    ctx.strokeStyle='rgba(201,168,76,0.6)';ctx.lineWidth=1.5;ctx.setLineDash([6,4]);
+    ctx.beginPath();ctx.moveTo(P.l,yIwmo);ctx.lineTo(P.l+w,yIwmo);ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle='rgba(201,168,76,0.8)';ctx.font='8px DM Mono,monospace';ctx.textAlign='left';
+    ctx.fillText(`IWMO ${iwmoPerf>=0?'+':''}${iwmoPerf.toFixed(1)}%`,P.l+4,yIwmo-5);
+  }
+
+  // Punti
+  pts.forEach(p=>{
+    const x=xS(p.vol),y=yS(p.perf);
+    const r=Math.max(22,(p.mdd/maxMdd)*44);
+    const batte=iwmoPerf!=null&&p.perf>iwmoPerf;
+    ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);
+    ctx.fillStyle=p.isC?'rgba(24,95,165,0.75)':'rgba(109,40,217,0.75)';ctx.fill();
+    ctx.strokeStyle=batte?'rgba(52,211,153,0.95)':'rgba(239,68,68,0.7)';ctx.lineWidth=2;ctx.stroke();
+    ctx.font=`bold ${r>28?13:10}px DM Mono,monospace`;
+    ctx.fillStyle='rgba(255,255,255,0.97)';ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillText(p.lid,x,y);
+  });
+
+  // Legenda
+  [['Cedola (C)','rgba(24,95,165,0.75)'],['Accumulazione (A)','rgba(109,40,217,0.75)'],
+   ['Verde = batte IWMO','rgba(52,211,153,0.8)'],['Rosso = sotto IWMO','rgba(239,68,68,0.7)']
+  ].forEach(([lbl,col],i)=>{
+    const lx=P.l+8,ly=P.t+12+i*18;
+    ctx.beginPath();ctx.arc(lx,ly,6,0,Math.PI*2);
+    ctx.fillStyle=col;ctx.fill();
+    ctx.font='9px DM Mono,monospace';ctx.fillStyle='rgba(255,255,255,0.6)';
+    ctx.textAlign='left';ctx.textBaseline='middle';ctx.fillText(lbl,lx+12,ly);
+  });
+}
+
+async function render(){
+  try{
+    const data = await loadData();
+    const pf = data.portafogli_factor||{};
+    const etfScores = data.etf_scores||{};
+    const iwmo = data.benchmark_perf_pct||0;
+    const regime = data.regime_oggi||{};
+
+    let html = buildCover(data);
+
+    // Regime corrente
+    const scColors={goldilocks:'#1A6B3A',reflazione:'#B8860B',stagflazione:'#8B1A1A',risk_off:'#6B1A1A',neutro:'#4B5563'};
+    const sc = regime.scenario||'neutro';
+    html += `<div style="background:white;border:1px solid var(--factor-border);border-left:4px solid var(--factor);padding:16px 24px;margin-bottom:48px;display:flex;align-items:center;gap:24px">
+      <div>
+        <div style="font-size:8px;letter-spacing:3px;color:var(--factor2);text-transform:uppercase;margin-bottom:4px">Regime Macro Oggi</div>
+        <div style="font-family:'Playfair Display',serif;font-size:20px;font-weight:600;color:${scColors[sc]||'var(--text)'}">${sc.toUpperCase()}</div>
+      </div>
+      <div style="font-size:28px;font-weight:600;color:${scColors[sc]||'var(--text)'}">${regime.confidence||'—'}%</div>
+      <div style="font-size:9px;color:var(--text2);flex:1">Calcolato dai dati reali dei 15 ETF proxy. Soglia rotazione momentum: +${data.rotation_threshold||15}% mom3M.</div>
+    </div>`;
+
+    // IWMO hero
+    html += buildIwmoHero(iwmo);
+
+    // Risultati
+    html += `<div class="section-block">
+      <div class="section-head">
+        <span class="section-eyebrow">Risultati</span>
+        <h2 class="section-h2">6 Livelli vs IWMO</h2>
+      </div>
+      ${buildResults(data)}
+      ${buildRanking(data)}
+    </div>`;
+
+    // Scatter
+    html += `<div class="section-block">
+      <div class="section-head">
+        <span class="section-eyebrow">Analisi Rischio</span>
+        <h2 class="section-h2">Rischio / Rendimento</h2>
+      </div>
+      ${buildScatter(pf, iwmo)}
+    </div>`;
+
+    // Heatmap
+    html += `<div class="section-block">
+      <div class="section-head">
+        <span class="section-eyebrow">Rendimenti Mensili</span>
+        <h2 class="section-h2">Heatmap Jan 2025 → Oggi</h2>
+      </div>
+      ${buildHeatmap(pf)}
+      <div style="margin-top:8px;display:flex;align-items:center;gap:8px;font-size:9px;color:var(--text2)">
+        <div style="width:12px;height:10px;background:#791F1F;border-radius:2px"></div><span>Forte negativo</span>
+        <div style="width:12px;height:10px;background:#F7C1C1;border-radius:2px"></div><span>Lieve negativo</span>
+        <div style="width:12px;height:10px;background:#EDE8DF;border-radius:2px;border:1px solid #D4CDB8"></div><span>Neutro</span>
+        <div style="width:12px;height:10px;background:#C0DD97;border-radius:2px"></div><span>Lieve positivo</span>
+        <div style="width:12px;height:10px;background:#27500A;border-radius:2px"></div><span>Forte positivo</span>
+        <span style="margin-left:auto">Bordo viola = rendimento cumulato composto</span>
+      </div>
+    </div>`;
+
+    // Metodologia
+    html += `<div class="section-block">
+      <div class="section-head">
+        <span class="section-eyebrow">Come Funziona</span>
+        <h2 class="section-h2">Metodologia Factor Momentum</h2>
+      </div>
+      ${buildMetodo()}
+      <div class="section-head" style="margin-top:32px">
+        <span class="section-eyebrow">Score Weights</span>
+        <h2 class="section-h2" style="font-size:20px">Pesi dello Score per Livello</h2>
+      </div>
+      ${buildScorePesi()}
+    </div>`;
+
+    // Level cards
+    html += `<div class="section-block">
+      <div class="section-head">
+        <span class="section-eyebrow">Portafogli</span>
+        <h2 class="section-h2">Composizione e Diario Movimenti</h2>
+      </div>
+      ${LIVELLI_FACTOR.map(lid=>pf[lid]?buildLevelCard(lid,pf[lid],etfScores):'').join('')}
+    </div>`;
+
+    html += `<div class="book-footer">
+      COMPASS Factor Momentum Strategy · Backtest Jan 2025 → Oggi · Documento riservato<br>
+      Non costituisce consulenza d'investimento · Aggiornamento automatico notturno
+    </div>`;
+
+    document.getElementById('loading').style.display='none';
+    const cont = document.getElementById('content');
+    cont.innerHTML = html;
+    cont.style.display = 'block';
+
+    setTimeout(()=>renderScatter(pf, iwmo), 100);
+
+  }catch(e){
+    document.getElementById('loading').innerHTML=`<div style="color:var(--red)">Errore: ${e.message}</div>`;
+    console.error(e);
+  }
+}
+
+render();
+</script>
+</body>
+</html>
