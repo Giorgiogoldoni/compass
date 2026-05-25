@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>COMPASS — Composizione 3 Linee</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --gold:#C9A84C;--gold2:#E8C96A;--gold3:#8B6914;
+  --ink:#0D0D1A;--paper:#F7F4EE;--paper2:#EDE8DF;
+  --text:#1A1828;--text2:#6B6580;
+  --green:#1A6B3A;--red:#8B1A1A;--blue:#1A3A6B;
+  --border:#D4CDB8;
+  --M:#0EA5E9;--M2:#BAE6FD;--M3:#0369A1;
+  --O:#8B5CF6;--O2:#DDD6FE;--O3:#6D28D9;
+  --A:#DC2626;--A2:#FECACA;--A3:#991B1B;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'DM Mono',monospace;background:var(--paper);color:var(--text);font-size:11px;line-height:1.7;}
+
+.toolbar{position:fixed;top:0;left:0;right:0;z-index:1000;background:var(--ink);border-bottom:1px solid var(--gold3);display:flex;align-items:center;justify-content:space-between;padding:0 32px;height:52px;}
+.toolbar-brand{font-family:'Playfair Display',serif;font-size:15px;color:var(--gold);letter-spacing:1px;}
+.toolbar-brand span{color:rgba(255,255,255,0.4);font-size:10px;margin-left:8px;}
+.btn-outline{background:transparent;color:rgba(255,255,255,0.6);border:1px solid rgba(255,255,255,0.2);padding:7px 14px;font-family:'DM Mono',monospace;font-size:10px;cursor:pointer;border-radius:2px;transition:all 0.2s;text-decoration:none;display:inline-block;}
+.btn-outline:hover{border-color:var(--gold);color:var(--gold);}
+.btn-gold{background:var(--gold);color:var(--ink);border:none;padding:8px 18px;font-family:'DM Mono',monospace;font-size:10px;font-weight:500;letter-spacing:1px;cursor:pointer;border-radius:2px;}
+
+.main{max-width:1100px;margin:72px auto 60px;padding:0 32px;}
+
+/* HERO */
+.hero{padding:48px 0 36px;border-bottom:2px solid var(--gold);margin-bottom:40px;}
+.hero-eyebrow{font-size:9px;letter-spacing:4px;color:var(--gold3);text-transform:uppercase;margin-bottom:12px;}
+.hero-title{font-family:'Playfair Display',serif;font-size:40px;font-weight:700;color:var(--ink);margin-bottom:6px;}
+.hero-title em{color:var(--gold3);font-style:italic;}
+.hero-sub{font-family:'Playfair Display',serif;font-size:15px;color:var(--text2);font-style:italic;margin-bottom:24px;}
+
+/* REGIME BANNER */
+.regime-banner{background:white;border:1px solid var(--border);border-left:4px solid var(--gold);padding:16px 24px;margin-bottom:32px;display:flex;align-items:center;gap:24px;flex-wrap:wrap;border-radius:2px;}
+.regime-dot{width:12px;height:12px;border-radius:50%;flex-shrink:0;}
+.regime-val{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;}
+.regime-label{font-size:8px;letter-spacing:3px;color:var(--text2);text-transform:uppercase;}
+.regime-conf{font-size:9px;color:var(--text2);margin-top:2px;}
+.regime-trigger{font-size:9px;color:var(--text2);margin-left:auto;text-align:right;line-height:1.8;}
+
+/* SECTION */
+.section-head{display:flex;align-items:baseline;gap:16px;margin-bottom:20px;padding-bottom:10px;border-bottom:1px solid var(--border);}
+.section-eyebrow{font-size:8px;letter-spacing:4px;color:var(--gold3);text-transform:uppercase;}
+.section-h2{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:var(--ink);}
+
+/* SPECCHIO */
+.specchio{display:grid;grid-template-columns:1fr 1fr;gap:2px;margin-bottom:32px;border:1px solid var(--border);border-radius:3px;overflow:hidden;}
+.specchio-col{background:white;}
+.specchio-header{padding:14px 20px;font-size:9px;letter-spacing:3px;text-transform:uppercase;font-weight:500;border-bottom:1px solid var(--border);}
+.specchio-header.attuale{background:var(--paper2);color:var(--text2);}
+.specchio-header.ideale{color:white;}
+.specchio-header.M-ideale{background:var(--M3);}
+.specchio-header.O-ideale{background:var(--O3);}
+.specchio-header.A-ideale{background:var(--A3);}
+
+/* LINEA BLOCK */
+.linea-block{margin-bottom:40px;}
+.linea-title{display:flex;align-items:center;gap:12px;margin-bottom:16px;}
+.linea-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.linea-nome{font-family:'Playfair Display',serif;font-size:18px;font-weight:700;}
+.linea-desc{font-size:9px;color:var(--text2);}
+.linea-perf{font-family:'Playfair Display',serif;font-size:22px;font-weight:600;margin-left:auto;}
+
+/* ETF ROWS */
+.etf-row{display:flex;align-items:center;gap:0;padding:10px 20px;border-bottom:1px solid var(--border);}
+.etf-row:last-child{border-bottom:none;}
+.etf-row.changed{background:rgba(201,168,76,0.06);}
+.etf-row.new{background:rgba(26,107,58,0.04);}
+.etf-row.removed{background:rgba(139,26,26,0.04);}
+
+.etf-ticker{font-weight:500;color:var(--blue);font-size:11px;width:90px;flex-shrink:0;}
+.etf-nome{color:var(--text2);flex:1;font-size:10px;}
+.etf-peso{font-weight:600;width:50px;text-align:right;flex-shrink:0;}
+.etf-yield{color:var(--gold3);width:60px;text-align:right;font-size:10px;flex-shrink:0;}
+.etf-perf{width:70px;text-align:right;font-size:10px;flex-shrink:0;}
+.etf-tipo{font-size:8px;padding:2px 6px;border-radius:2px;margin-left:8px;flex-shrink:0;}
+.tipo-dist{background:rgba(201,168,76,0.15);color:var(--gold3);}
+.tipo-acc{background:rgba(26,58,107,0.1);color:var(--blue);}
+.etf-flag{width:20px;text-align:center;flex-shrink:0;font-size:10px;}
+
+/* DELTA */
+.delta-row{display:flex;align-items:center;gap:8px;padding:8px 20px;font-size:10px;border-bottom:1px solid var(--border);}
+.delta-row.add{color:var(--green);background:rgba(26,107,58,0.04);}
+.delta-row.remove{color:var(--red);background:rgba(139,26,26,0.04);}
+.delta-row.change{color:var(--gold3);background:rgba(201,168,76,0.06);}
+
+/* CEDOLA BOX */
+.cedola-box{background:rgba(201,168,76,0.08);border:1px solid rgba(201,168,76,0.3);padding:14px 20px;border-radius:2px;margin-top:12px;display:flex;gap:24px;align-items:center;flex-wrap:wrap;}
+.cedola-item{text-align:center;}
+.cedola-label{font-size:7px;letter-spacing:2px;color:var(--gold3);text-transform:uppercase;display:block;margin-bottom:4px;}
+.cedola-val{font-family:'Playfair Display',serif;font-size:20px;font-weight:600;color:var(--gold3);}
+.cedola-ok{font-size:9px;padding:3px 10px;border-radius:10px;display:inline-block;margin-top:4px;}
+.cedola-ok.ok{background:rgba(26,107,58,0.1);color:var(--green);}
+.cedola-ok.ko{background:rgba(139,26,26,0.1);color:var(--red);}
+
+/* TRIGGER TABLE */
+.trigger-table{width:100%;border-collapse:collapse;font-size:10px;margin-bottom:32px;}
+.trigger-table th{font-size:7px;letter-spacing:2px;color:var(--text2);text-transform:uppercase;padding:8px 12px;border-bottom:2px solid var(--ink);background:var(--paper2);text-align:left;}
+.trigger-table td{padding:8px 12px;border-bottom:1px solid var(--border);}
+.trigger-table tr:hover td{background:rgba(201,168,76,0.03);}
+
+/* TUTTI REGIMI */
+.regimi-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:32px;}
+.regime-card{background:white;border:1px solid var(--border);border-radius:3px;overflow:hidden;}
+.regime-card-header{padding:10px 14px;font-size:9px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:white;}
+.regime-card-body{padding:10px 14px;}
+.regime-etf-row{display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--border);font-size:9px;}
+.regime-etf-row:last-child{border:none;}
+.regime-cedola{font-size:8px;color:var(--gold3);margin-top:8px;padding-top:8px;border-top:1px solid rgba(201,168,76,0.3);}
+
+/* LOADING */
+.loading{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:60vh;gap:16px;color:var(--text2);}
+.spinner{width:32px;height:32px;border:2px solid var(--border);border-top-color:var(--gold);border-radius:50%;animation:spin 0.8s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+.pos{color:var(--green);font-weight:500;}
+.neg{color:var(--red);font-weight:500;}
+
+@media print{.toolbar{display:none!important;}.main{margin-top:0;}}
+</style>
+</head>
+<body>
+
+<div class="toolbar">
+  <div class="toolbar-brand">COMPASS <span>COMPOSIZIONE 3 LINEE</span></div>
+  <div style="display:flex;gap:10px;align-items:center">
+    <span id="update-info" style="font-size:9px;color:rgba(255,255,255,0.3)">—</span>
+    <a href="advisor.html" class="btn-outline">← Advisor</a>
+    <a href="strategia-3linee.html" class="btn-outline">3️⃣ 3 Linee</a>
+    <a href="strategia-factor.html" class="btn-outline">⚡ Factor</a>
+    <button class="btn-gold" onclick="window.print()">🖨 Stampa</button>
+  </div>
+</div>
+
+<div class="main">
+  <div id="loading" class="loading"><div class="spinner"></div><div>Caricamento composizione...</div></div>
+  <div id="content" style="display:none"></div>
+</div>
+
+<script>
+const BASE = 'data/';
+const SCENARI_COL = {goldilocks:'#1A6B3A',reflazione:'#B8860B',stagflazione:'#8B1A1A',risk_off:'#6B1A1A',neutro:'#4B5563'};
+const SCENARI_DESC = {
+  goldilocks:'Crescita solida, inflazione sotto controllo. Priorità: cedola alta, HY breve, Corp IG.',
+  reflazione:'Crescita con inflazione in risalita. Priorità: EM bond, Corp IG USD, duration breve.',
+  stagflazione:'Crescita debole, inflazione alta. Priorità: Gov breve, preservazione capitale, zero HY.',
+  risk_off:'Avversione al rischio. Priorità: Gov breve EUR, Global Govt, Corp IG breve.',
+  neutro:'Regime di transizione. Composizione bilanciata senza sovrapesi.',
+};
+const ETF_TIPO = {
+  'XEON.MI':'Acc','SMART.MI':'Acc','IU0E.MI':'Dist',
+  'IHYU.MI':'Dist','XUCS.DE':'Acc','STHE.MI':'Dist','IEAC.MI':'Dist',
+  'EMBE.MI':'Dist','IBGS.MI':'Dist','SEGA.MI':'Dist','XGSH.MI':'Acc',
+  'SMH.MI':'Acc','VAPX.MI':'Dist','IS3N.DE':'Acc','IWMO.MI':'Acc',
+  'RARE.MI':'Acc','CMOD.MI':'Acc','DFNS.MI':'Acc','XDWT.MI':'Acc',
+  'XUTC.MI':'Dist','WRTY.MI':'Acc','COPA.MI':'Acc','IWQU.MI':'Acc',
+};
+const LINEE_META = {
+  M:{nome:'Monetario',col:'var(--M)',col3:'var(--M3)',desc:'Bunker — statico, tasso overnight, mai cambia'},
+  O:{nome:'Obbligazionario',col:'var(--O)',col3:'var(--O3)',desc:'Cuscinetto — statico per regime, cedola ≥3% netto, non perde'},
+  A:{nome:'Azionario',col:'var(--A)',col3:'var(--A3)',desc:'Motore — rotation momentum A7 Factor, score adattivo RSI'},
+};
+
+function fmt(n,d=1){return n==null?'—':(n>=0?'+':'')+n.toFixed(d)+'%';}
+function fmtE(n){return n==null?'—':'€'+Math.round(n).toLocaleString('it-IT');}
+
+async function loadData(){
+  const r = await fetch(BASE+'compass_3linee.json?t='+Date.now());
+  return r.json();
+}
+
+function buildRegimeBanner(rg, data){
+  const sc = rg.scenario||'neutro';
+  const conf = rg.confidence||50;
+  const col = SCENARI_COL[sc]||'#888';
+  const gen = data.generated?new Date(data.generated).toLocaleString('it-IT'):'—';
+  document.getElementById('update-info').textContent = '3 Linee v'+data.run_number+' · '+gen;
+
+  return `<div class="regime-banner">
+    <div class="regime-dot" style="background:${col}"></div>
+    <div>
+      <div class="regime-label">Regime Macro Corrente</div>
+      <div class="regime-val" style="color:${col}">${sc.toUpperCase()}</div>
+      <div class="regime-conf">Confidence ${conf}%</div>
+    </div>
+    <div style="flex:1;padding:0 24px;font-size:10px;color:var(--text2);line-height:1.8;border-left:1px solid var(--border);margin-left:12px">
+      ${SCENARI_DESC[sc]||''}
+    </div>
+    <div class="regime-trigger">
+      <div style="font-size:8px;letter-spacing:2px;color:var(--text2);text-transform:uppercase;margin-bottom:4px">Trigger cambio</div>
+      <div>Linea M: <strong>mai</strong></div>
+      <div>Linea O: conf ≥65% · persistenza 3 sett.</div>
+      <div>Linea A: conf ≥60% · persistenza 2 sett.</div>
+    </div>
+  </div>`;
+}
+
+function buildSpecchioLinea(lid, ptf, compIdealeTicker, data){
+  const meta = LINEE_META[lid];
+  const col = meta.col;
+  const col3 = meta.col3;
+  const storia = ptf.storia||[];
+  const verAtt = storia.find(v=>!v.data_chiusura)||storia[storia.length-1]||{};
+  const compAtt = (verAtt.composizione||[]).filter(e=>(e.peso||0)>0);
+  const perf = ptf.performance_totale_pct||0;
+
+  // Composizione ideale dal JSON
+  const ideale = data.composizione_ideale?.[lid]?.composizione ||
+                 compIdealeTicker || [];
+  const cedola_ideale = data.composizione_ideale?.[lid]?.cedola_aggregata_netta_pct;
+  const cedola_ok = data.composizione_ideale?.[lid]?.cedola_ok;
+
+  // Calcola delta tra attuale e ideale
+  const tickerAtt = new Set(compAtt.map(e=>e.ticker));
+  const tickerIde = new Set(ideale.map(e=>e.ticker));
+  const daAggiungere = [...tickerIde].filter(t=>!tickerAtt.has(t));
+  const daRimuovere  = [...tickerAtt].filter(t=>!tickerIde.has(t));
+  const invariati    = [...tickerAtt].filter(t=>tickerIde.has(t));
+  const uguale = daAggiungere.length===0 && daRimuovere.length===0;
+
+  // Cedola attuale
+  const cedola_att = compAtt.reduce((s,e)=>{
+    const y = e.yield_pct||0;
+    return s + (y * e.peso / 100);
+  }, 0);
+
+  const tipo_badge = t => {
+    const tipo = ETF_TIPO[t]||'Acc';
+    return `<span class="etf-tipo tipo-${tipo.toLowerCase()}">${tipo}</span>`;
+  };
+
+  const rowAtt = e => {
+    const isRemoved = daRimuovere.includes(e.ticker);
+    const p = e.perf_pct||0;
+    return `<div class="etf-row${isRemoved?' removed':''}">
+      <span class="etf-flag">${isRemoved?'✕':''}</span>
+      <span class="etf-ticker">${e.ticker}</span>
+      <span class="etf-nome">${e.nome||e.ticker}</span>
+      <span class="etf-yield">${(e.yield_pct||0)>0?(e.yield_pct).toFixed(1)+'%':'—'}</span>
+      <span class="etf-perf ${p>=0?'pos':'neg'}">${fmt(p)}</span>
+      <span class="etf-peso">${(e.peso||0).toFixed(0)}%</span>
+      ${tipo_badge(e.ticker)}
+    </div>`;
+  };
+
+  const rowIde = e => {
+    const isNew = daAggiungere.includes(e.ticker);
+    const yield_s = e.yield_pct||e.yield_stimato||0;
+    return `<div class="etf-row${isNew?' new':''}">
+      <span class="etf-flag">${isNew?'✚':''}</span>
+      <span class="etf-ticker">${e.ticker}</span>
+      <span class="etf-nome">${e.nome||ETF_NOMI_MAP[e.ticker]||e.ticker}</span>
+      <span class="etf-yield">${yield_s>0?yield_s.toFixed(1)+'%':'—'}</span>
+      <span class="etf-perf" style="color:var(--text2)">—</span>
+      <span class="etf-peso">${(e.peso||0).toFixed(0)}%</span>
+      ${tipo_badge(e.ticker)}
+    </div>`;
+  };
+
+  const deltaHTML = uguale ? 
+    `<div style="padding:12px 20px;font-size:10px;color:var(--green)">✅ Composizione attuale = composizione ideale per il regime corrente</div>` :
+    `${daRimuovere.map(t=>`<div class="delta-row remove">✕ Vendere: <strong>${t}</strong> — non ottimale per ${(verAtt.regime||'').toUpperCase()}</div>`).join('')}
+     ${daAggiungere.map(t=>`<div class="delta-row add">✚ Acquistare: <strong>${t}</strong> — ideale per ${(verAtt.regime||'neutro').toUpperCase()}</div>`).join('')}`;
+
+  const cedolaHTML = lid==='O' ? `
+  <div class="cedola-box">
+    <div class="cedola-item">
+      <span class="cedola-label">Cedola Attuale Aggregata</span>
+      <span class="cedola-val">${cedola_att.toFixed(1)}%</span>
+      <span class="cedola-ok ${cedola_att>=3?'ok':'ko'}">${cedola_att>=3?'✅ ≥3% netto':'❌ sotto 3%'}</span>
+    </div>
+    ${cedola_ideale!=null?`<div class="cedola-item">
+      <span class="cedola-label">Cedola Ideale (${(verAtt.regime||'neutro').toUpperCase()})</span>
+      <span class="cedola-val">${cedola_ideale.toFixed(1)}%</span>
+      <span class="cedola-ok ${cedola_ok?'ok':'ko'}">${cedola_ok?'✅ ≥3% netto':'❌ sotto 3%'}</span>
+    </div>`:''}
+    <div class="cedola-item">
+      <span class="cedola-label">Cedola Mensile Netta</span>
+      <span class="cedola-val">€${Math.round(cedola_att*1000/12).toLocaleString('it-IT')}</span>
+      <span style="font-size:9px;color:var(--text2);display:block;margin-top:4px">su €100.000</span>
+    </div>
+    <div class="cedola-item">
+      <span class="cedola-label">Cedola Annua Netta</span>
+      <span class="cedola-val">€${Math.round(cedola_att*1000).toLocaleString('it-IT')}</span>
+      <span style="font-size:9px;color:var(--text2);display:block;margin-top:4px">su €100.000 · tass. 26%</span>
+    </div>
+  </div>` : '';
+
+  return `
+  <div class="linea-block">
+    <div class="linea-title">
+      <div class="linea-dot" style="background:${col}"></div>
+      <div>
+        <div class="linea-nome" style="color:${col3}">Linea ${lid} — ${meta.nome}</div>
+        <div class="linea-desc">${meta.desc}</div>
+      </div>
+      <div class="linea-perf ${perf>=0?'pos':'neg'}">${fmt(perf)}</div>
+    </div>
+
+    <div class="specchio">
+      <div class="specchio-col">
+        <div class="specchio-header attuale">
+          📊 Composizione Attuale · Versione ${verAtt.versione||1} · Regime ${(verAtt.regime||'—').toUpperCase()}
+        </div>
+        ${compAtt.map(e=>rowAtt(e)).join('')}
+      </div>
+      <div class="specchio-col">
+        <div class="specchio-header ideale ${lid}-ideale">
+          🎯 Composizione Ideale · Regime Attuale ${(verAtt.regime||'—').toUpperCase()}
+        </div>
+        ${ideale.map(e=>rowIde(e)).join('')}
+      </div>
+    </div>
+
+    ${deltaHTML}
+    ${cedolaHTML}
+  </div>`;
+}
+
+function buildTuttiRegimi(data){
+  const comp_per_regime = data.composizione_O_per_regime||{};
+  if(!Object.keys(comp_per_regime).length) return '';
+
+  const cards = Object.entries(comp_per_regime).map(([sc, etfs])=>{
+    const col = SCENARI_COL[sc]||'#888';
+    const cedola = etfs.reduce((s,e)=>{
+      const p = e.peso||0;
+      const y = e.yield_stimato||0;
+      return s + (y*p/100);
+    }, 0);
+    const rows = etfs.map(e=>`
+      <div class="regime-etf-row">
+        <span style="font-weight:500;color:var(--blue)">${e.ticker}</span>
+        <span style="color:var(--text2)">${e.peso}%</span>
+        <span style="color:var(--gold3)">${(e.yield_stimato||0)>0?e.yield_stimato.toFixed(1)+'%':'—'}</span>
+      </div>`).join('');
+    return `<div class="regime-card">
+      <div class="regime-card-header" style="background:${col}">${sc.toUpperCase()}</div>
+      <div class="regime-card-body">
+        ${rows}
+        <div class="regime-cedola">💛 Cedola: ~${cedola.toFixed(1)}% netto ${cedola>=3?'✅':'❌'}</div>
+      </div>
+    </div>`;
+  }).join('');
+
+  return `
+  <div class="section-head" style="margin-top:48px">
+    <span class="section-eyebrow">Linea O — Tutti i Regimi</span>
+    <h2 class="section-h2">Composizione Obbligazionario per Scenario</h2>
+  </div>
+  <div style="font-size:10px;color:var(--text2);margin-bottom:16px;line-height:1.8">
+    La linea O cambia composizione solo al cambio regime (confidence ≥65%, persistenza ≥3 settimane).
+    In goldilocks priorità alla cedola. In risk_off priorità alla preservazione.
+  </div>
+  <div class="regimi-grid">${cards}</div>`;
+}
+
+function buildTriggerTable(){
+  const triggers = [
+    {linea:'M',tipo:'Cambio regime','trigger':'Mai — statica assoluta',note:'Solo 3 ETF monetari per tutta la vita'},
+    {linea:'M',tipo:'Rotation','trigger':'Mai',note:'Nessuna rotation momentum'},
+    {linea:'M',tipo:'Drawdown','trigger':'ETF singolo -10%','note':'Sostituisce con migliore disponibile'},
+    {linea:'O',tipo:'Cambio regime','trigger':'Conf ≥65% · 3 settimane','note':'Ricostruisce con composizione statica nuovo regime'},
+    {linea:'O',tipo:'Rotation','trigger':'Mai','note':'Nessuna rotation momentum — bond non si ruotano per momentum'},
+    {linea:'O',tipo:'Floor mensile','trigger':'-3% dal capital inizio versione','note':'Ribilanciamento difensivo immediato verso risk_off'},
+    {linea:'A',tipo:'Cambio regime','trigger':'Conf ≥60% · 2 settimane','note':'Ricostruisce portafoglio con selezione score'},
+    {linea:'A',tipo:'Rotation','trigger':'Gap momentum +15%','note':'Score adattivo RSI — penalizza eccessi'},
+    {linea:'A',tipo:'Drawdown','trigger':'ETF singolo -25%','note':'Sostituisce con migliore nel pool'},
+  ];
+
+  const colori = {M:'var(--M3)',O:'var(--O3)',A:'var(--A3)'};
+  const rows = triggers.map(t=>`<tr>
+    <td style="color:${colori[t.linea]};font-weight:600">Linea ${t.linea}</td>
+    <td>${t.tipo}</td>
+    <td style="font-weight:500">${t.trigger}</td>
+    <td style="color:var(--text2)">${t.note}</td>
+  </tr>`).join('');
+
+  return `
+  <div class="section-head" style="margin-top:48px">
+    <span class="section-eyebrow">Regole</span>
+    <h2 class="section-h2">Trigger di Ribilanciamento</h2>
+  </div>
+  <table class="trigger-table">
+    <thead><tr><th>Linea</th><th>Tipo</th><th>Trigger</th><th>Nota</th></tr></thead>
+    <tbody>${rows}</tbody>
+  </table>`;
+}
+
+// Map nomi ETF
+const ETF_NOMI_MAP = {
+  'XEON.MI':'Xtrackers II EUR Overnight Rate Swap',
+  'SMART.MI':'iShares EUR Ultrashort Bond',
+  'IU0E.MI':'iShares EUR Ultrashort Bond Dist',
+  'IHYU.MI':'iShares USD High Yield Corp Bond EUR Hdg',
+  'XUCS.DE':'Xtrackers USD Corp Bond EUR Hdg',
+  'STHE.MI':'SPDR Bloomberg 0-3Y EUR HY Corp Bond',
+  'IEAC.MI':'iShares Core EUR Corp Bond',
+  'EMBE.MI':'iShares JPM EM Bond EUR Hdg',
+  'IBGS.MI':'iShares EUR Govt Bond 1-3yr',
+  'SEGA.MI':'iShares EUR Govt Bond 1-5yr',
+  'XGSH.MI':'Xtrackers II Global Govt Bond EUR Hdg',
+  'SMH.MI':'VanEck Semiconductor UCITS ETF',
+  'VAPX.MI':'Vanguard Dev Asia Pacific',
+  'RARE.MI':'VanEck Rare Earth & Strategic Metals',
+  'CMOD.MI':'iShares Diversified Commodity Swap',
+  'IS3N.DE':'iShares MSCI EM Small Cap',
+  'XDWT.MI':'Xtrackers MSCI World Swap',
+  'XUTC.MI':'Xtrackers MSCI USA IT 1D',
+  'IWMO.MI':'iShares MSCI World Momentum',
+  'IWQU.MI':'iShares MSCI World Quality Factor',
+  'WRTY.MI':'WisdomTree Russell 2000',
+  'COPA.MI':'WisdomTree Copper',
+  'DFNS.MI':'VanEck Defense UCITS ETF',
+};
+
+async function render(){
+  try{
+    const data = await loadData();
+    const portafogli = data.portafogli_3linee||{};
+    const rg = data.regime_oggi||{};
+    const compIdeale = data.composizione_ideale||{};
+
+    let html = `
+    <div class="hero">
+      <div class="hero-eyebrow">Composizione Consigliata · Aggiornata ogni notte</div>
+      <div class="hero-title">Specchio <em>Attuale vs Ideale</em></div>
+      <div class="hero-sub">Composizione corrente confrontata con quella ottimale per il regime macro di oggi</div>
+    </div>`;
+
+    html += buildRegimeBanner(rg, data);
+
+    html += `<div class="section-head">
+      <span class="section-eyebrow">Composizione</span>
+      <h2 class="section-h2">3 Linee — Attuale vs Ideale per Regime</h2>
+    </div>
+    <div style="font-size:10px;color:var(--text2);margin-bottom:24px;line-height:1.8">
+      🔴 Attuale: composizione corrente del portafoglio con prezzi di carico e performance.<br>
+      🎯 Ideale: composizione ottimale calcolata per il regime <strong>${(rg.scenario||'').toUpperCase()}</strong> di oggi.<br>
+      ✕ da vendere · ✚ da acquistare · ✅ invariato
+    </div>`;
+
+    ['M','O','A'].forEach(lid=>{
+      const ptf = portafogli[lid]||{};
+      const ideale = compIdeale[lid]?.composizione||[];
+      html += buildSpecchioLinea(lid, ptf, ideale, data);
+    });
+
+    html += buildTuttiRegimi(data);
+    html += buildTriggerTable();
+
+    html += `<div style="text-align:center;padding:40px 0;border-top:1px solid var(--border);color:var(--text2);font-size:9px;letter-spacing:1px;margin-top:48px">
+      COMPASS 3 Linee · Composizione Consigliata · Aggiornamento automatico notturno lun-ven 21:30 UTC<br>
+      Non costituisce consulenza d'investimento · Dati: ${data.generated?new Date(data.generated).toLocaleString('it-IT'):'—'}
+    </div>`;
+
+    document.getElementById('loading').style.display='none';
+    const cont = document.getElementById('content');
+    cont.innerHTML = html;
+    cont.style.display = 'block';
+
+  }catch(e){
+    document.getElementById('loading').innerHTML=`<div style="color:var(--red)">Errore: ${e.message}</div>`;
+    console.error(e);
+  }
+}
+
+render();
+</script>
+</body>
+</html>
