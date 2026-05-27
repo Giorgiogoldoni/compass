@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>COMPASS ETP — Portafoglio Presente + Futuro</title>
+<style>
+:root{
+  --bg:#fff;--ink:#111;--dim:#666;--rule:#e5e5e5;
+  --green:#16a34a;--red:#dc2626;--gold:#b45309;--blue:#2563eb;
+  --etp:#7c3aed;--card:#f9f9f9;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'IBM Plex Sans',system-ui,sans-serif;background:var(--bg);color:var(--ink);font-size:14px}
+header{padding:18px 32px 14px;border-bottom:2px solid var(--ink);display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+header h1{font-size:20px;font-weight:700}
+header h1 span{color:var(--etp)}
+.nav-link{font-size:11px;font-family:monospace;color:var(--dim);text-decoration:none;padding:4px 10px;border:1px solid var(--rule);border-radius:2px}
+.nav-link:hover{border-color:var(--ink);color:var(--ink)}
+.ts{font-size:11px;color:var(--dim);font-family:monospace}
+main{max-width:1300px;margin:0 auto;padding:16px 32px 64px}
+.sec{font-family:monospace;font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--dim);padding:18px 0 10px;border-top:1px solid var(--rule)}
+.sec:first-of-type{border-top:none;padding-top:0}
+
+/* KPI */
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:1px;background:var(--rule);border:1px solid var(--rule);border-radius:4px;overflow:hidden;margin-bottom:16px}
+.kpi{background:var(--bg);padding:12px 14px}
+.kpi .k{font-size:9px;font-family:monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);margin-bottom:3px}
+.kpi .v{font-size:17px;font-weight:700;font-family:monospace}
+.kpi .v.pos{color:var(--green)}.kpi .v.neg{color:var(--red)}.kpi .v.etp{color:var(--etp)}
+.kpi .sub{font-size:10px;color:var(--dim);margin-top:2px;font-family:monospace}
+
+/* TABS */
+.tabs{display:flex;gap:0;border-bottom:2px solid var(--rule);margin-bottom:16px;overflow-x:auto}
+.tab{padding:9px 18px;font-size:12px;font-weight:500;cursor:pointer;border:none;background:none;color:var(--dim);border-bottom:2px solid transparent;margin-bottom:-2px;white-space:nowrap;font-family:inherit}
+.tab.active{color:var(--ink);border-bottom-color:var(--etp);font-weight:600}
+.tab-panel{display:none}.tab-panel.active{display:block}
+
+/* FORECAST */
+.forecast-strip{display:grid;grid-template-columns:auto 1fr auto;gap:16px;align-items:center;padding:14px 18px;border:1.5px solid var(--rule);border-radius:4px;margin-bottom:16px}
+.sig-badge{display:inline-block;padding:3px 10px;border-radius:2px;font-family:monospace;font-size:11px;font-weight:700;color:#fff}
+.sig-badge.HOLD{background:var(--green)}.sig-badge.WATCH{background:var(--gold)}.sig-badge.ROTATE{background:var(--red)}
+.prob-row{display:flex;align-items:center;gap:8px;margin-bottom:5px}
+.prob-label{font-size:11px;font-family:monospace;color:var(--dim);min-width:95px;text-transform:capitalize}
+.prob-track{flex:1;height:15px;background:#f0f0f0;border-radius:2px;overflow:hidden}
+.prob-fill{height:100%;border-radius:2px;display:flex;align-items:center;padding:0 5px;font-size:10px;font-weight:600;color:#fff}
+.prob-fill.goldilocks{background:#16a34a}.prob-fill.euforia{background:#0ea5e9}
+.prob-fill.reflazione{background:#b45309}.prob-fill.stagflazione{background:#7c3aed}
+.prob-fill.risk_off{background:#dc2626}.prob-fill.neutro{background:#6b7280}
+
+/* TABELLE */
+.data-table{width:100%;border-collapse:collapse;font-size:12.5px}
+.data-table th{padding:8px 10px;text-align:left;font-family:monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);border-bottom:2px solid var(--ink)}
+.data-table td{padding:8px 10px;border-bottom:1px solid var(--rule);vertical-align:middle}
+.data-table tr:hover td{background:#fafafa}
+
+/* RENDIMENTI MENSILI */
+.cal-table{width:100%;border-collapse:collapse;font-size:12px;font-family:monospace}
+.cal-table th{padding:6px 8px;text-align:center;font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);border-bottom:2px solid var(--ink)}
+.cal-table td{padding:6px 8px;text-align:right;border-bottom:1px solid var(--rule);border-right:1px solid var(--rule)}
+.cal-table td.pos{background:#dcfce7;color:var(--green);font-weight:600}
+.cal-table td.neg{background:#fee2e2;color:var(--red);font-weight:600}
+.cal-table td.anno{font-weight:700;text-align:left;background:var(--card)}
+.cal-table td.totale{font-weight:700;border-left:2px solid var(--ink)}
+.cal-table td.empty{color:var(--dim)}
+
+/* CAT BADGE */
+.cat-badge{display:inline-block;padding:1px 6px;border-radius:2px;font-family:monospace;font-size:9px;font-weight:600;color:#fff}
+.cat-badge.az_globale{background:#2563eb}.cat-badge.az_europa{background:#16a34a}
+.cat-badge.az_usa{background:#0284c7}.cat-badge.az_em{background:#b45309}
+.cat-badge.tematico{background:#7c3aed}.cat-badge.hy{background:#dc2626}
+.cat-badge.obbligaz_ig{background:#6b7280}.cat-badge.leva{background:#1a1a1a}
+.cat-badge.monetario{background:#9ca3af}.cat-badge.em_bond{background:#92400e}
+
+/* CORRELAZIONE */
+.corr-box{padding:20px 24px;border:1.5px solid var(--rule);border-radius:4px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px}
+.corr-item{text-align:center}
+.corr-item .cv{font-size:32px;font-weight:700;font-family:monospace}
+.corr-item .cl{font-size:11px;color:var(--dim);margin-top:4px}
+.corr-item .cs{font-size:11px;margin-top:8px;padding:3px 10px;border-radius:20px;display:inline-block;font-family:monospace}
+
+/* REGIME HISTORY */
+.rh-wrap{display:flex;gap:6px;flex-wrap:wrap}
+.rh-pill{padding:3px 10px;border-radius:20px;font-family:monospace;font-size:10px;font-weight:600;color:#fff}
+.rh-pill.goldilocks{background:#16a34a}.rh-pill.reflazione{background:#b45309}
+.rh-pill.stagflazione{background:#7c3aed}.rh-pill.risk_off{background:#dc2626}
+.rh-pill.neutro{background:#6b7280}.rh-pill.euforia{background:#0ea5e9}
+
+/* SCENARIO TABLE */
+.scenario-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px}
+.sc-card{padding:14px 16px;border:1.5px solid var(--rule);border-radius:4px}
+.sc-card h3{font-family:monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px;font-weight:600}
+.sc-card .sc-val{font-size:20px;font-weight:700;font-family:monospace}
+.sc-card .sc-sub{font-size:11px;color:var(--dim);margin-top:4px}
+
+canvas{display:block;width:100%}
+.loading{padding:48px;text-align:center;color:var(--dim);font-family:monospace;animation:pulse 1.5s infinite}
+.err{padding:32px;text-align:center;color:var(--red);font-family:monospace}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+@media(max-width:900px){header,main{padding-left:16px;padding-right:16px}.corr-box{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header>
+  <h1>COMPASS <span>ETP</span></h1>
+  <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+    <a href="index.html" class="nav-link">← FACTOR</a>
+    <a href="strategia-3linee.html" class="nav-link">3 Linee</a>
+    <a href="fase2.html" class="nav-link">Fase 2</a>
+    <a href="confronto.html" class="nav-link">Confronto</a>
+    <span class="ts" id="ts-update">—</span>
+  </div>
+</header>
+
+<main>
+  <div id="loading" class="loading">Caricamento dati ETP...</div>
+  <div id="content" style="display:none">
+
+    <div class="sec">Performance</div>
+    <div class="kpi-grid" id="kpi-grid"></div>
+
+    <div class="tabs">
+      <button class="tab active" onclick="showTab('overview')">📊 Overview</button>
+      <button class="tab" onclick="showTab('rendimenti')">📅 Rendimenti mensili</button>
+      <button class="tab" onclick="showTab('rischio')">📉 Rischio</button>
+      <button class="tab" onclick="showTab('portafoglio')">🗂 Portafoglio</button>
+      <button class="tab" onclick="showTab('regime')">🔄 Regime & Forecast</button>
+      <button class="tab" onclick="showTab('confronto')">⚖ Confronto</button>
+    </div>
+
+    <!-- TAB OVERVIEW -->
+    <div class="tab-panel active" id="tab-overview">
+      <div class="sec" style="padding-top:0;border-top:none">Equity curve (mensile)</div>
+      <canvas id="c-equity" height="260" style="margin-bottom:16px"></canvas>
+      <div class="sec">Performance per scenario di mercato</div>
+      <div class="scenario-grid" id="scenario-grid"></div>
+    </div>
+
+    <!-- TAB RENDIMENTI MENSILI -->
+    <div class="tab-panel" id="tab-rendimenti">
+      <div class="sec" style="padding-top:0;border-top:none">Rendimenti mensili (%) — heatmap</div>
+      <table class="cal-table" id="cal-table"></table>
+      <div style="margin-top:12px;font-size:11px;color:var(--dim)">* Verde = mese positivo · Rosso = mese negativo</div>
+    </div>
+
+    <!-- TAB RISCHIO -->
+    <div class="tab-panel" id="tab-rischio">
+      <div class="sec" style="padding-top:0;border-top:none">Drawdown nel tempo</div>
+      <canvas id="c-dd" height="200" style="margin-bottom:16px"></canvas>
+      <div class="sec">Rolling Sharpe (finestra 13 settimane)</div>
+      <canvas id="c-sharpe" height="180" style="margin-bottom:16px"></canvas>
+      <div class="sec">Metriche di rischio</div>
+      <div class="kpi-grid" id="risk-kpi"></div>
+    </div>
+
+    <!-- TAB PORTAFOGLIO -->
+    <div class="tab-panel" id="tab-portafoglio">
+      <div style="display:grid;grid-template-columns:1fr auto;gap:20px;align-items:start">
+        <div>
+          <div class="sec" style="padding-top:0;border-top:none">Composizione corrente</div>
+          <table class="data-table" id="comp-body-full">
+            <thead><tr><th>Ticker</th><th>Nome</th><th>Categoria</th><th>Peso</th><th>Score P</th><th>Score F</th></tr></thead>
+            <tbody id="comp-tbody"></tbody>
+          </table>
+        </div>
+        <div style="min-width:280px">
+          <div class="sec" style="padding-top:0;border-top:none">Per categoria</div>
+          <canvas id="c-donut" height="280"></canvas>
+          <div style="margin-top:12px;font-size:11px;color:var(--dim);font-family:monospace">
+            Turnover medio: <strong id="turnover-val">—</strong>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB REGIME & FORECAST -->
+    <div class="tab-panel" id="tab-regime">
+      <div class="sec" style="padding-top:0;border-top:none">Forecast regime</div>
+      <div class="forecast-strip" id="forecast-strip"></div>
+      <div class="sec">Storia regime (ultime settimane)</div>
+      <div class="rh-wrap" id="regime-history"></div>
+      <div class="sec">Storico versioni portafoglio</div>
+      <table class="data-table">
+        <thead><tr><th>Data</th><th>Regime</th><th>Conf</th><th>Capitale</th><th>N ETF</th><th>Forecast 4W</th><th>Peso futuro</th></tr></thead>
+        <tbody id="ver-body"></tbody>
+      </table>
+    </div>
+
+    <!-- TAB CONFRONTO -->
+    <div class="tab-panel" id="tab-confronto">
+      <div class="sec" style="padding-top:0;border-top:none">Correlazione con altri sistemi</div>
+      <div class="corr-box" id="corr-box"></div>
+      <div class="sec">vs Benchmark</div>
+      <div class="kpi-grid" id="bm-kpi"></div>
+    </div>
+
+  </div>
+  <div id="err" class="err" style="display:none"></div>
+</main>
+
+<script>
+const URL_ETP = 'https://giorgiogoldoni.github.io/FACTOR/data/compass_etp.json';
+const fmt  = (n,d=1) => n==null?'—':(n>=0?'+':'')+n.toFixed(d)+'%';
+const fmtC = n => n==null?'—':Math.round(n).toLocaleString('it')+'€';
+const cap1 = s => s?s.charAt(0).toUpperCase()+s.slice(1):'—';
+const REGIME_COLORS = {goldilocks:'#16a34a',euforia:'#0ea5e9',reflazione:'#b45309',stagflazione:'#7c3aed',risk_off:'#dc2626',neutro:'#6b7280'};
+const CAT_COLORS = {az_globale:'#2563eb',az_europa:'#16a34a',az_usa:'#0284c7',az_em:'#b45309',tematico:'#7c3aed',hy:'#dc2626',obbligaz_ig:'#6b7280',leva:'#1a1a1a',monetario:'#9ca3af',em_bond:'#92400e'};
+
+function showTab(id) {
+  document.querySelectorAll('.tab').forEach((t,i)=>{
+    const ids=['overview','rendimenti','rischio','portafoglio','regime','confronto'];
+    t.classList.toggle('active', ids[i]===id);
+  });
+  document.querySelectorAll('.tab-panel').forEach(p=>{
+    p.classList.toggle('active', p.id==='tab-'+id);
+  });
+  if (id==='rischio') { setTimeout(()=>{drawDD(); drawRollingS();},50); }
+  if (id==='overview') { setTimeout(()=>drawEquity(),50); }
+}
+
+async function load() {
+  try {
+    const r = await fetch(URL_ETP+'?t='+Date.now());
+    if (!r.ok) throw new Error('HTTP '+r.status);
+    const d = await r.json();
+    render(d);
+  } catch(e) {
+    document.getElementById('loading').style.display='none';
+    const err = document.getElementById('err');
+    err.style.display='block';
+    err.textContent='Errore: '+e.message;
+  }
+}
+
+let DATA = null;
+
+function render(d) {
+  DATA = d;
+  document.getElementById('loading').style.display='none';
+  document.getElementById('content').style.display='block';
+  document.getElementById('ts-update').textContent = d.generated ? new Date(d.generated).toLocaleString('it') : '—';
+
+  const reg = d.regime_oggi || {};
+  const fc  = d.forecast || {};
+
+  // ── KPI ──────────────────────────────────────────────────────────
+  const sh6  = d.sharpe_6m;
+  const sh12 = d.sharpe_12m;
+  const shStr = sh12 ? sh12.toFixed(2) : (sh6 ? sh6.toFixed(2)+' (6M)' : '—');
+  const kpis = [
+    {k:'Strategia',   v:'ETP P+F',      cls:'etp',  sub:'Universo '+d.n_etf_universo+' ETF'},
+    {k:'Performance', v:fmt(d.performance_totale_pct), cls:d.performance_totale_pct>=0?'pos':'neg', sub:'da '+d.backtest_start},
+    {k:'Capitale',    v:fmtC(d.capitale_attuale), cls:'', sub:'su €100k iniziali'},
+    {k:'vs IWMO',     v:d.outperformance!=null?fmt(d.outperformance):'—', cls:d.outperformance>=0?'pos':'neg', sub:'benchmark primario'},
+    {k:'vs VWCE',     v:d.outperformance2!=null?fmt(d.outperformance2):'—', cls:d.outperformance2>=0?'pos':'neg', sub:'benchmark secondario'},
+    {k:'MDD',         v:fmt(d.max_drawdown), cls:'neg', sub:'max drawdown'},
+    {k:'Sharpe 12M',  v:shStr, cls:'', sub:'risk-adjusted'},
+    {k:'Sharpe 6M',   v:sh6?sh6.toFixed(2):'n.d.', cls:'', sub:'ultimi 6 mesi'},
+    {k:'Turnover',    v:d.turnover_medio?d.turnover_medio.toFixed(0)+'%':'—', cls:'', sub:'per rebalancing'},
+    {k:'Regime oggi', v:cap1(reg.scenario), cls:'', sub:'conf '+reg.confidence+'%'},
+  ];
+  const kg = document.getElementById('kpi-grid');
+  kpis.forEach(k => {
+    kg.innerHTML += `<div class="kpi"><div class="k">${k.k}</div><div class="v ${k.cls}">${k.v}</div><div class="sub">${k.sub}</div></div>`;
+  });
+
+  // ── EQUITY ───────────────────────────────────────────────────────
+  setTimeout(()=>drawEquity(), 50);
+
+  // ── SCENARIO GRID ────────────────────────────────────────────────
+  const sg = document.getElementById('scenario-grid');
+  const pr = d.perf_per_regime || {};
+  const regOrd = ['goldilocks','euforia','reflazione','neutro','stagflazione','risk_off'];
+  regOrd.forEach(reg => {
+    const info = pr[reg];
+    if (!info) return;
+    const col = REGIME_COLORS[reg]||'#666';
+    const rate = info.media_sett;
+    sg.innerHTML += `<div class="sc-card" style="border-color:${col}20">
+      <h3 style="color:${col}">${cap1(reg)}</h3>
+      <div class="sc-val" style="color:${rate>=0?'var(--green)':'var(--red)'}">${rate>=0?'+':''}${rate.toFixed(2)}%</div>
+      <div class="sc-sub">media settimanale · ${info.n} settimane</div>
+      <div class="sc-sub">${info.positivi}/${info.n} positive (${Math.round(info.positivi/info.n*100)}%)</div>
+    </div>`;
+  });
+
+  // ── RENDIMENTI MENSILI ────────────────────────────────────────────
+  const rpa = d.rend_per_anno || {};
+  const ra  = d.rend_annuo || {};
+  const mesiNomi = ['01','02','03','04','05','06','07','08','09','10','11','12'];
+  const mesiLabel = ['Gen','Feb','Mar','Apr','Mag','Giu','Lug','Ago','Set','Ott','Nov','Dic'];
+  const anni = Object.keys(rpa).sort();
+  const ct = document.getElementById('cal-table');
+  ct.innerHTML = `<thead><tr><th>Anno</th>${mesiLabel.map(m=>`<th>${m}</th>`).join('')}<th>Totale</th></tr></thead><tbody>`;
+  anni.forEach(anno => {
+    const mesi = rpa[anno];
+    const tot = ra[anno];
+    let row = `<tr><td class="anno">${anno}</td>`;
+    mesiNomi.forEach(m => {
+      const v = mesi[m];
+      if (v==null) row += `<td class="empty">—</td>`;
+      else row += `<td class="${v>=0?'pos':'neg'}">${v>=0?'+':''}${v.toFixed(1)}</td>`;
+    });
+    row += `<td class="totale ${tot>=0?'pos':'neg'}">${tot>=0?'+':''}${tot?.toFixed(1)||'—'}</td></tr>`;
+    ct.innerHTML += row;
+  });
+  ct.innerHTML += '</tbody>';
+
+  // ── RISCHIO KPI ───────────────────────────────────────────────────
+  const rk = document.getElementById('risk-kpi');
+  const rkpis = [
+    {k:'Sharpe 6M',   v:sh6?sh6.toFixed(2):'n.d.',  sub:'ultime 26 settimane'},
+    {k:'Sharpe 12M',  v:sh12?sh12.toFixed(2):'n.d.', sub:'ultime 52 settimane'},
+    {k:'Max Drawdown',v:fmt(d.max_drawdown),          sub:'picco→valle'},
+    {k:'Turnover',    v:d.turnover_medio?d.turnover_medio.toFixed(0)+'%':'—', sub:'medio per rebalancing'},
+    {k:'Rebalancing', v:d.n_rebalancing||'—',         sub:'totali eseguiti'},
+  ];
+  rkpis.forEach(k => {
+    rk.innerHTML += `<div class="kpi"><div class="k">${k.k}</div><div class="v">${k.v}</div><div class="sub">${k.sub}</div></div>`;
+  });
+  if (d.turnover_medio) document.getElementById('turnover-val').textContent = d.turnover_medio.toFixed(0)+'%';
+
+  // ── PORTAFOGLIO ───────────────────────────────────────────────────
+  const comp = d.composizione_corrente || [];
+  const cb = document.getElementById('comp-tbody');
+  comp.forEach(p => {
+    cb.innerHTML += `<tr>
+      <td style="font-family:monospace;font-weight:600">${p.ticker}</td>
+      <td style="font-size:11.5px;color:var(--dim)">${(p.nome||'').replace('iShares','iSh').replace('WisdomTree','WT')}</td>
+      <td><span class="cat-badge ${p.cat}">${(p.cat||'').replace('_',' ')}</span></td>
+      <td style="font-family:monospace">${p.peso?.toFixed(1)||'—'}%</td>
+      <td style="font-family:monospace;color:var(--etp)">${p.sp?.toFixed(0)||p.score?.toFixed(0)||'—'}</td>
+      <td style="font-family:monospace;color:var(--gold)">${p.sf?.toFixed(0)||'—'}</td>
+    </tr>`;
+  });
+  drawDonut(comp);
+
+  // ── FORECAST ─────────────────────────────────────────────────────
+  const segnale = fc.segnale||'HOLD';
+  const probs = fc.probs||{};
+  const probsHtml = Object.entries(probs).sort((a,b)=>b[1]-a[1]).map(([sc,pct])=>`
+    <div class="prob-row">
+      <span class="prob-label">${cap1(sc)}</span>
+      <div class="prob-track"><div class="prob-fill ${sc}" style="width:${pct}%">${pct>8?pct.toFixed(0)+'%':''}</div></div>
+      <span style="font-family:monospace;font-size:11px;min-width:32px;text-align:right">${pct.toFixed(0)}%</span>
+    </div>`).join('');
+  document.getElementById('forecast-strip').innerHTML = `
+    <div style="text-align:center">
+      <div style="font-size:28px">${{HOLD:'✅',WATCH:'⚠️',ROTATE:'🔴'}[segnale]||'—'}</div>
+      <div style="margin-top:6px"><span class="sig-badge ${segnale}">${segnale}</span></div>
+      <div style="margin-top:8px;font-size:12px;color:var(--dim)">→ <strong>${cap1(fc.regime_4w)}</strong> (${(fc.prob_4w||0).toFixed(0)}%)</div>
+    </div>
+    <div>${probsHtml}</div>
+    <div>
+      <div style="font-family:monospace;font-size:12px;margin-bottom:6px"><span style="color:var(--dim)">Peso presente: </span><strong>${((fc.peso_presente||1)*100).toFixed(0)}%</strong></div>
+      <div style="font-family:monospace;font-size:12px;margin-bottom:6px"><span style="color:var(--dim)">Peso futuro: </span><strong>${((fc.peso_futuro||0)*100).toFixed(0)}%</strong></div>
+      <div style="font-size:11px;color:var(--dim);margin-top:10px">Regole attivate:<br><strong>${fc.n_attivate||0}/25</strong></div>
+    </div>`;
+
+  // Storia regime
+  const rh = document.getElementById('regime-history');
+  (d.storia_regime||[]).slice(-20).forEach(r => {
+    rh.innerHTML += `<span class="rh-pill ${r.regime}">${r.data.slice(5)} ${cap1(r.regime)} ${r.conf}%</span>`;
+  });
+
+  // Versioni
+  const vb = document.getElementById('ver-body');
+  (d.versioni||[]).slice().reverse().slice(0,20).forEach(v => {
+    const fc_v = v.forecast||{};
+    const col = REGIME_COLORS[v.regime]||'#666';
+    vb.innerHTML += `<tr>
+      <td style="font-family:monospace;font-size:11px">${v.data}</td>
+      <td style="color:${col};font-weight:600;text-transform:capitalize">${v.regime||'—'}</td>
+      <td style="font-family:monospace">${v.conf||'—'}%</td>
+      <td style="font-family:monospace">${fmtC(v.capitale)}</td>
+      <td style="font-family:monospace">${(v.composizione||[]).length}</td>
+      <td style="color:${REGIME_COLORS[fc_v.regime_4w]||'var(--dim)'};text-transform:capitalize">${fc_v.regime_4w||'—'}</td>
+      <td style="font-family:monospace">${fc_v.peso_futuro!=null?(fc_v.peso_futuro*100).toFixed(0)+'%':'—'}</td>
+    </tr>`;
+  });
+
+  // ── CONFRONTO ─────────────────────────────────────────────────────
+  const cb2 = document.getElementById('corr-box');
+  const corr = d.corr_raptor;
+  const corrLabel = corr==null ? 'N/D' : corr.toFixed(2);
+  const corrColor = corr==null ? '#6b7280' : Math.abs(corr)<0.3 ? '#16a34a' : Math.abs(corr)<0.6 ? '#b45309' : '#dc2626';
+  const corrDesc  = corr==null ? '—' : Math.abs(corr)<0.3 ? 'Bassa — buona diversificazione' : Math.abs(corr)<0.6 ? 'Moderata' : 'Alta — sistemi correlati';
+  cb2.innerHTML = `
+    <div class="corr-item">
+      <div class="cv" style="color:${corrColor}">${corrLabel}</div>
+      <div class="cl">Correlazione ETP vs RAPTOR</div>
+      <div class="cs" style="background:${corrColor}20;color:${corrColor}">${corrDesc}</div>
+      <div style="font-size:10px;color:var(--dim);margin-top:6px">n=${d.corr_raptor_n||'—'} settimane comuni</div>
+    </div>
+    <div class="corr-item">
+      <div class="cv">${d.benchmark_perf!=null?fmt(d.benchmark_perf):'—'}</div>
+      <div class="cl">IWMO.MI benchmark</div>
+      <div class="cs" style="background:${(d.outperformance||0)>=0?'#dcfce7':'#fee2e2'};color:${(d.outperformance||0)>=0?'var(--green)':'var(--red)'}">
+        Outperf: ${d.outperformance!=null?fmt(d.outperformance):'—'}
+      </div>
+    </div>
+    <div class="corr-item">
+      <div class="cv">${d.benchmark2_perf!=null?fmt(d.benchmark2_perf):'—'}</div>
+      <div class="cl">VWCE.DE benchmark</div>
+      <div class="cs" style="background:${(d.outperformance2||0)>=0?'#dcfce7':'#fee2e2'};color:${(d.outperformance2||0)>=0?'var(--green)':'var(--red)'}">
+        Outperf: ${d.outperformance2!=null?fmt(d.outperformance2):'—'}
+      </div>
+    </div>`;
+
+  const bk = document.getElementById('bm-kpi');
+  [{k:'IWMO perf',v:d.benchmark_perf!=null?fmt(d.benchmark_perf):'—',sub:'da '+d.backtest_start},
+   {k:'ETP vs IWMO',v:d.outperformance!=null?fmt(d.outperformance):'—',sub:'outperformance'},
+   {k:'VWCE perf',v:d.benchmark2_perf!=null?fmt(d.benchmark2_perf):'—',sub:'da '+d.backtest_start},
+   {k:'ETP vs VWCE',v:d.outperformance2!=null?fmt(d.outperformance2):'—',sub:'outperformance'},
+  ].forEach(k=>{
+    bk.innerHTML+=`<div class="kpi"><div class="k">${k.k}</div><div class="v">${k.v}</div><div class="sub">${k.sub}</div></div>`;
+  });
+}
+
+// ── CHARTS ─────────────────────────────────────────────────────────
+function initC(id, h) {
+  const c = document.getElementById(id);
+  const W = c.parentElement.clientWidth;
+  c.width=W; c.style.width=W+'px'; c.height=h;
+  return {c, ctx:c.getContext('2d'), W, H:h};
+}
+
+function drawEquity() {
+  if (!DATA) return;
+  const eq = DATA.equity_mensile||[];
+  if (!eq.length) return;
+  const {c,ctx,W,H} = initC('c-equity',260);
+  const PAD={l:65,r:20,t:12,b:28};
+  const cw=W-PAD.l-PAD.r, ch=H-PAD.t-PAD.b;
+  const vals=eq.map(e=>e.valore), labels=eq.map(e=>e.mese);
+  const base=100000;
+  const minV=Math.min(...vals,base)*0.995, maxV=Math.max(...vals)*1.005;
+  const sx=i=>PAD.l+i/(vals.length-1)*cw;
+  const sy=v=>PAD.t+(1-(v-minV)/(maxV-minV))*ch;
+  ctx.fillStyle='#fff'; ctx.fillRect(0,0,W,H);
+  ctx.strokeStyle='#f0f0f0'; ctx.lineWidth=1;
+  for(let i=0;i<=4;i++){const y=PAD.t+ch*i/4; ctx.beginPath(); ctx.moveTo(PAD.l,y); ctx.lineTo(W-PAD.r,y); ctx.stroke(); ctx.fillStyle='#999'; ctx.font='9px monospace'; ctx.fillText(Math.round((maxV-(maxV-minV)*i/4)/1000)+'k€',2,y+4);}
+  ctx.strokeStyle='#e5e5e5'; ctx.setLineDash([4,4]);
+  ctx.beginPath(); ctx.moveTo(PAD.l,sy(base)); ctx.lineTo(W-PAD.r,sy(base)); ctx.stroke(); ctx.setLineDash([]);
+  ctx.beginPath(); ctx.moveTo(sx(0),sy(vals[0])); vals.forEach((v,i)=>ctx.lineTo(sx(i),sy(v))); ctx.lineTo(sx(vals.length-1),H-PAD.b); ctx.lineTo(PAD.l,H-PAD.b); ctx.closePath();
+  const g=ctx.createLinearGradient(0,PAD.t,0,H-PAD.b); g.addColorStop(0,'rgba(124,58,237,0.2)'); g.addColorStop(1,'rgba(124,58,237,0)');
+  ctx.fillStyle=g; ctx.fill();
+  ctx.strokeStyle='#7c3aed'; ctx.lineWidth=2; ctx.beginPath(); vals.forEach((v,i)=>i===0?ctx.moveTo(sx(i),sy(v)):ctx.lineTo(sx(i),sy(v))); ctx.stroke();
+  ctx.fillStyle='#999'; ctx.font='9px monospace'; labels.forEach((l,i)=>{if(i%2===0||i===labels.length-1)ctx.fillText(l.slice(2),sx(i)-12,H-PAD.b+14);});
+  ctx.fillStyle='#7c3aed'; ctx.font='bold 11px monospace'; ctx.fillText(fmtC(vals[vals.length-1]),sx(vals.length-1)+4,sy(vals[vals.length-1])+4);
+}
+
+function drawDD() {
+  if (!DATA) return;
+  const dds = DATA.drawdown_series||[];
+  if (!dds.length) return;
+  const {c,ctx,W,H} = initC('c-dd',200);
+  const PAD={l:55,r:12,t:12,b:28};
+  const cw=W-PAD.l-PAD.r, ch=H-PAD.t-PAD.b;
+  const vals=dds.map(d=>d.dd), labels=dds.map(d=>d.data);
+  const minV=Math.min(...vals)*1.05, maxV=0.5;
+  const sx=i=>PAD.l+i/(vals.length-1)*cw;
+  const sy=v=>PAD.t+(1-(v-minV)/(maxV-minV))*ch;
+  ctx.fillStyle='#fff'; ctx.fillRect(0,0,W,H);
+  // Griglia
+  for(let i=0;i<=4;i++){const v=minV+(maxV-minV)*i/4; const y=PAD.t+ch*(1-i/4); ctx.strokeStyle='#f0f0f0'; ctx.lineWidth=1; ctx.beginPath(); ctx.moveTo(PAD.l,y); ctx.lineTo(W-PAD.r,y); ctx.stroke(); ctx.fillStyle='#999'; ctx.font='9px monospace'; ctx.fillText(v.toFixed(1)+'%',2,y+4);}
+  // Linea 0
+  ctx.strokeStyle='#e5e5e5'; ctx.setLineDash([4,4]); ctx.beginPath(); ctx.moveTo(PAD.l,sy(0)); ctx.lineTo(W-PAD.r,sy(0)); ctx.stroke(); ctx.setLineDash([]);
+  // Area
+  ctx.beginPath(); ctx.moveTo(sx(0),sy(0)); vals.forEach((v,i)=>ctx.lineTo(sx(i),sy(v))); ctx.lineTo(sx(vals.length-1),sy(0)); ctx.closePath();
+  const g=ctx.createLinearGradient(0,sy(minV),0,sy(0)); g.addColorStop(0,'rgba(220,38,38,0.3)'); g.addColorStop(1,'rgba(220,38,38,0.05)');
+  ctx.fillStyle=g; ctx.fill();
+  ctx.strokeStyle='#dc2626'; ctx.lineWidth=1.5; ctx.beginPath(); vals.forEach((v,i)=>i===0?ctx.moveTo(sx(i),sy(v)):ctx.lineTo(sx(i),sy(v))); ctx.stroke();
+  // Labels X
+  ctx.fillStyle='#999'; ctx.font='9px monospace';
+  const step=Math.max(1,Math.floor(vals.length/8));
+  labels.forEach((l,i)=>{if(i%step===0)ctx.fillText(l.slice(5),sx(i)-12,H-PAD.b+14);});
+  // Max DD label
+  const minIdx=vals.indexOf(Math.min(...vals));
+  ctx.fillStyle='#dc2626'; ctx.font='bold 10px monospace';
+  ctx.fillText(vals[minIdx].toFixed(1)+'%',sx(minIdx)+4,sy(vals[minIdx])-4);
+}
+
+function drawRollingS() {
+  if (!DATA) return;
+  const rs = DATA.rolling_sharpe||[];
+  if (!rs.length) return;
+  const {c,ctx,W,H} = initC('c-sharpe',180);
+  const PAD={l:45,r:12,t:12,b:28};
+  const cw=W-PAD.l-PAD.r, ch=H-PAD.t-PAD.b;
+  const vals=rs.map(r=>r.sharpe), labels=rs.map(r=>r.data||'');
+  const minV=Math.min(...vals)-0.3, maxV=Math.max(...vals)+0.3;
+  const sx=i=>PAD.l+i/(vals.length-1)*cw;
+  const sy=v=>PAD.t+(1-(v-minV)/(maxV-minV))*ch;
+  ctx.fillStyle='#fff'; ctx.fillRect(0,0,W,H);
+  // Griglia
+  for(let i=0;i<=4;i++){const v=minV+(maxV-minV)*i/4; const y=PAD.t+ch*(1-i/4); ctx.strokeStyle='#f0f0f0'; ctx.lineWidth=1; ctx.beginPath(); ctx.moveTo(PAD.l,y); ctx.lineTo(W-PAD.r,y); ctx.stroke(); ctx.fillStyle='#999'; ctx.font='9px monospace'; ctx.fillText(v.toFixed(1),2,y+4);}
+  // Linea 0
+  if (minV < 0) { const y0=sy(0); ctx.strokeStyle='#e5e5e5'; ctx.setLineDash([4,4]); ctx.beginPath(); ctx.moveTo(PAD.l,y0); ctx.lineTo(W-PAD.r,y0); ctx.stroke(); ctx.setLineDash([]); }
+  // Area colorata sopra/sotto 0
+  vals.forEach((v,i)=>{
+    if(i===0) return;
+    const x0=sx(i-1),x1=sx(i);
+    const y0=sy(Math.min(vals[i-1],0)), y1=sy(Math.max(v,0));
+    const yv=sy(v), yp=sy(vals[i-1]);
+    ctx.fillStyle=v>=0?'rgba(22,163,74,0.15)':'rgba(220,38,38,0.15)';
+    const zeroY=sy(0);
+    ctx.beginPath(); ctx.moveTo(x0,yp); ctx.lineTo(x1,yv); ctx.lineTo(x1,zeroY); ctx.lineTo(x0,zeroY); ctx.closePath(); ctx.fill();
+  });
+  // Linea
+  ctx.lineWidth=2; ctx.beginPath();
+  vals.forEach((v,i)=>{
+    ctx.strokeStyle=v>=0?'#16a34a':'#dc2626';
+    if(i===0){ctx.moveTo(sx(i),sy(v));return;}
+    ctx.lineTo(sx(i),sy(v));
+  });
+  ctx.stroke();
+  // Labels X
+  ctx.fillStyle='#999'; ctx.font='9px monospace';
+  const step=Math.max(1,Math.floor(vals.length/8));
+  labels.forEach((l,i)=>{if(l&&i%step===0)ctx.fillText(l.slice(5),sx(i)-12,H-PAD.b+14);});
+  // Valore attuale
+  ctx.fillStyle=vals[vals.length-1]>=0?'#16a34a':'#dc2626';
+  ctx.font='bold 10px monospace';
+  ctx.fillText(vals[vals.length-1].toFixed(2),sx(vals.length-1)+4,sy(vals[vals.length-1])-4);
+}
+
+function drawDonut(comp) {
+  const {c,ctx,W,H} = initC('c-donut',280);
+  const catTotals={};
+  comp.forEach(p=>{ catTotals[p.cat]=(catTotals[p.cat]||0)+(p.peso||0); });
+  const cx=W/2, cy=H/2-20, R=Math.min(W,H)/2-35, r=R*0.5;
+  ctx.fillStyle='#fff'; ctx.fillRect(0,0,W,H);
+  let startAngle=-Math.PI/2;
+  const entries=Object.entries(catTotals).sort((a,b)=>b[1]-a[1]);
+  const total=entries.reduce((s,[,v])=>s+v,0);
+  entries.forEach(([cat,pct])=>{
+    const angle=(pct/total)*2*Math.PI;
+    ctx.beginPath(); ctx.moveTo(cx,cy); ctx.arc(cx,cy,R,startAngle,startAngle+angle); ctx.closePath();
+    ctx.fillStyle=CAT_COLORS[cat]||'#ccc'; ctx.fill();
+    ctx.strokeStyle='#fff'; ctx.lineWidth=2; ctx.stroke();
+    if(pct>5){const ma=startAngle+angle/2; const lx=cx+(R*0.72)*Math.cos(ma); const ly=cy+(R*0.72)*Math.sin(ma); ctx.fillStyle='#fff'; ctx.font='bold 10px monospace'; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText(pct.toFixed(0)+'%',lx,ly);}
+    startAngle+=angle;
+  });
+  ctx.beginPath(); ctx.arc(cx,cy,r,0,2*Math.PI); ctx.fillStyle='#fff'; ctx.fill();
+  ctx.fillStyle='#111'; ctx.font='bold 13px monospace'; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText(comp.length+' ETF',cx,cy);
+  // Legenda
+  ctx.textAlign='left'; ctx.textBaseline='alphabetic';
+  let lx=8, ly=H-10;
+  entries.forEach(([cat])=>{
+    ctx.fillStyle=CAT_COLORS[cat]||'#ccc'; ctx.fillRect(lx,ly-8,8,8);
+    ctx.fillStyle='#555'; ctx.font='9px monospace';
+    const label=cat.replace(/_/g,' ');
+    ctx.fillText(label,lx+10,ly);
+    lx+=ctx.measureText(label).width+24;
+    if(lx>W-80){lx=8; ly-=14;}
+  });
+}
+
+window.addEventListener('resize', ()=>{
+  if(document.getElementById('tab-overview').classList.contains('active')) drawEquity();
+  if(document.getElementById('tab-rischio').classList.contains('active')){drawDD(); drawRollingS();}
+});
+
+load();
+</script>
+</body>
+</html>
