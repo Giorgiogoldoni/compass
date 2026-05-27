@@ -1,0 +1,37 @@
+name: COMPASS Factor — Data Fetch
+on:
+  schedule:
+    - cron: '0 22 * * 1-5'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install dependencies
+        run: pip install yfinance requests
+      - name: Run Factor Strategy
+        run: python compass_factor.py
+      - name: Run 3 Linee Strategy
+        run: python compass_3linee.py
+      - name: Run ETP Strategy
+        run: python compass_etp.py
+      - name: Run Alert Check
+        run: python compass_alert.py
+      - name: Commit and push
+        run: |
+          git config user.name "COMPASS Factor Bot"
+          git config user.email "compass-factor@raptor.rwm"
+          git add -f data/ || true
+          git diff --cached --quiet || git commit -m "COMPASS Factor: aggiornamento dati $(date -u '+%Y-%m-%d %H:%M') UTC"
+          git push
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
