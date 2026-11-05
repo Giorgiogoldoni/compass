@@ -1,0 +1,53 @@
+name: COMPASS Factor — Data Fetch
+on:
+  schedule:
+    - cron: '0 22 * * 1-5'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install dependencies
+        run: pip install yfinance requests
+      - name: Locate scripts
+        run: |
+          f=$(find . -name compass_factor.py -not -path './.git/*' | head -n1)
+          if [ -z "$f" ]; then
+            echo "ERRORE: compass_factor.py non trovato nel repo. Contenuto:"
+            find . -maxdepth 2 -not -path './.git*' | sort | head -60
+            exit 1
+          fi
+          d=$(dirname "$f")
+          echo "Script trovati in: $d"
+          echo "SCRIPT_DIR=$d" >> "$GITHUB_ENV"
+      - name: Run Factor Strategy
+        working-directory: ${{ env.SCRIPT_DIR }}
+        run: python compass_factor.py
+      - name: Run 3 Linee Strategy
+        working-directory: ${{ env.SCRIPT_DIR }}
+        run: python compass_3linee.py
+      - name: Run ETP Strategy
+        working-directory: ${{ env.SCRIPT_DIR }}
+        run: python compass_etp.py
+      - name: Run Alert Check
+        working-directory: ${{ env.SCRIPT_DIR }}
+        run: python compass_alert.py
+      - name: Commit and push
+        run: |
+          git config user.name "COMPASS Factor Bot"
+          git config user.email "compass-factor@raptor.rwm"
+          git add -f data/ 2>/dev/null || true
+          git add -f "$SCRIPT_DIR/data/" 2>/dev/null || true
+          git diff --cached --quiet || git commit -m "COMPASS Factor: aggiornamento dati $(date -u '+%Y-%m-%d %H:%M') UTC"
+          git push
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
